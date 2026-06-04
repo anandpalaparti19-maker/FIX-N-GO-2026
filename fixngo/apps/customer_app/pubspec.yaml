@@ -1,5 +1,8 @@
-name: fix_n_go_customer
-description: Customer app (migrated)
+name: fixngo_customer
+description: >
+  Official customer application for Fix-N-Go Private Limited. 
+  A comprehensive mobile repair service platform providing on-demand 
+  booking, real-time tracking, and secure payment solutions.
 publish_to: 'none'
 version: 1.0.0+1
 environment:
@@ -10,6 +13,10 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   http: ^1.2.2
+  google_fonts: ^6.2.1
+  shared_preferences: ^2.3.2
+  provider: ^6.1.5+1
+  flutter_stripe: ^12.6.0
 
 dev_dependencies:
   flutter_test:
@@ -18,12 +25,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/
-  fonts:
-    - family: Outfit
-      fonts:
-        - asset: assets/fonts/Outfit-Regular.ttf
-    - family: Nunito
-      fonts:
-        - asset: assets/fonts/Nunito-Regular.ttf

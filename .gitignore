@@ -3,3 +3,10 @@ android/nul
 build/
 .dart_tool/
 .idea/
+
+# Monorepo generated folders
+fixngo/backend/node_modules/
+fixngo/backend/.env
+fixngo/apps/customer_app/.dart_tool/
+fixngo/apps/customer_app/build/
+fixngo/apps/customer_app/.packages

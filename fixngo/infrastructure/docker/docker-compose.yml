@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: fixngo_mongo
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - fixngo_net
+    environment:
+      MONGO_INITDB_DATABASE: fixngo
+
+  backend:
+    build:
+      context: ../../..
+      dockerfile: fixngo/infrastructure/docker/backend.Dockerfile
+    container_name: fixngo_backend
+    restart: unless-stopped
+    env_file:
+      - ../../backend/.env
+    environment:
+      MONGO_URI: mongodb://mongo:27017/fixngo
+      NODE_ENV: production
+    ports:
+      - '5000:5000'
+    depends_on:
+      - mongo
+    networks:
+      - fixngo_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: fixngo_nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+    networks:
+      - fixngo_net
+
+volumes:
+  mongo_data:
+
+networks:
+  fixngo_net:
+    driver: bridge

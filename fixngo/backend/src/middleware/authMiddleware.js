@@ -11,9 +11,17 @@ const protect = async (req, res, next) => {
     return res.status(401).json({ message: 'Not authorized, token missing' });
   }
 
+  if (!process.env.JWT_SECRET) {
+    console.error('FATAL: JWT_SECRET environment variable is not set');
+    return res.status(500).json({ message: 'Server misconfiguration' });
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decoded.id).select('-password');
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authorized, user not found' });
+    }
     next();
   } catch (error) {
     return res.status(401).json({ message: 'Not authorized, token invalid' });

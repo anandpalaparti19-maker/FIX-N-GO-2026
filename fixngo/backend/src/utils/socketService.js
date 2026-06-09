@@ -10,7 +10,7 @@ const connectedUsers = new Map(); // userId -> socket.id mapping
 const initializeSocket = (server) => {
   io = socketIO(server, {
     cors: {
-      origin: '*',
+      origin: (process.env.CORS_ORIGINS || 'http://localhost:5173').split(',').map(o => o.trim()),
       methods: ['GET', 'POST'],
     },
   });

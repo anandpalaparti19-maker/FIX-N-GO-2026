@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
 import 'notifications_screen.dart';
 import 'select_device_screen.dart';
@@ -9,25 +11,35 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgDark,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(context),
-              _buildHeroCard(context),
-              _buildServicesSection(context),
-              _buildPopularRepairs(context),
-              _buildHowItWorks(context),
-              _buildReviewsSection(context),
-              const SizedBox(height: 20),
-            ],
+    return Consumer<AuthProvider>(
+      builder: (context, auth, _) {
+        final profile = auth.userProfile ?? {};
+        final userName = (profile['name'] as String?)?.isNotEmpty == true
+            ? profile['name'] as String
+            : (profile['email'] as String?) ?? 'there';
+        final userEmail = (profile['email'] as String?) ?? '';
+
+        return Scaffold(
+          backgroundColor: AppColors.bgDark,
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(context),
+                  _buildHeroCard(context, userName, userEmail),
+                  _buildServicesSection(context),
+                  _buildPopularRepairs(context),
+                  _buildHowItWorks(context),
+                  _buildReviewsSection(context),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -105,7 +117,9 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroCard(BuildContext context) {
+  Widget _buildHeroCard(BuildContext context, String userName, String userEmail) {
+    // Extract first name for greeting
+    final firstName = userName.contains('@') ? userName.split('@').first : userName.split(' ').first;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Container(
@@ -133,12 +147,28 @@ class HomeScreen extends StatelessWidget {
               children: [
                 const Text('👋', style: TextStyle(fontSize: 22)),
                 const SizedBox(width: 8),
-                Text(
-                  'Hi Rahul',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w500,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hi $firstName',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (userEmail.isNotEmpty)
+                        Text(
+                          userEmail,
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
                   ),
                 ),
               ],

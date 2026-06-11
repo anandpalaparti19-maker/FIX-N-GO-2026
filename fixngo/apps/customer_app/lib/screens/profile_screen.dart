@@ -106,8 +106,8 @@ class ProfileScreen extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, auth, _) {
         final profile = auth.userProfile ?? {};
-        final name = profile['name'] as String? ?? 'Rahul Sharma';
-        final phone = profile['phone'] as String? ?? '+91 98765 43210';
+        final name = profile['name'] as String? ?? 'Customer';
+        final phone = profile['phone'] as String? ?? '';
         final email = profile['email'] as String? ?? '';
 
         return Scaffold(
@@ -197,11 +197,18 @@ class ProfileScreen extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                               color: AppColors.textWhite,
                             )),
-                        Text(phone.isNotEmpty ? phone : email,
-                            style: GoogleFonts.poppins(
-                              fontSize: 14,
-                              color: AppColors.textSecondary,
-                            )),
+                        if (email.isNotEmpty)
+                          Text(email,
+                              style: GoogleFonts.poppins(
+                                fontSize: 14,
+                                color: AppColors.textSecondary,
+                              )),
+                        if (phone.isNotEmpty)
+                          Text(phone,
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: AppColors.textMuted,
+                              )),
                         const SizedBox(height: 20),
                         // Stats row
                         Row(

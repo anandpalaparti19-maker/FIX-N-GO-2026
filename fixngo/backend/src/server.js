@@ -15,6 +15,7 @@ const rateLimit = require('express-rate-limit');
 const mongoSanitize = require('express-mongo-sanitize');
 const colors = require('colors');
 const http = require('http');
+const path = require('path');
 const connectDB = require('./config/db');
 const routes = require('./routes');
 const { errorHandler } = require('./middleware/errorMiddleware');
@@ -74,6 +75,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // NoSQL injection sanitization
 app.use(mongoSanitize());
+
+// Serve static uploads folder (for KYC and Profile photos)
+app.use('/api/uploads', express.static(path.join(__dirname, '../../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
 // ── Database ─────────────────────────────────────────────────────────────────
 connectDB();

@@ -51,15 +51,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
 
     setState(() => _loading = true);
-    final success = await _api.login(_emailCtrl.text.trim(), _passCtrl.text);
-    setState(() => _loading = false);
-
-    if (success) {
+    try {
+      final success = await _api.login(_emailCtrl.text.trim(), _passCtrl.text);
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
+      if (success) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } catch (e) {
       if (!mounted) return;
-      _showSnack('Invalid credentials. Please try again.', isError: true);
+      _showSnack(e.toString().replaceAll('Exception: ', ''), isError: true);
+    } finally {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
     }
   }
 

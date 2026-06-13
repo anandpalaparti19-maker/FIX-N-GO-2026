@@ -48,10 +48,13 @@ class ApiService {
         final data = jsonDecode(response.body);
         await saveToken(data['token']);
         return true;
+      } else {
+        final errorData = jsonDecode(response.body);
+        throw Exception(errorData['message'] ?? 'Invalid credentials');
       }
-      return false;
     } catch (e) {
-      return false;
+      if (e is Exception) rethrow;
+      throw Exception('Connection failed');
     }
   }
 

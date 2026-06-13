@@ -73,6 +73,8 @@ const formatOrderForCustomer = (order) => {
     technicianName: order.technician || tech?.name || '',
     technicianRating: tech?.technicianMeta?.rating,
     technicianPhone: tech?.phone || '',
+    technicianLat: tech?.lastLat || null,
+    technicianLng: tech?.lastLng || null,
     statusHistory: order.statusHistory || [],
   };
 };
@@ -88,7 +90,7 @@ const getOrders = async (req, res, next) => {
     }
 
     const orders = await Order.find(query)
-      .populate('technicianUser', 'name phone technicianMeta')
+      .populate('technicianUser', 'name phone technicianMeta lastLat lastLng')
       .sort({ [sortBy]: -1 });
 
     res.json({
@@ -185,7 +187,7 @@ const createOrder = async (req, res, next) => {
     // Populate and return
     const populated = await Order.findById(order._id).populate(
       'technicianUser',
-      'name phone technicianMeta'
+      'name phone technicianMeta lastLat lastLng'
     );
 
     res.status(201).json({
@@ -203,7 +205,7 @@ const getOrderById = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id).populate(
       'technicianUser',
-      'name phone technicianMeta'
+      'name phone technicianMeta lastLat lastLng'
     );
 
     if (!order) {
@@ -235,7 +237,7 @@ const acceptOrder = async (req, res, next) => {
 
     const order = await Order.findById(req.params.id).populate(
       'technicianUser',
-      'name phone technicianMeta'
+      'name phone technicianMeta lastLat lastLng'
     );
 
     if (!order) {

@@ -6,7 +6,7 @@ import '../theme/app_theme.dart';
 import 'order_detail_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
-  const OrdersScreen({super.key});
+  OrdersScreen({super.key});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -96,13 +96,13 @@ class _OrdersScreenState extends State<OrdersScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -111,24 +111,24 @@ class _OrdersScreenState extends State<OrdersScreen>
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textWhite,
+                        color: Colors.white,
                       ),
                     ),
                   ),
                   IconButton(
                     onPressed: _loadOrders,
-                    icon: const Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
+                    icon: Icon(Icons.refresh_rounded, color: AppColors.textSecondary),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
-                color: AppColors.bgCard,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.borderColor),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: TabBar(
                 controller: _tabController,
@@ -136,23 +136,23 @@ class _OrdersScreenState extends State<OrdersScreen>
                   color: AppColors.brandBlue,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                indicatorPadding: const EdgeInsets.all(4),
+                indicatorPadding: EdgeInsets.all(4),
                 labelColor: Colors.white,
                 unselectedLabelColor: AppColors.textMuted,
                 labelStyle: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
                 unselectedLabelStyle: GoogleFonts.poppins(fontSize: 13),
                 dividerColor: Colors.transparent,
-                tabs: const [
+                tabs: [
                   Tab(text: 'Active'),
                   Tab(text: 'Completed'),
                   Tab(text: 'Cancelled'),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: _loading
-                  ? const Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
+                  ? Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
                   : _errorMsg != null
                       ? _buildError()
                       : TabBarView(
@@ -175,17 +175,17 @@ class _OrdersScreenState extends State<OrdersScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline_rounded, color: AppColors.statusRed, size: 48),
-          const SizedBox(height: 12),
+          Icon(Icons.error_outline_rounded, color: AppColors.statusRed, size: 48),
+          SizedBox(height: 12),
           Text(
             _errorMsg ?? 'Failed to load orders',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 14),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _loadOrders,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
+            icon: Icon(Icons.refresh_rounded, size: 18),
             label: Text('Retry', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
@@ -206,8 +206,8 @@ class _OrdersScreenState extends State<OrdersScreen>
       onRefresh: _loadOrders,
       color: AppColors.brandBlue,
       child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+        physics: AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
         itemCount: orders.length,
         itemBuilder: (context, i) {
           final order = orders[i];
@@ -230,13 +230,13 @@ class _OrdersScreenState extends State<OrdersScreen>
               }
             },
             child: Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.all(16),
+              margin: EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.bgCard,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isActive ? AppColors.brandBlue.withValues(alpha: 0.3) : AppColors.borderColor,
+                  color: isActive ? AppColors.brandBlue.withValues(alpha: 0.3) : Theme.of(context).colorScheme.outline,
                 ),
                 boxShadow: isActive
                     ? [BoxShadow(color: AppColors.brandBlue.withValues(alpha: 0.08), blurRadius: 16)]
@@ -256,7 +256,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                         ),
                         child: Icon(_statusIcon(status), color: statusCol, size: 24),
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +266,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textWhite,
+                                color: Colors.white,
                               ),
                             ),
                             if (issues.isNotEmpty)
@@ -287,11 +287,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textWhite,
+                              color: Colors.white,
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
                               color: statusCol.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(8),
@@ -309,20 +309,20 @@ class _OrdersScreenState extends State<OrdersScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Container(height: 1, color: AppColors.borderColor),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 12),
+                  Container(height: 1, color: Theme.of(context).colorScheme.outline),
+                  SizedBox(height: 10),
                   Row(
                     children: [
-                      const Icon(Icons.receipt_rounded, size: 14, color: AppColors.textMuted),
-                      const SizedBox(width: 4),
+                      Icon(Icons.receipt_rounded, size: 14, color: AppColors.textMuted),
+                      SizedBox(width: 4),
                       Text(
                         orderId.length > 8 ? '#${orderId.substring(orderId.length - 6).toUpperCase()}' : orderId,
                         style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
                       ),
-                      const Spacer(),
-                      const Icon(Icons.access_time_rounded, size: 13, color: AppColors.textMuted),
-                      const SizedBox(width: 3),
+                      Spacer(),
+                      Icon(Icons.access_time_rounded, size: 13, color: AppColors.textMuted),
+                      SizedBox(width: 3),
                       Text(
                         _formatDate(createdAt),
                         style: GoogleFonts.poppins(fontSize: 12, color: AppColors.textMuted),
@@ -330,7 +330,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                     ],
                   ),
                   if (isActive && orderId.isNotEmpty && orderId.length > 8) ...[
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -341,7 +341,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brandBlue,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 0,
                         ),
@@ -362,7 +362,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   String _formatDate(String iso) {
     try {
       final dt = DateTime.parse(iso);
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return '${months[dt.month - 1]} ${dt.day}';
     } catch (_) {
@@ -379,13 +379,13 @@ class _OrdersScreenState extends State<OrdersScreen>
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.receipt_long_rounded, size: 36, color: AppColors.textMuted),
+            child: Icon(Icons.receipt_long_rounded, size: 36, color: AppColors.textMuted),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             message,
             style: GoogleFonts.poppins(

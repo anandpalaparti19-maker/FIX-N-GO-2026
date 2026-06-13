@@ -3,7 +3,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+  EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();
@@ -57,7 +57,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Profile updated successfully!'),
+          content: Text('Profile updated successfully!'),
           backgroundColor: AppColors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -67,7 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Failed to update profile'),
+          content: Text('Failed to update profile'),
           backgroundColor: AppColors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -79,26 +79,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
           ),
         ),
-        title: const Text('Edit Profile'),
+        title: Text('Edit Profile'),
       ),
       body: _loading 
-        ? const Center(child: CircularProgressIndicator(color: AppColors.red))
+        ? Center(child: CircularProgressIndicator(color: AppColors.red))
         : SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -110,10 +110,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     height: 100,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.border, width: 3),
-                      color: AppColors.card,
+                      border: Border.all(color: Theme.of(context).colorScheme.outline, width: 3),
+                      color: Theme.of(context).colorScheme.surface,
                     ),
-                    child: const Icon(Icons.person_rounded, size: 50, color: AppColors.grey),
+                    child: Icon(Icons.person_rounded, size: 50, color: AppColors.grey),
                   ),
                   Positioned(
                     bottom: 0,
@@ -121,49 +121,49 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: Container(
                       width: 32,
                       height: 32,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: AppColors.red,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.camera_alt_rounded, size: 16, color: Colors.white),
+                      child: Icon(Icons.camera_alt_rounded, size: 16, color: Colors.white),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            const SectionLabel('Full Name'),
+            SizedBox(height: 32),
+            SectionLabel('Full Name'),
             TextField(
               controller: _nameCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter your full name',
                 prefixIcon: Icon(Icons.person_outline_rounded),
               ),
             ),
-            const SizedBox(height: 20),
-            const SectionLabel('Phone Number'),
+            SizedBox(height: 20),
+            SectionLabel('Phone Number'),
             TextField(
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter your phone number',
                 prefixIcon: Icon(Icons.phone_outlined),
               ),
             ),
-            const SizedBox(height: 20),
-            const SectionLabel('Email Address'),
+            SizedBox(height: 20),
+            SectionLabel('Email Address'),
             TextField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter your email',
                 prefixIcon: Icon(Icons.email_outlined),
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
             PrimaryButton(
               label: 'Save Changes',
               isLoading: _saving,

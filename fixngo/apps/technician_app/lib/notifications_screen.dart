@@ -41,34 +41,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final unreadCount = _notifications.where((n) => n['read'] != true).length;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
           ),
         ),
         title: Row(
           children: [
-            const Text('Notifications'),
+            Text('Notifications'),
             if (unreadCount > 0) ...[
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: AppColors.red,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '$unreadCount',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -82,7 +82,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (unreadCount > 0)
             TextButton(
               onPressed: _markAllRead,
-              child: const Text(
+              child: Text(
                 'Mark all read',
                 style: TextStyle(color: AppColors.grey, fontSize: 13),
               ),
@@ -90,12 +90,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         ],
       ),
       body: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         itemCount: _loading ? 1 : _notifications.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 6),
+        separatorBuilder: (_, _) => SizedBox(height: 6),
         itemBuilder: (context, i) {
           if (_loading) {
-            return const Padding(
+            return Padding(
               padding: EdgeInsets.only(top: 64),
               child: Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2)),
             );
@@ -115,12 +115,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              padding: const EdgeInsets.all(14),
+              padding: EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.card,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: read ? AppColors.border : AppColors.red.withValues(alpha: 0.3),
+                  color: read ? Theme.of(context).colorScheme.outline : AppColors.red.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -133,9 +133,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       color: AppColors.red.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.notifications_rounded, color: AppColors.red, size: 22),
+                    child: Icon(Icons.notifications_rounded, color: AppColors.red, size: 22),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +145,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             Expanded(
                               child: Text(
                                 n['title'] as String? ?? 'Notification',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
@@ -154,15 +154,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             ),
                             Text(
                               _formatTime(n['createdAt']?.toString()),
-                              style: const TextStyle(color: AppColors.grey, fontSize: 11),
+                              style: TextStyle(color: AppColors.grey, fontSize: 11),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           n['message'] as String? ?? '',
-                          style: const TextStyle(
-                            color: AppColors.greyLight,
+                          style: TextStyle(color: AppColors.greyLight,
                             fontSize: 12,
                             height: 1.4,
                           ),
@@ -174,8 +173,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     Container(
                       width: 8,
                       height: 8,
-                      margin: const EdgeInsets.only(left: 8, top: 3),
-                      decoration: const BoxDecoration(
+                      margin: EdgeInsets.only(left: 8, top: 3),
+                      decoration: BoxDecoration(
                         color: AppColors.red,
                         shape: BoxShape.circle,
                       ),

@@ -120,12 +120,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Row(
                 children: [
                   GestureDetector(
@@ -140,25 +140,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors.card,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.arrow_back_ios_new_rounded,
                         color: Colors.white,
                         size: 18,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           _step == 0 ? 'Personal Info' : 'Your Skills',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
@@ -166,7 +166,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         Text(
                           'Step ${_step + 1} of 2',
-                          style: const TextStyle(color: AppColors.grey, fontSize: 13),
+                          style: TextStyle(color: AppColors.grey, fontSize: 13),
                         ),
                       ],
                     ),
@@ -175,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              padding: EdgeInsets.fromLTRB(24, 16, 24, 0),
               child: Row(
                 children: [
                   Expanded(
@@ -187,12 +187,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Expanded(
                     child: Container(
                       height: 4,
                       decoration: BoxDecoration(
-                        color: _step >= 1 ? AppColors.red : AppColors.border,
+                        color: _step >= 1 ? AppColors.red : Theme.of(context).colorScheme.outline,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -200,15 +200,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: 24),
                 child: _step == 0 ? _buildStep0() : _buildStep1(),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              padding: EdgeInsets.fromLTRB(24, 0, 24, 32),
               child: PrimaryButton(
                 label: _step == 0 ? 'Continue' : 'Submit Registration',
                 isLoading: _loading,
@@ -240,44 +240,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SectionLabel('Full Name'),
         TextField(
           controller: _nameCtrl,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
           decoration: const InputDecoration(
             hintText: 'Enter your full name',
             prefixIcon: Icon(Icons.person_outline_rounded),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const SectionLabel('Phone Number'),
         TextField(
           controller: _phoneCtrl,
           keyboardType: TextInputType.phone,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
           decoration: const InputDecoration(
             labelText: 'Phone Number',
             hintText: 'Enter your phone number',
             prefixIcon: Icon(Icons.phone_outlined),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const SectionLabel('Email'),
         TextField(
           controller: _emailCtrl,
           keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
           decoration: const InputDecoration(
             hintText: 'your@email.com',
             prefixIcon: Icon(Icons.mail_outline_rounded),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         const SectionLabel('Password'),
         TextField(
           controller: _passCtrl,
           obscureText: _obscure,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: '••••••••',
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            prefixIcon: Icon(Icons.lock_outline_rounded),
             suffixIcon: IconButton(
               icon: Icon(
                 _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -289,11 +289,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         // TODO: Re-enable Aadhaar verification section after testing
         // Aadhaar section temporarily hidden
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         Center(
           child: GestureDetector(
             onTap: () => Navigator.pushReplacementNamed(context, '/login'),
-            child: const Text.rich(
+            child: Text.rich(
               TextSpan(
                 text: 'Already registered? ',
                 style: TextStyle(color: AppColors.grey, fontSize: 14),
@@ -307,7 +307,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
       ],
     );
   }
@@ -316,11 +316,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Select your repair specializations',
           style: TextStyle(color: AppColors.grey, fontSize: 14),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -338,12 +338,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.red.withValues(alpha: 0.15) : AppColors.card,
+                  color: selected ? AppColors.red.withValues(alpha: 0.15) : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: selected ? AppColors.red : AppColors.border,
+                    color: selected ? AppColors.red : Theme.of(context).colorScheme.outline,
                     width: selected ? 1.5 : 1,
                   ),
                 ),
@@ -351,7 +351,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (selected)
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(right: 6),
                         child: Icon(Icons.check_circle_rounded, color: AppColors.red, size: 16),
                       ),
@@ -369,7 +369,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             );
           }).toList(),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
       ],
     );
   }
@@ -383,11 +383,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,16 +403,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   child: Icon(icon, color: AppColors.red, size: 18),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(
               fileName ?? 'Tap to upload',
               maxLines: 1,

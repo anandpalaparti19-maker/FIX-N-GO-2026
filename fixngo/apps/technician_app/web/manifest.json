@@ -1,11 +1,11 @@
 {
-    "name": "FixTech - Technician",
-    "short_name": "FixTech",
+    "name": "Fix-N-Go Technician",
+    "short_name": "Fixer",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0D1B2A",
-    "theme_color": "#F5A623",
-    "description": "FixTech - Technician App for Fix-N-Go mobile repair service.",
+    "background_color": "#0D0A0A",
+    "theme_color": "#E53935",
+    "description": "Fix-N-Go Technician - Manage jobs, track earnings, and serve customers on demand.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

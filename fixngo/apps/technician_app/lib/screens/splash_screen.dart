@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           Center(
@@ -111,22 +111,23 @@ class _SplashScreenState extends State<SplashScreen>
                         Transform.scale(
                           scale: _pulseAnim.value,
                           child: Container(
-                            width: 100,
-                            height: 100,
+                            width: 140,
+                            height: 140,
                             decoration: BoxDecoration(
-                              color: AppColors.red,
-                              shape: BoxShape.circle,
+                              borderRadius: BorderRadius.circular(70),
                               boxShadow: AppShadows.red,
                             ),
-                            child: const Icon(
-                              Icons.build_rounded,
-                              size: 48,
-                              color: Colors.white,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(70),
+                              child: Image.asset(
+                                'assets/images/logo.png',
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        const Text(
+                        SizedBox(height: 24),
+                        Text(
                           'FIXER',
                           style: TextStyle(
                             color: Colors.white,
@@ -135,7 +136,7 @@ class _SplashScreenState extends State<SplashScreen>
                             letterSpacing: 6,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Text(
                           'Technician Partner App',
                           style: TextStyle(
@@ -161,7 +162,7 @@ class _SplashScreenState extends State<SplashScreen>
               builder: (context, child) {
                 return Opacity(
                   opacity: _opacityAnim.value,
-                  child: const Column(
+                  child: Column(
                     children: [
                       Text(
                         'Powered by Fix-N-Go',

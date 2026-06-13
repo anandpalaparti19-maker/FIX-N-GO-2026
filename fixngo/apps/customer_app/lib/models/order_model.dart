@@ -9,6 +9,8 @@ class OrderModel {
   final String? technicianUser;
   final double? technicianRating;
   final String? technicianPhone;
+  final double? technicianLat;
+  final double? technicianLng;
   final String paymentStatus;
   final String serviceAddress;
   final double? serviceLat;
@@ -26,6 +28,8 @@ class OrderModel {
     this.technicianUser,
     this.technicianRating,
     this.technicianPhone,
+    this.technicianLat,
+    this.technicianLng,
     required this.paymentStatus,
     required this.serviceAddress,
     this.serviceLat,
@@ -47,6 +51,8 @@ class OrderModel {
           : (json['technicianUser'] is Map ? json['technicianUser']['_id'] : null),
       technicianRating: (json['technicianRating'] as num?)?.toDouble(),
       technicianPhone: json['technicianPhone'],
+      technicianLat: (json['technicianLat'] as num?)?.toDouble(),
+      technicianLng: (json['technicianLng'] as num?)?.toDouble(),
       paymentStatus: json['paymentStatus'] ?? 'pending',
       serviceAddress: json['serviceAddress'] ?? '',
       serviceLat: (json['serviceLat'] as num?)?.toDouble(),

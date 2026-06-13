@@ -70,7 +70,7 @@ class _SupportScreenState extends State<SupportScreen> {
     final messenger = ScaffoldMessenger.of(context);
     if (_subjectCtrl.text.trim().isEmpty || _messageCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please enter both subject and message'),
           backgroundColor: AppColors.red,
         ),
@@ -92,11 +92,11 @@ class _SupportScreenState extends State<SupportScreen> {
       await _loadTickets();
       if (!mounted) return;
       messenger.showSnackBar(
-        const SnackBar(content: Text('Support request sent'), backgroundColor: AppColors.green),
+        SnackBar(content: Text('Support request sent'), backgroundColor: AppColors.green),
       );
     } else {
       messenger.showSnackBar(
-        const SnackBar(content: Text('Failed to send support request'), backgroundColor: AppColors.red),
+        SnackBar(content: Text('Failed to send support request'), backgroundColor: AppColors.red),
       );
     }
   }
@@ -104,21 +104,21 @@ class _SupportScreenState extends State<SupportScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Help & Support'),
-        backgroundColor: AppColors.bg,
+        title: Text('Help & Support'),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         foregroundColor: AppColors.white,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.arrow_back_ios_new_rounded,
               size: 18,
               color: Colors.white,
@@ -127,7 +127,7 @@ class _SupportScreenState extends State<SupportScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -143,7 +143,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     () => _showSupportHelp('Call Support', 'Please call customer support for urgent assistance.'),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: _contactCard(
                     Icons.chat_rounded,
@@ -158,33 +158,33 @@ class _SupportScreenState extends State<SupportScreen> {
               const SectionLabel('Raise a Request'),
               TextField(
                 controller: _subjectCtrl,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Subject',
                   prefixIcon: Icon(Icons.subject_rounded),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: _messageCtrl,
                 minLines: 4,
                 maxLines: 6,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: 'Describe your issue',
                   prefixIcon: Icon(Icons.message_rounded),
                   alignLabelWithHint: true,
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _category,
                       decoration: const InputDecoration(labelText: 'Category'),
-                      dropdownColor: AppColors.cardHigh,
-                      items: const [
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      items: [
                         DropdownMenuItem(value: 'general', child: Text('General')),
                         DropdownMenuItem(value: 'payment', child: Text('Payment')),
                         DropdownMenuItem(value: 'job', child: Text('Job Issue')),
@@ -193,13 +193,13 @@ class _SupportScreenState extends State<SupportScreen> {
                       onChanged: (value) => setState(() => _category = value ?? 'general'),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: _priority,
                       decoration: const InputDecoration(labelText: 'Priority'),
-                      dropdownColor: AppColors.cardHigh,
-                      items: const [
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      items: [
                         DropdownMenuItem(value: 'low', child: Text('Low')),
                         DropdownMenuItem(value: 'medium', child: Text('Medium')),
                         DropdownMenuItem(value: 'high', child: Text('High')),
@@ -209,7 +209,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -217,27 +217,27 @@ class _SupportScreenState extends State<SupportScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.red,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _submitting
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 18,
                           width: 18,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('Send Support Request'),
+                      : Text('Send Support Request'),
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
               const SectionLabel('My Tickets'),
               if (_loading)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2)),
                 )
               else if (_tickets.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 12),
                   child: Text('No support tickets yet.', style: TextStyle(color: AppColors.grey)),
                 )
@@ -245,12 +245,12 @@ class _SupportScreenState extends State<SupportScreen> {
                 ..._tickets.map((ticket) {
                   final item = ticket as Map<String, dynamic>;
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
+                    margin: EdgeInsets.only(bottom: 10),
+                    padding: EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.card,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.border),
+                      border: Border.all(color: Theme.of(context).colorScheme.outline),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -260,25 +260,25 @@ class _SupportScreenState extends State<SupportScreen> {
                             Expanded(
                               child: Text(
                                 item['subject'] as String? ?? 'Support',
-                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                               ),
                             ),
                             Text(
                               item['status'] as String? ?? 'open',
-                              style: const TextStyle(color: AppColors.green, fontSize: 12),
+                              style: TextStyle(color: AppColors.green, fontSize: 12),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Text(
                           item['message'] as String? ?? '',
-                          style: const TextStyle(color: AppColors.greyLight, fontSize: 12, height: 1.5),
+                          style: TextStyle(color: AppColors.greyLight, fontSize: 12, height: 1.5),
                         ),
                       ],
                     ),
                   );
                 }),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _contactCard(
               Icons.email_rounded,
               'Email Support',
@@ -287,7 +287,7 @@ class _SupportScreenState extends State<SupportScreen> {
               () {},
               fullWidth: true,
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             const SectionLabel('FAQs'),
             ...List.generate(_faqs.length, (i) {
               final open = _openFaq == i;
@@ -295,13 +295,13 @@ class _SupportScreenState extends State<SupportScreen> {
                 onTap: () => setState(() => _openFaq = open ? null : i),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: 8),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: open ? AppColors.cardHigh : AppColors.card,
+                    color: open ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: open ? AppColors.red.withValues(alpha: 0.3) : AppColors.border,
+                      color: open ? AppColors.red.withValues(alpha: 0.3) : Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   child: Column(
@@ -312,7 +312,7 @@ class _SupportScreenState extends State<SupportScreen> {
                           Expanded(
                             child: Text(
                               _faqs[i]['q']!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -327,13 +327,12 @@ class _SupportScreenState extends State<SupportScreen> {
                         ],
                       ),
                       if (open) ...[
-                        const SizedBox(height: 12),
-                        const Divider(color: AppColors.border),
-                        const SizedBox(height: 10),
+                        SizedBox(height: 12),
+                        Divider(color: Theme.of(context).colorScheme.outline),
+                        SizedBox(height: 10),
                         Text(
                           _faqs[i]['a']!,
-                          style: const TextStyle(
-                            color: AppColors.greyLight,
+                          style: TextStyle(color: AppColors.greyLight,
                             fontSize: 13,
                             height: 1.6,
                           ),
@@ -344,7 +343,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 ),
               );
             }),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
           ],
         ),
       ),
@@ -363,11 +362,11 @@ class _SupportScreenState extends State<SupportScreen> {
       onTap: onTap,
       child: Container(
         width: fullWidth ? double.infinity : null,
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.card,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border),
+          border: Border.all(color: Theme.of(context).colorScheme.outline),
         ),
         child: Row(
           children: [
@@ -380,14 +379,14 @@ class _SupportScreenState extends State<SupportScreen> {
               ),
               child: Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -395,7 +394,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   ),
                   Text(
                     sub,
-                    style: const TextStyle(color: AppColors.grey, fontSize: 11),
+                    style: TextStyle(color: AppColors.grey, fontSize: 11),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -412,13 +411,13 @@ class _SupportScreenState extends State<SupportScreen> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.card,
-        title: Text(title, style: const TextStyle(color: Colors.white)),
-        content: Text(message, style: const TextStyle(color: AppColors.greyLight)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(title, style: TextStyle(color: Colors.white)),
+        content: Text(message, style: TextStyle(color: AppColors.greyLight)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK', style: TextStyle(color: AppColors.red)),
+            child: Text('OK', style: TextStyle(color: AppColors.red)),
           ),
         ],
       ),

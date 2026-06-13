@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'api_service_new.dart';
+import 'utils/socket_service.dart';
 import 'widgets/common_widgets.dart';
 
 class JobDetailScreen extends StatefulWidget {
@@ -32,16 +35,43 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     'Apply screen guard (if applicable)',
   ];
 
+  StreamSubscription<Position>? _jobLocationStream;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
-    if (args is Map<String, dynamic>) {
+    if (args is Map<String, dynamic> && _job == null) {
       _job = args;
+      _initNavigationStream();
     }
   }
 
+  void _initNavigationStream() {
+    if (_currentStep == 0 && _job?['_id'] != null) {
+      const locationSettings = LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 3, 
+      );
+      _jobLocationStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
+        if (!mounted) return;
+        SocketService().emitLocationUpdate(_job!['_id'], position.latitude, position.longitude);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _jobLocationStream?.cancel();
+    super.dispose();
+  }
+
   Future<void> _advanceStep() async {
+    if (_currentStep == 0) {
+      // Arrived at destination
+      _jobLocationStream?.cancel();
+    }
+
     if (_currentStep == 1) {
       setState(() => _loading = true);
       if (_job?['_id'] != null) {
@@ -75,7 +105,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Row(
                 children: [
                   GestureDetector(
@@ -88,17 +118,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           serviceType,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
@@ -110,8 +140,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ),
                   Text(
                     '₹$price',
-                    style: const TextStyle(
-                      color: AppColors.green,
+                    style: TextStyle(color: AppColors.green,
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
                     ),
@@ -120,7 +149,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+              padding: EdgeInsets.fromLTRB(16, 20, 16, 0),
               child: Row(
                 children: _steps.asMap().entries.map((e) {
                   final i = e.key;
@@ -158,7 +187,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   color: done || active ? Colors.white : AppColors.border,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text(
                                 e.value,
                                 style: TextStyle(
@@ -176,7 +205,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           Expanded(
                             child: Container(
                               height: 2,
-                              margin: const EdgeInsets.only(bottom: 24),
+                              margin: EdgeInsets.only(bottom: 24),
                               color: i < _currentStep ? AppColors.green : AppColors.border,
                             ),
                           ),
@@ -186,10 +215,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   children: [
                     GlassCard(
@@ -202,16 +231,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               color: AppColors.red.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.person_rounded, color: AppColors.red, size: 26),
+                            child: Icon(Icons.person_rounded, color: AppColors.red, size: 26),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: 12),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   customerName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -219,17 +248,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 ),
                                 Text(
                                   device,
-                                  style: const TextStyle(color: AppColors.grey, fontSize: 13),
+                                  style: TextStyle(color: AppColors.grey, fontSize: 13),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.location_on_rounded, color: AppColors.grey, size: 13),
-                                    const SizedBox(width: 4),
+                                    Icon(Icons.location_on_rounded, color: AppColors.grey, size: 13),
+                                    SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
                                         address,
-                                        style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                                        style: TextStyle(color: AppColors.grey, fontSize: 12),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -242,14 +271,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           Row(
                             children: [
                               _actionBtn(Icons.call_rounded, AppColors.green, () {}),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               _actionBtn(Icons.navigation_rounded, AppColors.orange, () {}),
                             ],
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     if (_currentStep == 0) _buildNavigateContent(address),
                     if (_currentStep == 1) _buildStartContent(serviceType, device, phone),
                     if (_currentStep == 2) _buildChecklist(),
@@ -259,7 +288,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              padding: EdgeInsets.fromLTRB(16, 8, 16, 24),
               child: PrimaryButton(
                 label: _currentStep == 0
                     ? 'I\'ve Arrived'
@@ -308,7 +337,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.map_rounded, color: AppColors.orange, size: 20),
                   SizedBox(width: 8),
@@ -322,11 +351,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Container(
                 height: 160,
                 decoration: BoxDecoration(
-                  color: AppColors.cardHigh,
+                  color: AppColors.card,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Stack(
@@ -344,17 +373,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               shape: BoxShape.circle,
                               boxShadow: AppShadows.red,
                             ),
-                            child: const Icon(Icons.my_location_rounded, color: Colors.white, size: 24),
+                            child: Icon(Icons.my_location_rounded, color: Colors.white, size: 24),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: AppColors.surface,
+                              color: AppColors.card,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(color: AppColors.border),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Tap to open Maps',
                               style: TextStyle(color: Colors.white, fontSize: 13),
                             ),
@@ -365,15 +394,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Row(
                 children: [
-                  const Icon(Icons.location_on_rounded, color: AppColors.red, size: 16),
-                  const SizedBox(width: 6),
+                  Icon(Icons.location_on_rounded, color: AppColors.red, size: 16),
+                  SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       address,
-                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                      style: TextStyle(color: Colors.white, fontSize: 13),
                     ),
                   ),
                 ],
@@ -403,18 +432,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _detailRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 90,
-            child: Text(label, style: const TextStyle(color: AppColors.grey, fontSize: 13)),
+            child: Text(label, style: TextStyle(color: AppColors.grey, fontSize: 13)),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -431,7 +460,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.checklist_rounded, color: AppColors.orange, size: 20),
               SizedBox(width: 8),
@@ -445,21 +474,21 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          const Text(
+          SizedBox(height: 4),
+          Text(
             'Complete all steps before proceeding',
             style: TextStyle(color: AppColors.grey, fontSize: 12),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           ...List.generate(_checklistItems.length, (i) {
             return GestureDetector(
               onTap: () => setState(() => _checklist[i] = !_checklist[i]),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.only(bottom: 10),
-                padding: const EdgeInsets.all(12),
+                margin: EdgeInsets.only(bottom: 10),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _checklist[i] ? AppColors.green.withValues(alpha: 0.08) : AppColors.cardHigh,
+                  color: _checklist[i] ? AppColors.green.withValues(alpha: 0.08) : AppColors.card,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: _checklist[i] ? AppColors.green.withValues(alpha: 0.4) : AppColors.border,
@@ -480,10 +509,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                       ),
                       child: _checklist[i]
-                          ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                          ? Icon(Icons.check_rounded, color: Colors.white, size: 14)
                           : null,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Text(
                       _checklistItems[i],
                       style: TextStyle(
@@ -508,7 +537,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.receipt_long_rounded, color: AppColors.green, size: 20),
               SizedBox(width: 8),
@@ -522,17 +551,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           _billRow('Service Charge', '₹${(price * 0.8).toInt()}'),
           _billRow('Parts & Material', '₹${(price * 0.2).toInt()}'),
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 8),
             child: Divider(color: AppColors.border),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Total',
                 style: TextStyle(
                   color: Colors.white,
@@ -542,8 +571,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
               Text(
                 '₹$price',
-                style: const TextStyle(
-                  color: AppColors.green,
+                style: TextStyle(color: AppColors.green,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                 ),
@@ -557,14 +585,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _billRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: AppColors.grey, fontSize: 14)),
+          Text(label, style: TextStyle(color: AppColors.grey, fontSize: 14)),
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 14,
               fontWeight: FontWeight.w600,

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
+import '../services/payment_service.dart';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
+import 'payment_sheet.dart';
 import 'track_technician_screen.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -20,6 +22,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Map<String, dynamic>? _order;
   bool _loading = true;
   String? _errorMsg;
+  bool _payLoading = false;
 
   @override
   void initState() {
@@ -65,30 +68,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_rounded,
-                color: AppColors.textPrimary, size: 20),
+            child: Icon(Icons.arrow_back_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
         title: Text('Order Details',
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textWhite)),
+                color: Colors.white)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
+          ? Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
           : (_order == null || _errorMsg != null)
               ? _buildError()
               : _buildBody(),
@@ -100,17 +102,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error_outline_rounded, color: AppColors.statusRed, size: 48),
-          const SizedBox(height: 12),
+          Icon(Icons.error_outline_rounded, color: AppColors.statusRed, size: 48),
+          SizedBox(height: 12),
           Text(
             _errorMsg ?? 'Failed to load order details',
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 14),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _load,
-            icon: const Icon(Icons.refresh_rounded, size: 18),
+            icon: Icon(Icons.refresh_rounded, size: 18),
             label: Text('Retry', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
@@ -142,13 +144,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       color: AppColors.brandBlue,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Status badge
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
               decoration: BoxDecoration(
                 color: _statusColor(status).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -162,20 +164,20 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Device info card
             _card(
               icon: Icons.smartphone_rounded,
               title: '$brand $model',
               children: [
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
                   runSpacing: 6,
                   children: issues
                       .map((issue) => Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding: EdgeInsets.symmetric(
                                 horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
                               color: AppColors.brandBlue.withValues(alpha: 0.15),
@@ -189,14 +191,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Price card
             _card(
               icon: Icons.receipt_rounded,
               title: 'Payment',
               children: [
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -207,12 +209,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: AppColors.textWhite)),
+                            color: Colors.white)),
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Technician card
             if (techName.isNotEmpty)
@@ -220,7 +222,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 icon: Icons.engineering_rounded,
                 title: 'Technician',
                 children: [
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Row(
                     children: [
                       CircleAvatar(
@@ -233,13 +235,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               fontWeight: FontWeight.w700),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Text(techName,
                             style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textWhite)),
+                                color: Colors.white)),
                       ),
                       if (isActive && techUser.isNotEmpty)
                         GestureDetector(
@@ -260,15 +262,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               color: AppColors.brandBlue.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.chat_bubble_rounded,
-                                color: AppColors.brandBlue, size: 18),
+                            child: Icon(Icons.chat_bubble_rounded, color: AppColors.brandBlue, size: 18),
                           ),
                         ),
                     ],
                   ),
                 ],
               ),
-            if (techName.isNotEmpty) const SizedBox(height: 14),
+            if (techName.isNotEmpty) SizedBox(height: 14),
 
             // Date card
             if (createdAt.isNotEmpty)
@@ -276,13 +277,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 icon: Icons.calendar_today_rounded,
                 title: 'Order Date',
                 children: [
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(_formatDate(createdAt),
                       style: GoogleFonts.poppins(
                           fontSize: 13, color: AppColors.textSecondary)),
                 ],
               ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
+
+            // Payment section
+            _buildPaymentSection(o, status, total),
+            SizedBox(height: 24),
 
             // Action buttons
             if (isActive) ...[
@@ -296,29 +301,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           TrackTechnicianScreen(orderId: widget.orderId),
                     ),
                   ),
-                  icon: const Icon(Icons.location_on_rounded),
+                  icon: Icon(Icons.location_on_rounded),
                   label: Text('Track Technician',
                       style: GoogleFonts.poppins(
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => _cancelOrder(),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.statusRed,
-                    side: const BorderSide(color: AppColors.statusRed),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: AppColors.statusRed),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                   ),
@@ -334,6 +339,122 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  Widget _buildPaymentSection(Map<String, dynamic> o, String status, dynamic total) {
+    final paymentStatus = (o['paymentStatus'] as String?) ?? 'pending';
+    final isPaid = paymentStatus == 'collected';
+    final isCompleted = status.toLowerCase() == 'completed';
+    final isActive = ['pending', 'assigned', 'on_the_way', 'in_progress', 'started']
+        .contains(status.toLowerCase());
+
+    if (isPaid) {
+      // Already paid — show a green badge
+      return Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.brandGreen.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.brandGreen.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.check_circle_rounded, color: AppColors.brandGreen, size: 22),
+            SizedBox(width: 12),
+            Text(
+              'Payment Collected',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.brandGreen,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              '₹$total',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                color: AppColors.brandGreen,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (isCompleted || isActive) {
+      // Show Pay Now button
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton.icon(
+          onPressed: _payLoading ? null : () => _handlePayNow(o, total),
+          icon: _payLoading
+              ? SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+              : Icon(Icons.payment_rounded),
+          label: Text(
+            _payLoading ? 'Processing...' : 'Pay ₹$total Now',
+            style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w700),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.brandBlue,
+            foregroundColor: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            elevation: 0,
+          ),
+        ),
+      );
+    }
+
+    return SizedBox.shrink();
+  }
+
+  Future<void> _handlePayNow(Map<String, dynamic> o, dynamic total) async {
+    setState(() => _payLoading = true);
+    try {
+      final payService = PaymentService();
+      final intentData = await payService.createPaymentIntent(
+        widget.orderId,
+        (total is num) ? total : num.parse(total.toString()),
+      );
+      final paymentId = intentData['paymentId']?.toString() ?? '';
+      final clientSecret = intentData['clientSecret']?.toString() ?? '';
+      final paymentIntentId = clientSecret.contains('_secret')
+          ? clientSecret.split('_secret')[0]
+          : clientSecret;
+
+      if (!mounted) return;
+      final success = await showPaymentSheet(
+        context,
+        orderId: widget.orderId,
+        paymentId: paymentId,
+        paymentIntentId: paymentIntentId,
+        amount: (total is num) ? total : num.parse(total.toString()),
+      );
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ Payment successful!'),
+            backgroundColor: AppColors.brandGreen,
+          ),
+        );
+        await _load();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _payLoading = false);
+    }
+  }
+
+
   Widget _card({
     required IconData icon,
     required String title,
@@ -341,11 +462,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.bgCard,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderColor),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,7 +474,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Row(
             children: [
               Icon(icon, color: AppColors.brandBlue, size: 18),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text(title,
                   style: GoogleFonts.poppins(
                       fontSize: 14,
@@ -370,7 +491,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   String _formatDate(String iso) {
     try {
       final dt = DateTime.parse(iso);
-      const months = [
+      var months = [
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
       ];
@@ -384,21 +505,21 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.bgCard,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Cancel Order?',
             style: GoogleFonts.poppins(
-                color: AppColors.textWhite, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text('Are you sure you want to cancel this order?',
             style: GoogleFonts.poppins(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('No'),
+            child: Text('No'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.statusRed),
-            child: const Text('Yes, Cancel'),
+            child: Text('Yes, Cancel'),
           ),
         ],
       ),

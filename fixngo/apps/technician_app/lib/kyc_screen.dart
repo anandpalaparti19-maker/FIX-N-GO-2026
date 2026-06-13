@@ -5,7 +5,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class KycScreen extends StatefulWidget {
-  const KycScreen({super.key});
+  KycScreen({super.key});
 
   @override
   State<KycScreen> createState() => _KycScreenState();
@@ -80,21 +80,21 @@ class _KycScreenState extends State<KycScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
           ),
         ),
-        title: const Text('KYC Verification'),
+        title: Text('KYC Verification'),
       ),
       body: _submitted ? _buildSuccess() : _buildForm(),
     );
@@ -103,7 +103,7 @@ class _KycScreenState extends State<KycScreen> {
   Widget _buildSuccess() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -114,20 +114,20 @@ class _KycScreenState extends State<KycScreen> {
                 color: AppColors.green.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.check_circle_rounded, color: AppColors.green, size: 44),
+              child: Icon(Icons.check_circle_rounded, color: AppColors.green, size: 44),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            SizedBox(height: 24),
+            Text(
               'KYC Submitted!',
               style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 12),
-            const Text(
+            SizedBox(height: 12),
+            Text(
               'Your Aadhaar documents have been submitted for review. You\'ll be able to receive orders once our team verifies your KYC (usually within 24 hours).',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.grey, fontSize: 14, height: 1.5),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             PrimaryButton(
               label: 'Go to Home',
               onTap: () => Navigator.pushReplacementNamed(context, '/home'),
@@ -140,19 +140,19 @@ class _KycScreenState extends State<KycScreen> {
 
   Widget _buildForm() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Info banner
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.yellow.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.yellow.withValues(alpha: 0.3)),
             ),
-            child: const Row(
+            child: Row(
               children: [
                 Icon(Icons.info_outline_rounded, color: AppColors.yellow, size: 20),
                 SizedBox(width: 12),
@@ -165,22 +165,22 @@ class _KycScreenState extends State<KycScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 28),
-          const SectionLabel('Aadhaar Number'),
+          SizedBox(height: 28),
+          SectionLabel('Aadhaar Number'),
           TextField(
             controller: _aadhaarCtrl,
             keyboardType: TextInputType.number,
             maxLength: 12,
-            style: const TextStyle(color: Colors.white),
-            decoration: const InputDecoration(
+            style: TextStyle(color: Colors.white),
+            decoration: InputDecoration(
               hintText: '12-digit Aadhaar number',
               prefixIcon: Icon(Icons.badge_outlined),
               counterText: '',
             ),
           ),
-          const SizedBox(height: 24),
-          const SectionLabel('Aadhaar Card Images'),
-          const SizedBox(height: 12),
+          SizedBox(height: 24),
+          SectionLabel('Aadhaar Card Images'),
+          SizedBox(height: 12),
           Row(
             children: [
               Expanded(
@@ -191,7 +191,7 @@ class _KycScreenState extends State<KycScreen> {
                   onTap: () => _pickImage(true),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: _uploadTile(
                   title: 'Back Side',
@@ -202,12 +202,12 @@ class _KycScreenState extends State<KycScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          const Text(
+          SizedBox(height: 8),
+          Text(
             'Aadhaar details are used only for identity verification and are kept secure.',
             style: TextStyle(color: AppColors.grey, fontSize: 12),
           ),
-          const SizedBox(height: 36),
+          SizedBox(height: 36),
           PrimaryButton(
             label: 'Submit KYC',
             isLoading: _loading,
@@ -228,13 +228,13 @@ class _KycScreenState extends State<KycScreen> {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(14),
+        duration: Duration(milliseconds: 200),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: uploaded ? AppColors.green.withValues(alpha: 0.07) : AppColors.card,
+          color: uploaded ? AppColors.green.withValues(alpha: 0.07) : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: uploaded ? AppColors.green.withValues(alpha: 0.5) : AppColors.border,
+            color: uploaded ? AppColors.green.withValues(alpha: 0.5) : Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Column(
@@ -255,16 +255,16 @@ class _KycScreenState extends State<KycScreen> {
                     size: 18,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(
               file?.name ?? 'Tap to upload',
               maxLines: 1,

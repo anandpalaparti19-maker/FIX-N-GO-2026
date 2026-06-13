@@ -79,11 +79,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24),
             child: FadeTransition(
               opacity: _fadeAnim,
               child: SlideTransition(
@@ -91,21 +91,26 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 48),
+                    SizedBox(height: 48),
                     Center(
                       child: Container(
-                        width: 80,
-                        height: 80,
+                        width: 140,
+                        height: 140,
                         decoration: BoxDecoration(
-                          color: AppColors.red,
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(70),
                           boxShadow: AppShadows.red,
                         ),
-                        child: const Icon(Icons.build_rounded, size: 40, color: Colors.white),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(70),
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                       ),
                     ),
-                    const SizedBox(height: 32),
-                    const Text(
+                    SizedBox(height: 32),
+                    Text(
                       'Welcome back,\nFixer!',
                       style: TextStyle(
                         color: Colors.white,
@@ -115,31 +120,31 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                       'Sign in to start earning',
                       style: TextStyle(color: AppColors.grey, fontSize: 16),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
                     const SectionLabel('Email'),
                     TextField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         hintText: 'your@email.com',
                         prefixIcon: Icon(Icons.mail_outline_rounded),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     const SectionLabel('Password'),
                     TextField(
                       controller: _passCtrl,
                       obscureText: _obscure,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: '••••••••',
-                        prefixIcon: const Icon(Icons.lock_outline_rounded),
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -149,19 +154,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
                     PrimaryButton(
                       label: 'Sign In',
                       onTap: _login,
                       isLoading: _loading,
                       icon: Icons.login_rounded,
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     Center(
                       child: GestureDetector(
                         onTap: () => Navigator.pushReplacementNamed(context, '/register'),
                         child: RichText(
-                          text: const TextSpan(
+                          text: TextSpan(
                             text: "Don't have an account? ",
                             style: TextStyle(color: AppColors.grey, fontSize: 15),
                             children: [
@@ -177,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
                   ],
                 ),
               ),

@@ -163,31 +163,31 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgDark,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.bgCard,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.borderColor),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded,
-                size: 16, color: AppColors.textPrimary),
+            child: Icon(Icons.arrow_back_ios_new_rounded,
+                size: 16, color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
         title: Text(
           'Select your phone',
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textWhite),
+              fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -197,7 +197,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   )),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Wrap(
                 spacing: 10,
                 runSpacing: 10,
@@ -215,12 +215,12 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                     }),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? AppColors.brandBlue : AppColors.bgCard,
+                        color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: isSelected ? AppColors.brandBlue : AppColors.borderColor,
+                          color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
                           width: isSelected ? 1.5 : 1,
                         ),
                         boxShadow: isSelected
@@ -242,24 +242,24 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
               Text('Model',
                   style: GoogleFonts.poppins(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   )),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               if (selectedBrand == 'Other') ...[  
                 // Custom model text input
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.bgCard,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
                       color: _customModelCtrl.text.isEmpty
-                          ? AppColors.borderColor
+                          ? Theme.of(context).colorScheme.outline
                           : AppColors.brandBlue,
                     ),
                   ),
@@ -267,7 +267,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                     controller: _customModelCtrl,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: AppColors.textWhite,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
@@ -275,13 +275,12 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                       hintStyle: GoogleFonts.poppins(
                           color: AppColors.textMuted, fontSize: 14),
                       border: InputBorder.none,
-                      suffixIcon: const Icon(Icons.edit_rounded,
-                          color: AppColors.textMuted, size: 18),
+                      suffixIcon: Icon(Icons.edit_rounded, color: AppColors.textMuted, size: 18),
                     ),
                     onChanged: (val) => setState(() => selectedModel = val.trim()),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(
                   'Type your exact phone model name above',
                   style: GoogleFonts.poppins(
@@ -290,22 +289,21 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
               ] else ...[  
                 // Normal dropdown
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: AppColors.bgCard,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.borderColor),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: DropdownButton<String>(
                     value: selectedModel,
                     isExpanded: true,
-                    dropdownColor: AppColors.bgCardLight,
-                    underline: const SizedBox(),
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: AppColors.textSecondary),
+                    dropdownColor: Theme.of(context).colorScheme.surface,
+                    underline: SizedBox(),
+                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: AppColors.textWhite,
+                      color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                     items: (models[selectedBrand] ?? []).map((model) {
@@ -322,9 +320,9 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                   width: 120,
                   height: 200,
                   decoration: BoxDecoration(
-                    color: AppColors.bgCard,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: AppColors.borderColor, width: 2),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline, width: 2),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -338,7 +336,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                         size: 60,
                         color: AppColors.brandBlue.withValues(alpha: 0.6),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         selectedBrand ?? '',
                         style: GoogleFonts.poppins(
@@ -378,7 +376,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),

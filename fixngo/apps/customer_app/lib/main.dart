@@ -7,6 +7,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'providers/auth_provider.dart';
 import 'providers/locale_provider.dart';
+import 'providers/theme_provider.dart';
 import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
@@ -37,16 +38,13 @@ void main() async {
   Stripe.publishableKey = stripePk;
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-  ));
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const FixNGoApp(),
     ),
@@ -59,11 +57,23 @@ class FixNGoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final themeProvider  = context.watch<ThemeProvider>();
+
+    // Update system UI overlay based on theme
+    final isDark = themeProvider.isDark;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+      systemNavigationBarColor: isDark ? AppColors.bgDark : AppColors.bgLight,
+      systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+    ));
 
     return MaterialApp(
       title: 'Fix-N-Go',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
       home: const SplashScreen(),
 
       // ── Localization ─────────────────────────────────────────────
@@ -71,7 +81,7 @@ class FixNGoApp extends StatelessWidget {
       supportedLocales: AppLocalizations.supportedLanguageCodes
           .map((code) => Locale(code))
           .toList(),
-      localizationsDelegates: const [
+      localizationsDelegates: [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

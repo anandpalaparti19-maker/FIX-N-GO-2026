@@ -3,7 +3,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class BankDetailsScreen extends StatefulWidget {
-  const BankDetailsScreen({super.key});
+  BankDetailsScreen({super.key});
 
   @override
   State<BankDetailsScreen> createState() => _BankDetailsScreenState();
@@ -59,7 +59,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Bank details updated successfully!'),
+          content: Text('Bank details updated successfully!'),
           backgroundColor: AppColors.green,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -69,7 +69,7 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Failed to update bank details'),
+          content: Text('Failed to update bank details'),
           backgroundColor: AppColors.red,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -81,37 +81,37 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
-            margin: const EdgeInsets.all(8),
+            margin: EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.card,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.border),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
           ),
         ),
-        title: const Text('Bank Details'),
+        title: Text('Bank Details'),
       ),
       body: _loading
-        ? const Center(child: CircularProgressIndicator(color: AppColors.red))
+        ? Center(child: CircularProgressIndicator(color: AppColors.red))
         : SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.red.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.account_balance_rounded, color: AppColors.red, size: 24),
                   SizedBox(width: 16),
@@ -124,39 +124,39 @@ class _BankDetailsScreenState extends State<BankDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 32),
-            const SectionLabel('Account Holder Name'),
+            SizedBox(height: 32),
+            SectionLabel('Account Holder Name'),
             TextField(
               controller: _accNameCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter account holder name',
                 prefixIcon: Icon(Icons.person_outline_rounded),
               ),
             ),
-            const SizedBox(height: 20),
-            const SectionLabel('Account Number'),
+            SizedBox(height: 20),
+            SectionLabel('Account Number'),
             TextField(
               controller: _accNumberCtrl,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter your bank account number',
                 prefixIcon: Icon(Icons.numbers_rounded),
               ),
             ),
-            const SizedBox(height: 20),
-            const SectionLabel('IFSC Code'),
+            SizedBox(height: 20),
+            SectionLabel('IFSC Code'),
             TextField(
               controller: _ifscCtrl,
               textCapitalization: TextCapitalization.characters,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
                 hintText: 'Enter IFSC code',
                 prefixIcon: Icon(Icons.domain_rounded),
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
             PrimaryButton(
               label: 'Save Bank Details',
               isLoading: _saving,

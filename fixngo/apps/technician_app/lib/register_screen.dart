@@ -67,10 +67,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _showSnack('Select at least one skill', isError: true);
       return;
     }
-    if (_aadhaarCtrl.text.trim().isEmpty || _aadhaarFront == null || _aadhaarBack == null) {
-      _showSnack('Upload Aadhaar front and back to verify', isError: true);
-      return;
-    }
 
     if (_phoneCtrl.text.trim().isEmpty) {
       _showSnack('Phone number is required', isError: true);
@@ -78,46 +74,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
 
     setState(() => _loading = true);
-    final result = await _api.registerTechnician(
-      name: _nameCtrl.text.trim(),
-      email: _emailCtrl.text.trim(),
-      password: _passCtrl.text,
-      phone: _phoneCtrl.text.trim(),
-      skills: _selectedSkills.toList(),
-      aadhaarNumber: _aadhaarCtrl.text.trim(),
-      aadhaarFrontPath: _aadhaarFront!.path,
-      aadhaarBackPath: _aadhaarBack!.path,
-    );
+    try {
+      await _api.registerTechnician(
+        name: _nameCtrl.text.trim(),
+        email: _emailCtrl.text.trim(),
+        password: _passCtrl.text,
+        phone: _phoneCtrl.text.trim(),
+        skills: _selectedSkills.toList(),
+        aadhaarNumber: '',
+        aadhaarFrontPath: '',
+        aadhaarBackPath: '',
+      );
 
-    if (!mounted) return;
-
-    if (result == null) {
+      if (!mounted) return;
       setState(() => _loading = false);
-      _showSnack('Registration failed', isError: true);
-      return;
+
+      // TODO: Re-enable KYC upload after testing
+      // KYC upload temporarily disabled
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('onboarding_seen', true);
+
+      _showSnack('Registration submitted! Awaiting approval.');
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      _showSnack(e.toString(), isError: true);
     }
-
-    final uploadedKyc = await _api.uploadTechnicianKyc(
-      aadhaarNumber: _aadhaarCtrl.text.trim(),
-      frontPath: _aadhaarFront!.path,
-      backPath: _aadhaarBack!.path,
-    );
-
-    if (!mounted) return;
-    setState(() => _loading = false);
-
-    if (uploadedKyc == null) {
-      _showSnack('Account created, but KYC upload failed', isError: true);
-      return;
-    }
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_seen', true);
-
-    _showSnack('Registration submitted! Awaiting approval.');
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/home');
   }
 
   void _showSnack(String msg, {bool isError = false}) {
@@ -256,7 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           controller: _nameCtrl,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            hintText: 'Rahul Sharma',
+            hintText: 'Enter your full name',
             prefixIcon: Icon(Icons.person_outline_rounded),
           ),
         ),
@@ -267,7 +253,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           keyboardType: TextInputType.phone,
           style: const TextStyle(color: Colors.white),
           decoration: const InputDecoration(
-            hintText: '+91 98765 43210',
+            labelText: 'Phone Number',
+            hintText: 'Enter your phone number',
             prefixIcon: Icon(Icons.phone_outlined),
           ),
         ),
@@ -300,46 +287,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        const SectionLabel('Aadhaar Verification'),
-        TextField(
-          controller: _aadhaarCtrl,
-          keyboardType: TextInputType.number,
-          maxLength: 12,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Aadhaar number',
-            prefixIcon: Icon(Icons.badge_outlined),
-            counterText: '',
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _uploadTile(
-                title: 'Upload Front',
-                fileName: _aadhaarFront?.name,
-                icon: Icons.image_outlined,
-                onTap: () => _pickAadhaarImage(true),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _uploadTile(
-                title: 'Upload Back',
-                fileName: _aadhaarBack?.name,
-                icon: Icons.document_scanner_outlined,
-                onTap: () => _pickAadhaarImage(false),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Aadhaar details are used only for verification.',
-          style: TextStyle(color: AppColors.grey, fontSize: 12),
-        ),
+        // TODO: Re-enable Aadhaar verification section after testing
+        // Aadhaar section temporarily hidden
         const SizedBox(height: 24),
         Center(
           child: GestureDetector(

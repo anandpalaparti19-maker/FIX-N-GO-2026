@@ -140,7 +140,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     'Call Support',
                     '24/7 Available',
                     AppColors.orange,
-                    () => _showSupportHelp('Call Support', 'Please call +91 98765 43210 for urgent assistance.'),
+                    () => _showSupportHelp('Call Support', 'Please call customer support for urgent assistance.'),
                   ),
                 ),
                 const SizedBox(width: 12),

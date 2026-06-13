@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'config/api_config.dart';
@@ -86,6 +87,15 @@ class ApiService {
     }
   }
 
+  Future<Map<String, dynamic>?> getProfile() async {
+    try {
+      final res = await http.get(Uri.parse('$apiBaseUrl/tech/profile'), headers: await _getHeaders());
+      return jsonDecode(res.body);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>?> getStats() async {
     final dashboard = await getDashboard();
     if (dashboard == null) return null;
@@ -142,6 +152,42 @@ class ApiService {
         body: jsonEncode({'amount': amount, 'bankAccount': bankAccount})
       );
       return res.statusCode == 201;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateProfile({String? name, String? phone, String? email}) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/auth/profile'),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          if (name != null) 'name': name,
+          if (phone != null) 'phone': phone,
+          if (email != null) 'email': email,
+        }),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateBankDetails({required String accountName, required String accountNumber, required String ifscCode}) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/tech/profile'),
+        headers: await _getHeaders(),
+        body: jsonEncode({
+          'bankDetails': {
+            'accountName': accountName,
+            'accountNumber': accountNumber,
+            'ifscCode': ifscCode,
+          }
+        }),
+      );
+      return res.statusCode == 200;
     } catch (e) {
       return false;
     }
@@ -274,10 +320,16 @@ class ApiService {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
         await saveToken(data['token'] as String);
         return data;
+      } else {
+        try {
+          final errorData = jsonDecode(res.body);
+          throw Exception(errorData['message'] ?? 'Registration failed');
+        } catch (e) {
+          throw Exception('Registration failed (Code ${res.statusCode})');
+        }
       }
-      return null;
     } catch (e) {
-      return null;
+      throw Exception(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
@@ -299,8 +351,8 @@ class ApiService {
 
   Future<Map<String, dynamic>?> uploadTechnicianKyc({
     required String aadhaarNumber,
-    required String frontPath,
-    required String backPath,
+    required XFile frontFile,
+    required XFile backFile,
   }) async {
     try {
       final token = await getToken();
@@ -309,8 +361,12 @@ class ApiService {
       final request = http.MultipartRequest('PUT', Uri.parse('$apiBaseUrl/technician-profile/profile/kyc'));
       request.headers['Authorization'] = 'Bearer $token';
       request.fields['aadharNumber'] = aadhaarNumber;
-      request.files.add(await http.MultipartFile.fromPath('aadharFront', frontPath));
-      request.files.add(await http.MultipartFile.fromPath('aadharBack', backPath));
+
+      // Use fromBytes for cross-platform compatibility (works on Web + Mobile)
+      final frontBytes = await frontFile.readAsBytes();
+      final backBytes = await backFile.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes('aadharFront', frontBytes, filename: frontFile.name));
+      request.files.add(http.MultipartFile.fromBytes('aadharBack', backBytes, filename: backFile.name));
 
       final streamed = await request.send();
       final body = await streamed.stream.bytesToString();

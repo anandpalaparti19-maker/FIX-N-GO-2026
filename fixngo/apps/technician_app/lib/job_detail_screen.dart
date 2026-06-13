@@ -64,7 +64,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget build(BuildContext context) {
     final serviceType = _job?['serviceType'] ?? 'Screen Replacement';
     final customerName = _job?['customerName'] ?? 'Customer';
-    final phone = _job?['customerPhone'] ?? '+91 98765 43210';
+    final phone = _job?['customerPhone'] ?? 'Unknown';
     final address = _job?['location']?['address'] ?? '12 MG Road, Hyderabad';
     final price = _job?['estimatedPrice'] ?? 499;
     final device = _job?['deviceModel'] ?? 'Samsung Galaxy S21';

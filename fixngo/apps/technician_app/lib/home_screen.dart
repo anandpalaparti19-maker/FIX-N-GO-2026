@@ -356,12 +356,78 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return const Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2));
     }
 
+    // Check KYC status from dashboard
+    final verificationStatus = _dashboard?['verification']?['status'] ?? 'unverified';
+    final isKycVerified = verificationStatus == 'verified';
+
     return RefreshIndicator(
       color: AppColors.red,
       backgroundColor: AppColors.card,
       onRefresh: _fetchAll,
       child: CustomScrollView(
         slivers: [
+          // KYC Pending Banner
+          if (!isKycVerified)
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              sliver: SliverToBoxAdapter(
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/kyc').then((_) => _fetchAll()),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: verificationStatus == 'pending'
+                          ? AppColors.orange.withValues(alpha: 0.08)
+                          : AppColors.red.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: verificationStatus == 'pending'
+                            ? AppColors.orange.withValues(alpha: 0.4)
+                            : AppColors.red.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          verificationStatus == 'pending'
+                              ? Icons.hourglass_top_rounded
+                              : Icons.warning_amber_rounded,
+                          color: verificationStatus == 'pending' ? AppColors.orange : AppColors.red,
+                          size: 22,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                verificationStatus == 'pending'
+                                    ? 'KYC Under Review'
+                                    : 'Complete KYC to Receive Orders',
+                                style: TextStyle(
+                                  color: verificationStatus == 'pending' ? AppColors.orange : AppColors.red,
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                verificationStatus == 'pending'
+                                    ? 'Your documents are being verified. You\'ll be notified soon.'
+                                    : 'Tap here to upload your Aadhaar and get verified.',
+                                style: const TextStyle(color: AppColors.grey, fontSize: 12),
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (verificationStatus != 'pending')
+                          const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.grey, size: 14),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
             sliver: SliverToBoxAdapter(

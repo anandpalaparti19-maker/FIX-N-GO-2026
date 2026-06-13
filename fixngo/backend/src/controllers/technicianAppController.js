@@ -34,7 +34,7 @@ const getTechnicianProfile = async (req, res, next) => {
 
 const updateTechnicianProfile = async (req, res, next) => {
   try {
-    const { name, phone, address, city, pincode, emoji, experience } = req.body;
+    const { name, phone, address, city, pincode, emoji, experience, bankDetails } = req.body;
     const user = await User.findById(req.user._id);
     if (name) user.name = name;
     if (phone !== undefined) user.phone = phone;
@@ -43,6 +43,12 @@ const updateTechnicianProfile = async (req, res, next) => {
     if (pincode !== undefined) user.pincode = pincode;
     if (emoji) user.technicianMeta.emoji = emoji;
     if (experience) user.technicianMeta.experience = experience;
+    if (bankDetails) {
+      user.technicianMeta.bankDetails = {
+        ...user.technicianMeta.bankDetails,
+        ...bankDetails,
+      };
+    }
     await user.save();
     req.user = user;
     return getTechnicianProfile(req, res, next);

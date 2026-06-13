@@ -212,15 +212,9 @@ class ProfileScreen extends StatelessWidget {
                         const SizedBox(height: 20),
                         // Stats row
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             _StatItem(value: '7', label: l10n.repairs),
-                            Container(
-                                width: 1, height: 36, color: AppColors.borderColor),
-                            _StatItem(value: '₹3,495', label: l10n.saved),
-                            Container(
-                                width: 1, height: 36, color: AppColors.borderColor),
-                            _StatItem(value: '4.9★', label: l10n.rating),
                           ],
                         ),
                       ],

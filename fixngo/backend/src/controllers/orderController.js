@@ -72,6 +72,7 @@ const formatOrderForCustomer = (order) => {
     ...order.toObject(),
     technicianName: order.technician || tech?.name || '',
     technicianRating: tech?.technicianMeta?.rating,
+    technicianPhone: tech?.phone || '',
     statusHistory: order.statusHistory || [],
   };
 };

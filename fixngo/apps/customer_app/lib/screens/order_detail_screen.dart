@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
 import 'track_technician_screen.dart';
@@ -17,8 +16,10 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   final ApiService _api = ApiService();
+  final StorageService _storage = StorageService();
   Map<String, dynamic>? _order;
   bool _loading = true;
+  String? _errorMsg;
 
   @override
   void initState() {
@@ -27,17 +28,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Future<void> _load() async {
-    final auth = context.read<AuthProvider>();
-    final profile = auth.userProfile ?? {};
-    _api.setToken(profile['token'] as String?);
+    setState(() { _loading = true; _errorMsg = null; });
     try {
+      final token = await _storage.getToken();
+      if (token == null || token.isEmpty) {
+        setState(() { _loading = false; _errorMsg = 'Not logged in. Please log in again.'; });
+        return;
+      }
+      _api.setToken(token);
       final res = await _api.get('/api/orders/${widget.orderId}');
+      final data = res['data'];
       setState(() {
-        _order = (res['data'] as Map<String, dynamic>?) ?? res;
+        _order = data is Map<String, dynamic> ? data : null;
         _loading = false;
       });
     } catch (e) {
-      setState(() => _loading = false);
+      print('ORDER DETAIL LOAD ERROR: $e');
+      setState(() { _loading = false; _errorMsg = 'Failed to load order. Please try again.'; });
     }
   }
 
@@ -82,7 +89,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
-          : _order == null
+          : (_order == null || _errorMsg != null)
               ? _buildError()
               : _buildBody(),
     );
@@ -90,8 +97,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
   Widget _buildError() {
     return Center(
-      child: Text('Failed to load order details',
-          style: GoogleFonts.poppins(color: AppColors.textMuted)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.error_outline_rounded, color: AppColors.statusRed, size: 48),
+          const SizedBox(height: 12),
+          Text(
+            _errorMsg ?? 'Failed to load order details',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(color: AppColors.textMuted, fontSize: 14),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: _load,
+            icon: const Icon(Icons.refresh_rounded, size: 18),
+            label: Text('Retry', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.brandBlue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -103,7 +131,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final issues = (o['issues'] as List<dynamic>?) ?? [];
     final total = o['total'] ?? 0;
     final techName = (o['technicianName'] as String?) ?? '';
-    final techUser = (o['technicianUser'] as String?) ?? '';
+    final rawTechUser = o['technicianUser'];
+    final techUser = rawTechUser is Map ? (rawTechUser['_id']?.toString() ?? '') : (rawTechUser?.toString() ?? '');
     final createdAt = (o['createdAt'] as String?) ?? '';
     final isActive = ['pending', 'assigned', 'on_the_way', 'in_progress', 'started']
         .contains(status.toLowerCase());

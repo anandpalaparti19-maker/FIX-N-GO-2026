@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
+import '../widgets/brand_logo.dart';
 
 class RateAppScreen extends StatefulWidget {
   const RateAppScreen({super.key});
@@ -52,7 +53,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: Theme.of(context).colorScheme.onSurface)),
       ),
       body: Padding(
         padding: EdgeInsets.all(24),
@@ -65,23 +66,13 @@ class _RateAppScreenState extends State<RateAppScreen> {
     return Column(
       children: [
         SizedBox(height: 30),
-        Container(
-          width: 140,
-          height: 140,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(70),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(70),
-            child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
-          ),
-        ),
+        const BrandLogo(size: 140),
         SizedBox(height: 20),
         Text('How is your experience?',
             style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: Theme.of(context).colorScheme.onSurface)),
         SizedBox(height: 8),
         Text('Your feedback helps us improve Fix-N-Go',
             style: GoogleFonts.poppins(

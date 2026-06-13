@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import 'auth/login_screen.dart';
 import '../theme/app_theme.dart';
 import 'main_navigation.dart';
+import '../widgets/brand_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -67,6 +68,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
@@ -74,7 +78,10 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: RadialGradient(
             center: Alignment(0, -0.2),
             radius: 1.2,
-            colors: [Color(0xFF1A2A4A), Theme.of(context).scaffoldBackgroundColor],
+            colors: [
+              isDark ? const Color(0xFF173055) : const Color(0xFFDCEAFF),
+              Theme.of(context).scaffoldBackgroundColor,
+            ],
           ),
         ),
         child: Center(
@@ -88,26 +95,8 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Logo
-                      Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(70),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.brandBlue.withValues(alpha: 0.5),
-                              blurRadius: 40,
-                              spreadRadius: 5,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(70),
-                          child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
-                        ),
-                      ),
-                      SizedBox(height: 28),
+                      const BrandLogo(size: 144),
+                      const SizedBox(height: 28),
                       Transform.translate(
                         offset: Offset(0, _slideAnim.value),
                         child: Column(
@@ -117,11 +106,11 @@ class _SplashScreenState extends State<SplashScreen>
                               style: GoogleFonts.poppins(
                                 fontSize: 36,
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
+                                color: titleColor,
                                 letterSpacing: -0.5,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Text(
                               'Doorstep Mobile Repair · Under 60 min',
                               style: GoogleFonts.poppins(
@@ -133,8 +122,7 @@ class _SplashScreenState extends State<SplashScreen>
                           ],
                         ),
                       ),
-                      SizedBox(height: 60),
-                      // Loading dots
+                      const SizedBox(height: 60),
                       Transform.translate(
                         offset: Offset(0, _slideAnim.value),
                         child: Row(

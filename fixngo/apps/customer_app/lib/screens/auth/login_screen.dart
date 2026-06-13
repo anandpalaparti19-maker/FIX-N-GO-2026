@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/brand_logo.dart';
 import '../main_navigation.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
@@ -57,6 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Container(
@@ -64,7 +68,10 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: RadialGradient(
             center: Alignment(0, -0.3),
             radius: 1.3,
-            colors: [Color(0xFF1E293B), Theme.of(context).scaffoldBackgroundColor],
+            colors: [
+              isDark ? const Color(0xFF1A2944) : const Color(0xFFDCEAFF),
+              Theme.of(context).scaffoldBackgroundColor,
+            ],
           ),
         ),
         child: SafeArea(
@@ -77,34 +84,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Brand Logo / Icon
-                    Center(
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(70),
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.brandBlue.withValues(alpha: 0.4),
-                              blurRadius: 24,
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(70),
-                          child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 24),
+                    const Center(child: BrandLogo(size: 144)),
+                    const SizedBox(height: 24),
                     Text(
                       'Welcome Back',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.poppins(
                         fontSize: 28,
                         fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        color: titleColor,
                         letterSpacing: -0.5,
                       ),
                     ),

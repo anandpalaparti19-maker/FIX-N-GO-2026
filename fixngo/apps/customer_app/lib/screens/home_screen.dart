@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../theme/app_theme.dart';
+import '../widgets/brand_logo.dart';
 import 'notifications_screen.dart';
 import 'select_device_screen.dart';
 
@@ -48,17 +49,7 @@ class HomeScreen extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
-            ),
-          ),
+          const BrandLogo(size: 56, paddingScale: 0.1),
           SizedBox(width: 12),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +58,7 @@ class HomeScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                   )),
               Text('Doorstep mobile service',
                   style: GoogleFonts.poppins(

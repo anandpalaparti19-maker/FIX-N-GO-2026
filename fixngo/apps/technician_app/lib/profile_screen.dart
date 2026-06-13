@@ -84,9 +84,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _miniStat(String value, String label) {
     return Column(
       children: [
-        Text(value, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+        Text(
+          value,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w700,
+            fontSize: 16,
+          ),
+        ),
         SizedBox(height: 4),
-        Text(label, style: TextStyle(color: AppColors.grey, fontSize: 12)),
+        Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
       ],
     );
   }
@@ -105,10 +112,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.white, size: 20),
+            Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
             SizedBox(width: 14),
-            Expanded(child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
-            Icon(Icons.arrow_forward_ios_rounded, color: AppColors.grey, size: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios_rounded, color: AppColors.textSecondary, size: 16),
           ],
         ),
       ),
@@ -133,7 +148,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              size: 18,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ),
         title: Text('Profile'),
@@ -208,7 +227,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         SizedBox(height: 12),
-                        Text(name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                        Text(
+                          name,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
                         SizedBox(height: 4),
                         Text('Verified Technician', style: TextStyle(color: AppColors.green, fontSize: 13)),
                         SizedBox(height: 16),
@@ -247,13 +273,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Icon(Icons.verified_rounded, color: AppColors.green),
                         ),
                         SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Aadhaar KYC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                              Text(
+                                'Aadhaar KYC',
+                                style: TextStyle(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                               SizedBox(height: 4),
-                              Text('Upload docs and keep your profile verified.', style: TextStyle(color: AppColors.grey, fontSize: 12)),
+                              Text(
+                                'Upload docs and keep your profile verified.',
+                                style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                              ),
                             ],
                           ),
                         ),
@@ -299,9 +334,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.dark_mode_outlined, color: AppColors.white, size: 20),
+                          Icon(
+                            Icons.dark_mode_outlined,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 20,
+                          ),
                           SizedBox(width: 14),
-                          const Expanded(child: Text('Dark Mode', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+                          Expanded(
+                            child: Text(
+                              'Dark Mode',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                           Switch(
                             value: theme.isDark,
                             onChanged: (_) => theme.toggle(),

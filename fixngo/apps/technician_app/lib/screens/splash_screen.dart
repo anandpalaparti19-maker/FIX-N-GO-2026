@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_service_new.dart';
 import '../utils/app_theme.dart';
+import '../widgets/brand_logo.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -78,6 +79,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
@@ -90,7 +94,7 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.red.withValues(alpha: 0.12),
+                    (isDark ? AppColors.red : AppColors.orange).withValues(alpha: 0.14),
                     Colors.transparent,
                   ],
                 ),
@@ -110,27 +114,13 @@ class _SplashScreenState extends State<SplashScreen>
                       children: [
                         Transform.scale(
                           scale: _pulseAnim.value,
-                          child: Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(70),
-                              boxShadow: AppShadows.red,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(70),
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
+                          child: const BrandLogo(size: 144),
                         ),
                         SizedBox(height: 24),
                         Text(
                           'FIXER',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: titleColor,
                             fontSize: 36,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 6,

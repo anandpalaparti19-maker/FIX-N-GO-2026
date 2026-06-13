@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'api_service_new.dart';
-import '../utils/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import 'utils/app_theme.dart';
+import 'widgets/brand_logo.dart';
+import 'widgets/common_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -78,6 +79,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final titleColor = Theme.of(context).colorScheme.onSurface;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -92,28 +95,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 48),
-                    Center(
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(70),
-                          boxShadow: AppShadows.red,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(70),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
+                    const Center(child: BrandLogo(size: 144)),
                     SizedBox(height: 32),
                     Text(
                       'Welcome back,\nFixer!',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: titleColor,
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         height: 1.2,
@@ -130,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     TextField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: titleColor),
                       decoration: const InputDecoration(
                         hintText: 'your@email.com',
                         prefixIcon: Icon(Icons.mail_outline_rounded),
@@ -141,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     TextField(
                       controller: _passCtrl,
                       obscureText: _obscure,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: titleColor),
                       decoration: InputDecoration(
                         hintText: '••••••••',
                         prefixIcon: Icon(Icons.lock_outline_rounded),

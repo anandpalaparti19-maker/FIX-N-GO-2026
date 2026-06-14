@@ -3,7 +3,7 @@
     "short_name": "Fix-N-Go",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0A0F1E",
+    "background_color": "transparent",
     "theme_color": "#1A56F0",
     "description": "Fix-N-Go - Book mobile phone repair technicians on demand. Fast, reliable doorstep service.",
     "orientation": "portrait-primary",

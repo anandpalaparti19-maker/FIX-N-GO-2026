@@ -17,6 +17,8 @@ class ApiService {
 
   Map<String, String> get _headers => {
         'Content-Type': 'application/json',
+        'Bypass-Tunnel-Reminder': 'true',
+        'ngrok-skip-browser-warning': 'true',
         if (_token != null && _token!.isNotEmpty) 'Authorization': 'Bearer $_token',
       };
 

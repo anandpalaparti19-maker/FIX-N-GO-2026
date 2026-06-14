@@ -109,7 +109,7 @@ class _SplashScreenState extends State<SplashScreen>
                       scale: _pulseAnim.value,
                       child: Image.asset(
                         'assets/images/logo4.png',
-                        width: 300,
+                        width: 200,
                         fit: BoxFit.contain,
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'dart:io' show Platform;
 import 'package:provider/provider.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,13 +16,13 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    if (kIsWeb) {
+    if (kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS))) {
       await Firebase.initializeApp(
         options: const FirebaseOptions(
-          apiKey: 'dummy_api_key',
-          appId: 'dummy_app_id',
-          messagingSenderId: 'dummy_sender_id',
-          projectId: 'dummy_project_id',
+          apiKey: 'AIzaSyA-dummy-api-key',
+          appId: '1:1234567890:web:1234567890abcdef',
+          messagingSenderId: '1234567890',
+          projectId: 'dummy-project-id',
         ),
       );
     } else {
@@ -31,11 +32,13 @@ void main() async {
     debugPrint('Firebase initialization failed: $e');
   }
 
-  const stripePk = String.fromEnvironment(
-    'STRIPE_PK',
-    defaultValue: 'pk_test_REPLACE_WITH_YOUR_STRIPE_PUBLISHABLE_KEY',
-  );
-  Stripe.publishableKey = stripePk;
+  if (kIsWeb || (!kIsWeb && (Platform.isAndroid || Platform.isIOS))) {
+    const stripePk = String.fromEnvironment(
+      'STRIPE_PK',
+      defaultValue: 'pk_test_REPLACE_WITH_YOUR_STRIPE_PUBLISHABLE_KEY',
+    );
+    Stripe.publishableKey = stripePk;
+  }
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 

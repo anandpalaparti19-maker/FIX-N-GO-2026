@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     Center(
                       child: Image.asset(
                         'assets/images/logo4.png',
-                        width: 180,
+                        width: 120,
                         fit: BoxFit.contain,
                       ),
                     ),

@@ -49,14 +49,14 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 56,
-            height: 56,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(20),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: Image.asset('assets/images/logo.png', fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(20),
+              child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
             ),
           ),
           SizedBox(width: 12),

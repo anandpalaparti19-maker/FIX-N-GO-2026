@@ -25,8 +25,8 @@ class StatusBadge extends StatelessWidget {
         textColor = AppColors.orange;
         break;
       case 'accepted':
-        color = Colors.blue.withValues(alpha: 0.2);
-        textColor = Colors.blue;
+        color = AppColors.amber.withValues(alpha: 0.2);
+        textColor = AppColors.amber;
         break;
       case 'pending':
         color = AppColors.yellow.withValues(alpha: 0.2);
@@ -106,7 +106,8 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = color ?? AppColors.red;
+    final bg = color ?? AppColors.amber;
+    final fg = bg == AppColors.amber ? AppColors.navyDeep : Colors.white;
 
     return GestureDetector(
       onTap: isLoading ? null : onTap,
@@ -131,7 +132,7 @@ class PrimaryButton extends StatelessWidget {
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(
-                    color: Colors.white,
+                    color: fg,
                     strokeWidth: 2.5,
                   ),
                 ),
@@ -140,13 +141,13 @@ class PrimaryButton extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[
-                    Icon(icon, size: 20, color: Colors.white),
+                    Icon(icon, size: 20, color: fg),
                     SizedBox(width: 8),
                   ],
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: fg,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                       letterSpacing: 0.3,

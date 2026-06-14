@@ -90,7 +90,7 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.red.withValues(alpha: 0.12),
+                    AppColors.amber.withValues(alpha: 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -115,22 +115,25 @@ class _SplashScreenState extends State<SplashScreen>
                             height: 140,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(70),
-                              boxShadow: AppShadows.red,
+                              boxShadow: AppShadows.amber,
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(70),
-                              child: Image.asset(
-                                'assets/images/logo.png',
-                                fit: BoxFit.cover,
+                              child: Container(
+                                color: AppColors.navyDeep,
+                                child: Image.asset(
+                                  'assets/images/logo.png',
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
                         ),
                         SizedBox(height: 24),
                         Text(
-                          'FIXER',
+                          'FixTech',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 36,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 6,

@@ -132,7 +132,7 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                     style: GoogleFonts.poppins(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -442,7 +442,7 @@ class _SearchingCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                   )),
               Text('Searching in your area...',
                   style: GoogleFonts.poppins(
@@ -502,7 +502,7 @@ class _TechFoundCard extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                         )),
                     Row(
                       children: [

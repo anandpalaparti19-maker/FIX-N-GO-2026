@@ -47,7 +47,7 @@ class LanguageScreen extends StatelessWidget {
           style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w700,
-              color: Colors.white),
+              color: AppColors.textPrimary),
         ),
       ),
       body: Column(

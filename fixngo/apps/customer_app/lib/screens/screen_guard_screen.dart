@@ -81,7 +81,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
         title: Text(
           'Choose guard type',
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(
@@ -183,7 +183,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             Text(

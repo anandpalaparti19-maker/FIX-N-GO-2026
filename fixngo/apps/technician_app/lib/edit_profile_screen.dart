@@ -90,13 +90,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Text('Edit Profile'),
       ),
       body: _loading 
-        ? Center(child: CircularProgressIndicator(color: AppColors.red))
+        ? Center(child: CircularProgressIndicator(color: AppColors.amber))
         : SingleChildScrollView(
         padding: EdgeInsets.all(24),
         child: Column(
@@ -122,10 +122,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       width: 32,
                       height: 32,
                       decoration: BoxDecoration(
-                        color: AppColors.red,
+                        color: AppColors.amber,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.camera_alt_rounded, size: 16, color: Colors.white),
+                      child: Icon(Icons.camera_alt_rounded, size: 16, color: AppColors.navyDeep),
                     ),
                   ),
                 ],
@@ -135,7 +135,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             SectionLabel('Full Name'),
             TextField(
               controller: _nameCtrl,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Enter your full name',
                 prefixIcon: Icon(Icons.person_outline_rounded),
@@ -146,7 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextField(
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Enter your phone number',
                 prefixIcon: Icon(Icons.phone_outlined),
@@ -157,7 +157,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             TextField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: AppColors.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Enter your email',
                 prefixIcon: Icon(Icons.email_outlined),

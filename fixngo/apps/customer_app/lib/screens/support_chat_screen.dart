@@ -116,7 +116,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -139,7 +139,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                       style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
-                          color: Colors.white)),
+                          color: AppColors.textPrimary)),
                   SizedBox(height: 12),
                   TextField(
                     controller: _subjectCtrl,
@@ -215,7 +215,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                 style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: Colors.white)),
+                    color: AppColors.textPrimary)),
             SizedBox(height: 12),
             if (_loading)
               Center(
@@ -263,7 +263,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                               style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.white),
+                                  color: AppColors.textPrimary),
                             ),
                             Text(
                               status.replaceAll('_', ' ').toUpperCase(),

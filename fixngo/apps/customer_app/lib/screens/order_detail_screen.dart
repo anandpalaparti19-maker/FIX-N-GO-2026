@@ -87,7 +87,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       body: _loading
           ? Center(child: CircularProgressIndicator(color: AppColors.brandBlue))
@@ -209,7 +209,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         style: GoogleFonts.poppins(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
-                            color: Colors.white)),
+                            color: AppColors.textPrimary)),
                   ],
                 ),
               ],
@@ -241,7 +241,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                             style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white)),
+                                color: AppColors.textPrimary)),
                       ),
                       if (isActive && techUser.isNotEmpty)
                         GestureDetector(
@@ -508,7 +508,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Cancel Order?',
             style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         content: Text('Are you sure you want to cancel this order?',
             style: GoogleFonts.poppins(color: AppColors.textSecondary)),
         actions: [

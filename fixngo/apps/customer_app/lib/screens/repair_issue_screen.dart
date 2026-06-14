@@ -100,7 +100,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
         title: Text(
           "What's the issue?",
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(

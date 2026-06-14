@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'api_service_new.dart';
-import '../utils/app_theme.dart';
-import '../widgets/common_widgets.dart';
+import 'utils/app_theme.dart';
+import 'widgets/common_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -98,13 +98,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         height: 140,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(70),
-                          boxShadow: AppShadows.red,
+                          boxShadow: AppShadows.amber,
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(70),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            fit: BoxFit.cover,
+                          child: Container(
+                            color: AppColors.navyDeep,
+                            child: Image.asset(
+                              'assets/images/logo.png',
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -113,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     Text(
                       'Welcome back,\nFixer!',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         height: 1.2,
@@ -130,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     TextField(
                       controller: _emailCtrl,
                       keyboardType: TextInputType.emailAddress,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.textPrimary),
                       decoration: const InputDecoration(
                         hintText: 'your@email.com',
                         prefixIcon: Icon(Icons.mail_outline_rounded),
@@ -141,7 +144,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                     TextField(
                       controller: _passCtrl,
                       obscureText: _obscure,
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: AppColors.textPrimary),
                       decoration: InputDecoration(
                         hintText: '••••••••',
                         prefixIcon: Icon(Icons.lock_outline_rounded),
@@ -173,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               TextSpan(
                                 text: 'Register',
                                 style: TextStyle(
-                                  color: AppColors.red,
+                                  color: AppColors.amber,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

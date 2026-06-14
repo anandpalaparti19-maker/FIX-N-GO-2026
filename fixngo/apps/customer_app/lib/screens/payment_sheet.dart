@@ -168,7 +168,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         Spacer(),
@@ -438,7 +438,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
               SizedBox(height: 4),
@@ -520,7 +520,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
             style: GoogleFonts.poppins(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
           SizedBox(height: 8),
@@ -562,7 +562,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
           inputFormatters: inputFormatters,
           textCapitalization: textCapitalization,
           style: GoogleFonts.poppins(
-              color: Colors.white, fontSize: 14),
+              color: AppColors.textPrimary, fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: GoogleFonts.poppins(
@@ -662,7 +662,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         SizedBox(height: 8),
@@ -695,7 +695,7 @@ class _PaymentSheetState extends State<_PaymentSheet>
           style: GoogleFonts.poppins(
             fontSize: 20,
             fontWeight: FontWeight.w800,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         SizedBox(height: 8),

@@ -41,7 +41,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('Add Address',
             style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -113,7 +113,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddDialog,
@@ -190,7 +190,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                                 style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white)),
+                                    color: AppColors.textPrimary)),
                             Text(
                               [a['address'], a['city'], a['pincode']]
                                   .where((s) => s != null && s.isNotEmpty)

@@ -182,7 +182,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
         title: Text(
           'Select your phone',
           style: GoogleFonts.poppins(
-              fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white),
+              fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
         ),
       ),
       body: SafeArea(
@@ -267,7 +267,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                     controller: _customModelCtrl,
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                     decoration: InputDecoration(
@@ -303,7 +303,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                     icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
                     style: GoogleFonts.poppins(
                       fontSize: 15,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
                     ),
                     items: (models[selectedBrand] ?? []).map((model) {

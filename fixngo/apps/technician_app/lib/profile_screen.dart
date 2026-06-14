@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _miniStat(String value, String label) {
     return Column(
       children: [
-        Text(value, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16)),
+        Text(value, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 16)),
         SizedBox(height: 4),
         Text(label, style: TextStyle(color: AppColors.grey, fontSize: 12)),
       ],
@@ -105,9 +105,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: AppColors.white, size: 20),
+            Icon(icon, color: AppColors.textPrimary, size: 20),
             SizedBox(width: 14),
-            Expanded(child: Text(title, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+            Expanded(child: Text(title, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600))),
             Icon(Icons.arrow_forward_ios_rounded, color: AppColors.grey, size: 16),
           ],
         ),
@@ -133,13 +133,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Text('Profile'),
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2))
+          ? Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2))
           : SingleChildScrollView(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -156,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 height: 90,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.red, width: 2.5),
+                                  border: Border.all(color: AppColors.amber, width: 2.5),
                                 ),
                                 child: ClipOval(
                                   child: _photoBytes != null
@@ -197,18 +197,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 28,
                                   height: 28,
                                   decoration: BoxDecoration(
-                                    color: AppColors.red,
+                                    color: AppColors.amber,
                                     shape: BoxShape.circle,
                                     border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
                                   ),
-                                  child: Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+                                  child: Icon(Icons.camera_alt_rounded, size: 14, color: AppColors.navyDeep),
                                 ),
                               ),
                             ),
                           ],
                         ),
                         SizedBox(height: 12),
-                        Text(name, style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800)),
+                        Text(name, style: TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w800)),
                         SizedBox(height: 4),
                         Text('Verified Technician', style: TextStyle(color: AppColors.green, fontSize: 13)),
                         SizedBox(height: 16),
@@ -251,7 +251,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Aadhaar KYC', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                              Text('Aadhaar KYC', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
                               SizedBox(height: 4),
                               Text('Upload docs and keep your profile verified.', style: TextStyle(color: AppColors.grey, fontSize: 12)),
                             ],
@@ -278,11 +278,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ].map((s) => Container(
                       padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppColors.red.withValues(alpha: 0.1),
+                        color: AppColors.amber.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+                        border: Border.all(color: AppColors.amber.withValues(alpha: 0.3)),
                       ),
-                      child: Text(s, style: TextStyle(color: AppColors.red, fontSize: 12, fontWeight: FontWeight.w500)),
+                      child: Text(s, style: TextStyle(color: AppColors.amber, fontSize: 12, fontWeight: FontWeight.w500)),
                     )).toList(),
                   ),
                   SizedBox(height: 24),
@@ -299,13 +299,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.dark_mode_outlined, color: AppColors.white, size: 20),
+                          Icon(Icons.dark_mode_outlined, color: AppColors.textPrimary, size: 20),
                           SizedBox(width: 14),
-                          const Expanded(child: Text('Dark Mode', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600))),
+                          Expanded(child: Text('Dark Mode', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600))),
                           Switch(
                             value: theme.isDark,
                             onChanged: (_) => theme.toggle(),
-                            activeColor: AppColors.red,
+                            activeColor: AppColors.amber,
                           ),
                         ],
                       ),

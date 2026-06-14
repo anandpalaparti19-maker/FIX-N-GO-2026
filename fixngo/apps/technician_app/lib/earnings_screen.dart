@@ -48,7 +48,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Text('Earnings'),
@@ -60,9 +60,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
         ],
       ),
       body: _loading
-          ? Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2))
+          ? Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2))
           : RefreshIndicator(
-              color: AppColors.red,
+              color: AppColors.amber,
               backgroundColor: Theme.of(context).colorScheme.surface,
               onRefresh: _fetchStats,
               child: SingleChildScrollView(
@@ -129,7 +129,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
           Text(
             '₹$balance',
             style: TextStyle(
-              color: Colors.white,
+              color: AppColors.textPrimary,
               fontSize: 44,
               fontWeight: FontWeight.w900,
               letterSpacing: -1,
@@ -150,7 +150,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               child: Center(
                 child: Text(
                   'Withdraw to Bank',
-                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
+                  style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 15),
                 ),
               ),
             ),
@@ -168,7 +168,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         children: [
           Row(
             children: [
-              Text('This Week', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+              Text('This Week', style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w700)),
               const Spacer(),
               Text('₹${_weeklyData.reduce((a, b) => a + b).toInt()}', style: TextStyle(color: AppColors.green, fontWeight: FontWeight.w700)),
             ],
@@ -206,7 +206,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                           Text(
                             _days[i],
                             style: TextStyle(
-                              color: active ? Colors.white : AppColors.grey,
+                              color: active ? AppColors.textPrimary : AppColors.grey,
                               fontSize: 10,
                               fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                             ),
@@ -249,7 +249,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
         children: [
           Icon(icon, color: color, size: 22),
           SizedBox(height: 6),
-          Text(value, style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800)),
+          Text(value, style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w800)),
           SizedBox(height: 2),
           Text(label, style: TextStyle(color: AppColors.grey, fontSize: 10), textAlign: TextAlign.center),
         ],

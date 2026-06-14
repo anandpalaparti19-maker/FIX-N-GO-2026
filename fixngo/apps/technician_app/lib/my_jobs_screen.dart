@@ -45,7 +45,7 @@ class _MyJobsScreenState extends State<MyJobsScreen> {
       appBar: AppBar(
         title: Text('My Active Jobs'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: _loading 
         ? Center(child: CircularProgressIndicator())

@@ -204,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Text(
                   _dashboard?['name'] ?? 'Technician',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
@@ -244,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
-              child: Icon(Icons.notifications_outlined, color: Colors.white, size: 20),
+              child: Icon(Icons.notifications_outlined, color: AppColors.textPrimary, size: 20),
             ),
           ),
           GestureDetector(
@@ -258,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
-              child: Icon(Icons.assignment_outlined, color: Colors.white, size: 20),
+              child: Icon(Icons.assignment_outlined, color: AppColors.textPrimary, size: 20),
             ),
           ),
           GestureDetector(
@@ -330,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.textPrimary,
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
               ),
@@ -375,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildJobsTab() {
     if (_loading) {
-      return Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2));
+      return Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2));
     }
 
     // Check KYC status from dashboard
@@ -383,7 +383,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final isKycVerified = verificationStatus == 'verified';
 
     return RefreshIndicator(
-      color: AppColors.red,
+      color: AppColors.amber,
       backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: _fetchAll,
       child: CustomScrollView(
@@ -458,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Text(
                     'Available Jobs',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -467,12 +467,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.red.withValues(alpha: 0.15),
+                      color: AppColors.amber.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${_jobs.length}',
-                      style: TextStyle(color: AppColors.red,
+                      style: TextStyle(color: AppColors.amber,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -517,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   SizedBox(height: 16),
                   Text(
                     'No jobs nearby',
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w700),
                   ),
                   SizedBox(height: 8),
                   Text(
@@ -567,10 +567,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.red.withValues(alpha: 0.12),
+                    color: AppColors.amber.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.build_rounded, color: AppColors.red, size: 22),
+                  child: Icon(Icons.build_rounded, color: AppColors.amber, size: 22),
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -580,7 +580,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Text(
                         serviceType,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
@@ -690,10 +690,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.red.withValues(alpha: 0.5), width: 1.5),
+        border: Border.all(color: AppColors.amber.withValues(alpha: 0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppColors.red.withValues(alpha: 0.3),
+            color: AppColors.amber.withValues(alpha: 0.3),
             blurRadius: 40,
             spreadRadius: 0,
           ),
@@ -721,18 +721,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.red.withValues(alpha: 0.15),
+                        color: AppColors.amber.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.notifications_active_rounded, color: AppColors.red, size: 14),
+                          Icon(Icons.notifications_active_rounded, color: AppColors.amber, size: 14),
                           SizedBox(width: 4),
                           Text(
                             'NEW JOB REQUEST',
                             style: TextStyle(
-                              color: AppColors.red,
+                              color: AppColors.amber,
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5,
@@ -769,7 +769,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Text(
                   serviceType,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.3,
@@ -823,7 +823,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: Text(
                               'Decline',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -926,14 +926,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     children: [
                       Icon(
                         active ? item.activeIcon : item.icon,
-                        color: active ? AppColors.red : AppColors.grey,
+                        color: active ? AppColors.amber : AppColors.grey,
                         size: 24,
                       ),
                       SizedBox(height: 3),
                       Text(
                         item.label,
                         style: TextStyle(
-                          color: active ? AppColors.red : AppColors.grey,
+                          color: active ? AppColors.amber : AppColors.grey,
                           fontSize: 10,
                           fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                         ),

@@ -52,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Row(
@@ -63,13 +63,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.red,
+                  color: AppColors.amber,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   '$unreadCount',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.navyDeep,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),
@@ -97,7 +97,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           if (_loading) {
             return Padding(
               padding: EdgeInsets.only(top: 64),
-              child: Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2)),
+              child: Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2)),
             );
           }
 
@@ -120,7 +120,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: read ? Theme.of(context).colorScheme.outline : AppColors.red.withValues(alpha: 0.3),
+                  color: read ? Theme.of(context).colorScheme.outline : AppColors.amber.withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
@@ -130,10 +130,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: AppColors.red.withValues(alpha: 0.12),
+                      color: AppColors.amber.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.notifications_rounded, color: AppColors.red, size: 22),
+                    child: Icon(Icons.notifications_rounded, color: AppColors.amber, size: 22),
                   ),
                   SizedBox(width: 12),
                   Expanded(
@@ -146,7 +146,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               child: Text(
                                 n['title'] as String? ?? 'Notification',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -175,7 +175,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       height: 8,
                       margin: EdgeInsets.only(left: 8, top: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.red,
+                        color: AppColors.amber,
                         shape: BoxShape.circle,
                       ),
                     ),

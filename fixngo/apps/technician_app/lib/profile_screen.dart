@@ -247,7 +247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: Icon(Icons.verified_rounded, color: AppColors.green),
                         ),
                         SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [

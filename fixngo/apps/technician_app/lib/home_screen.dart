@@ -509,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
           if (_jobs.isEmpty)
-            const SliverFillRemaining(
+            SliverFillRemaining(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

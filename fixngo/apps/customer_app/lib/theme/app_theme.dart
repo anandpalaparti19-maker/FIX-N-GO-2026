@@ -34,6 +34,12 @@ class AppColors {
 
   static Color get gradientStart => isDark ? const Color(0xFF0A0E1A) : const Color(0xFFF8F9FA);
   static Color get gradientEnd => isDark ? const Color(0xFF111827) : const Color(0xFFF1F5F9);
+  static Color get surfaceSunken => isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9);
+  static Color get surfaceElevated => isDark ? const Color(0xFF162032) : const Color(0xFFFFFFFF);
+  static Color get outlineSoft => isDark ? const Color(0xFF243244) : const Color(0xFFD9E2EC);
+  static Color get heroStart => isDark ? const Color(0xFF1D4ED8) : const Color(0xFF2563EB);
+  static Color get heroEnd => isDark ? const Color(0xFF0EA5E9) : const Color(0xFF38BDF8);
+  static Color get glow => isDark ? const Color(0x332563EB) : const Color(0x1A2563EB);
 
   // Exposing old light names if they were still used
   static Color get bgLight => const Color(0xFFF8F9FA);
@@ -51,13 +57,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      scaffoldBackgroundColor: const Color(0xFF0A0E1A),
+      scaffoldBackgroundColor: bgDark,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.brandBlue,
         secondary: AppColors.brandGreen,
+        tertiary: AppColors.accentCyan,
         surface: Color(0xFF111827),
         onPrimary: Color(0xFFFFFFFF),
+        onSecondary: Color(0xFFFFFFFF),
         onSurface: Color(0xFFF1F5F9),
+        outline: Color(0xFF243244),
       ),
       textTheme: GoogleFonts.poppinsTextTheme(
         TextTheme(
@@ -78,9 +87,28 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: bgCard,
+        indicatorColor: AppColors.brandBlue.withValues(alpha: 0.16),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: selected ? AppColors.brandBlue : const Color(0xFF64748B),
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            color: selected ? AppColors.brandBlue : const Color(0xFF64748B),
+          );
+        }),
+      ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFF0A0E1A),
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         iconTheme: IconThemeData(color: Color(0xFFF1F5F9)),
         titleTextStyle: TextStyle(
           color: Color(0xFFF1F5F9),
@@ -105,13 +133,64 @@ class AppTheme {
         ),
         hintStyle: TextStyle(color: Color(0xFF64748B)),
       ),
+      cardTheme: CardThemeData(
+        color: bgCard,
+        elevation: 0,
+        shadowColor: Colors.black.withValues(alpha: 0.22),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: outlineSoft),
+        ),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.brandBlue,
           foregroundColor: Colors.white,
           elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: textPrimary,
+          side: BorderSide(color: outlineSoft),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: bgCardLight,
+        selectedColor: AppColors.brandBlue.withValues(alpha: 0.16),
+        disabledColor: bgCardLight,
+        secondarySelectedColor: AppColors.brandBlue.withValues(alpha: 0.16),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        labelStyle: GoogleFonts.poppins(color: textSecondary, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: GoogleFonts.poppins(color: AppColors.brandBlue, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: outlineSoft),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.brandBlue;
+          }
+          return const Color(0xFFE2E8F0);
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.brandBlue.withValues(alpha: 0.35);
+          }
+          return const Color(0xFF334155);
+        }),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: bgCardMedium,
+        contentTextStyle: GoogleFonts.poppins(color: textPrimary, fontWeight: FontWeight.w500),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       dividerColor: const Color(0xFF1E293B),
       cardColor: const Color(0xFF111827),
@@ -123,12 +202,14 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: const Color(0xFFF8F9FA),
+      scaffoldBackgroundColor: bgLight,
       colorScheme: const ColorScheme.light(
         primary: AppColors.brandBlue,
         secondary: AppColors.brandGreen,
+        tertiary: AppColors.accentCyan,
         surface: Color(0xFFFFFFFF),
         onPrimary: Colors.white,
+        onSecondary: Colors.white,
         onSurface: Color(0xFF0F172A),
         outline: Color(0xFFE2E8F0),
       ),
@@ -150,6 +231,24 @@ class AppTheme {
         unselectedItemColor: Color(0xFF94A3B8),
         type: BottomNavigationBarType.fixed,
         elevation: 0,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: bgCardLightMode,
+        indicatorColor: AppColors.brandBlue.withValues(alpha: 0.12),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return IconThemeData(
+            color: selected ? AppColors.brandBlue : const Color(0xFF94A3B8),
+          );
+        }),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final selected = states.contains(WidgetState.selected);
+          return GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            color: selected ? AppColors.brandBlue : const Color(0xFF64748B),
+          );
+        }),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Color(0xFFFFFFFF),
@@ -180,13 +279,64 @@ class AppTheme {
         ),
         hintStyle: TextStyle(color: Color(0xFF94A3B8)),
       ),
+      cardTheme: CardThemeData(
+        color: bgCardLightMode,
+        elevation: 0,
+        shadowColor: const Color(0x0C0F172A),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: outlineSoft),
+        ),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.brandBlue,
           foregroundColor: Colors.white,
           elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: textDark,
+          side: BorderSide(color: outlineSoft),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: bgCardLight,
+        selectedColor: AppColors.brandBlue.withValues(alpha: 0.10),
+        disabledColor: bgCardLight,
+        secondarySelectedColor: AppColors.brandBlue.withValues(alpha: 0.10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        labelStyle: GoogleFonts.poppins(color: textDarkSecondary, fontWeight: FontWeight.w500),
+        secondaryLabelStyle: GoogleFonts.poppins(color: AppColors.brandBlue, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: outlineSoft),
+        ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.brandBlue;
+          }
+          return const Color(0xFFFFFFFF);
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppColors.brandBlue.withValues(alpha: 0.35);
+          }
+          return const Color(0xFFD1D5DB);
+        }),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: bgCardLightMode,
+        contentTextStyle: GoogleFonts.poppins(color: textDark, fontWeight: FontWeight.w500),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       ),
       dividerColor: const Color(0xFFE2E8F0),
       cardColor: const Color(0xFFFFFFFF),

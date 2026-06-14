@@ -214,6 +214,19 @@ class ApiService {
     }
   }
 
+  Future<bool> updateChecklist(String orderId, List<Map<String, dynamic>> checklist) async {
+    try {
+      final res = await http.patch(
+        Uri.parse('$apiBaseUrl/tech/jobs/$orderId/checklist'),
+        headers: await _getHeaders(),
+        body: jsonEncode({'checklist': checklist}),
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future<bool> completeJob(String orderId) async {
     try {
       final res = await http.post(Uri.parse('$apiBaseUrl/tech/jobs/$orderId/complete'), headers: await _getHeaders());

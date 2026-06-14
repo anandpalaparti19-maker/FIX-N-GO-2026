@@ -53,7 +53,7 @@ class FixNGoTechApp extends StatelessWidget {
     ));
 
     return MaterialApp(
-      title: 'Fix-N-Go Tech',
+      title: 'FixTech',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

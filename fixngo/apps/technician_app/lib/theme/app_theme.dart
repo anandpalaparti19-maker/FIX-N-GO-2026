@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// ─── Color Tokens (Navy + Gold palette matching FixTech logo) ───────────────
+// ─── Color Tokens (Cinematic Precision) ───────────────
 class AppColors {
   static bool isDark = true;
 
-  // ── Brand — derived from FixTech logo ─────────────────────────────────────
+  // ── Brand — Cinematic Precision ───────────────────────────────────────────
   static const Color amber      = Color(0xFFF5B731);
   static const Color amberDark  = Color(0xFFD9A028);
   static const Color amberLight = Color(0xFFFFCC4D);
-  static const Color navy       = Color(0xFF2C3550);
-  static const Color navyDeep   = Color(0xFF1A2238);
+  static const Color navy       = Color(0xFF0A192F); // Primary Background
+  static const Color navyDeep   = Color(0xFF030D25); // Lowest surface
+  static const Color electricBlue = Color(0xFF00D2FF); // Accent
 
   // ── Semantic ──────────────────────────────────────────────────────────────
   static const Color green      = Color(0xFF00C853);
@@ -27,15 +28,15 @@ class AppColors {
   static const Color offline    = Color(0xFF8896AB);
 
   // ── Dark/Light adaptive getters ───────────────────────────────────────────
-  static Color get bg        => isDark ? const Color(0xFF0D1117) : const Color(0xFFF5F3EF);
-  static Color get surface   => isDark ? const Color(0xFF151B28) : const Color(0xFFFFFFFF);
-  static Color get card      => isDark ? const Color(0xFF1C2333) : const Color(0xFFFFFFFF);
-  static Color get cardHigh  => isDark ? const Color(0xFF232B3E) : const Color(0xFFFFF8E7);
+  static Color get bg        => isDark ? navy : const Color(0xFFF5F3EF);
+  static Color get surface   => isDark ? const Color(0xFF112240) : const Color(0xFFFFFFFF);
+  static Color get card      => isDark ? const Color(0xFF112240) : const Color(0xFFFFFFFF);
+  static Color get cardHigh  => isDark ? const Color(0xFF233554) : const Color(0xFFFFF8E7);
 
-  static Color get border    => isDark ? const Color(0xFF2A3448) : const Color(0xFFE8DFD0);
+  static Color get border    => isDark ? const Color(0x33FFFFFF) : const Color(0xFFE8DFD0);
 
-  static Color get textPrimary   => isDark ? const Color(0xFFF1F5F9) : const Color(0xFF1A2238);
-  static Color get textSecondary => isDark ? const Color(0xFF8896AB) : const Color(0xFF57657A);
+  static Color get textPrimary   => isDark ? const Color(0xFFCCD6F6) : const Color(0xFF1A2238);
+  static Color get textSecondary => isDark ? const Color(0xFF8892B0) : const Color(0xFF57657A);
   static Color get textMuted     => isDark ? const Color(0xFF5A6A82) : const Color(0xFF9AA5B4);
 
   // Light-mode explicit
@@ -54,9 +55,9 @@ class AppColors {
 class AppShadows {
   static const List<BoxShadow> card = [
     BoxShadow(
-      color: Color(0x33000000),
-      blurRadius: 20,
-      offset: Offset(0, 8),
+      color: Color(0x1A000000), // Lighter cinematic shadow
+      blurRadius: 10,
+      offset: Offset(0, 4),
     ),
   ];
 
@@ -73,6 +74,14 @@ class AppShadows {
       color: AppColors.amber.withValues(alpha: 0.35),
       blurRadius: 24,
       offset: const Offset(0, 8),
+    ),
+  ];
+
+  static List<BoxShadow> get glow => [
+    BoxShadow(
+      color: AppColors.electricBlue.withValues(alpha: 0.4),
+      blurRadius: 16,
+      spreadRadius: 2,
     ),
   ];
 
@@ -94,32 +103,32 @@ class AppTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.bg,
       colorScheme: ColorScheme.dark(
-        primary: AppColors.amber,
-        secondary: AppColors.orange,
+        primary: AppColors.electricBlue,
+        secondary: AppColors.amber,
         surface: AppColors.surface,
-        onPrimary: AppColors.navyDeep,
+        onPrimary: AppColors.navy,
         onSurface: AppColors.white,
         outline: AppColors.border,
       ),
       textTheme: GoogleFonts.interTextTheme(
         TextTheme(
-          displayLarge:   TextStyle(color: AppColors.white,     fontWeight: FontWeight.w700),
-          headlineLarge:  TextStyle(color: AppColors.white,     fontWeight: FontWeight.w700),
-          headlineMedium: TextStyle(color: AppColors.white,     fontWeight: FontWeight.w600),
-          titleLarge:     TextStyle(color: AppColors.white,     fontWeight: FontWeight.w600),
-          titleMedium:    TextStyle(color: AppColors.white,     fontWeight: FontWeight.w500),
-          bodyLarge:      TextStyle(color: AppColors.greyLight),
-          bodyMedium:     TextStyle(color: AppColors.greyLight),
-          labelLarge:     TextStyle(color: AppColors.white,     fontWeight: FontWeight.w600),
+          displayLarge:   TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, letterSpacing: -0.02),
+          headlineLarge:  TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, letterSpacing: -0.01),
+          headlineMedium: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600, letterSpacing: -0.01),
+          titleLarge:     TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+          titleMedium:    TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+          bodyLarge:      TextStyle(color: AppColors.textSecondary),
+          bodyMedium:     TextStyle(color: AppColors.textSecondary),
+          labelLarge:     GoogleFonts.jetBrainsMono(color: AppColors.textPrimary, fontWeight: FontWeight.w600), // Labels in monospace for high-tech feel
         ),
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.bg,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.white),
-        titleTextStyle: const TextStyle(
-          color: AppColors.white,
+        iconTheme: IconThemeData(color: AppColors.textPrimary),
+        titleTextStyle: TextStyle(
+          color: AppColors.textPrimary,
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
@@ -135,36 +144,36 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.amber,
-          foregroundColor: AppColors.navyDeep,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          backgroundColor: AppColors.electricBlue,
+          foregroundColor: AppColors.navy,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: AppColors.surface,
+        fillColor: AppColors.navyDeep, // Recessed inputs
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.border),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.border),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.amber),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.electricBlue),
         ),
         hintStyle: TextStyle(color: AppColors.textMuted),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return AppColors.amber;
+          if (states.contains(WidgetState.selected)) return AppColors.electricBlue;
           return const Color(0xFFE2E8F0);
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return AppColors.amber.withValues(alpha: 0.35);
+          if (states.contains(WidgetState.selected)) return AppColors.electricBlue.withValues(alpha: 0.35);
           return const Color(0xFF334155);
         }),
       ),
@@ -179,8 +188,8 @@ class AppTheme {
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.bgLight,
       colorScheme: ColorScheme.light(
-        primary: AppColors.amber,
-        secondary: AppColors.orange,
+        primary: AppColors.electricBlue,
+        secondary: AppColors.amber,
         surface: const Color(0xFFFFFFFF),
         onPrimary: AppColors.navyDeep,
         onSurface: AppColors.textDark,
@@ -221,9 +230,9 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.amber,
+          backgroundColor: AppColors.electricBlue,
           foregroundColor: AppColors.navyDeep,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         ),
       ),
@@ -231,26 +240,26 @@ class AppTheme {
         filled: true,
         fillColor: const Color(0xFFFFFFFF),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.borderLight),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.borderLight),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: AppColors.amber),
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.electricBlue),
         ),
         hintStyle: TextStyle(color: AppColors.textDarkMuted),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return AppColors.amber;
+          if (states.contains(WidgetState.selected)) return AppColors.electricBlue;
           return const Color(0xFFFFFFFF);
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) return AppColors.amber.withValues(alpha: 0.35);
+          if (states.contains(WidgetState.selected)) return AppColors.electricBlue.withValues(alpha: 0.35);
           return const Color(0xFFCBD5E1);
         }),
       ),

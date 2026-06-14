@@ -43,8 +43,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _updatePhoto() async {
+    final source = (kIsWeb || 
+                    defaultTargetPlatform == TargetPlatform.windows || 
+                    defaultTargetPlatform == TargetPlatform.macOS || 
+                    defaultTargetPlatform == TargetPlatform.linux)
+        ? ImageSource.gallery
+        : ImageSource.camera;
+
     final image = await _picker.pickImage(
-      source: ImageSource.camera,
+      source: source,
       imageQuality: 85,
       preferredCameraDevice: CameraDevice.front,
     );
@@ -212,15 +219,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         SizedBox(height: 4),
                         Text('Verified Technician', style: TextStyle(color: AppColors.green, fontSize: 13)),
                         SizedBox(height: 16),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _miniStat('$rating ★', 'Rating'),
-                            Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outline, margin: EdgeInsets.symmetric(horizontal: 20)),
-                            _miniStat('$jobs', 'Jobs Done'),
-                            Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outline, margin: EdgeInsets.symmetric(horizontal: 20)),
-                            _miniStat('4 yrs', 'Experience'),
-                          ],
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _miniStat('$rating ★', 'Rating'),
+                              Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outline, margin: EdgeInsets.symmetric(horizontal: 20)),
+                              _miniStat('$jobs', 'Jobs Done'),
+                              Container(width: 1, height: 32, color: Theme.of(context).colorScheme.outline, margin: EdgeInsets.symmetric(horizontal: 20)),
+                              _miniStat('4 yrs', 'Experience'),
+                            ],
+                          ),
                         ),
                       ],
                     ),

@@ -108,6 +108,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _toggleOnline(bool val) async {
+    if (val) {
+      final verificationStatus = _dashboard?['verification']?['status'] ?? 'unverified';
+      if (verificationStatus != 'verified') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Complete KYC process to earn'),
+            backgroundColor: AppColors.red,
+          ),
+        );
+        return;
+      }
+    }
+
     setState(() => _isOnline = val);
     if (!val) {
       _positionStream?.cancel();
@@ -179,20 +192,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       padding: EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Row(
         children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: _isOnline ? AppColors.green : Theme.of(context).colorScheme.outline,
-                width: 2,
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/profile'),
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _isOnline ? AppColors.green : Theme.of(context).colorScheme.outline,
+                  width: 2,
+                ),
               ),
-            ),
-            child: ClipOval(
-              child: Container(
-                color: Theme.of(context).colorScheme.surface,
-                child: Icon(Icons.person_rounded, color: AppColors.grey, size: 24),
+              child: ClipOval(
+                child: Container(
+                  color: Theme.of(context).colorScheme.surface,
+                  child: Icon(Icons.person_rounded, color: AppColors.grey, size: 24),
+                ),
               ),
             ),
           ),
@@ -375,7 +391,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Widget _buildJobsTab() {
     if (_loading) {
-      return Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2));
+      return Center(child: CircularProgressIndicator(color: AppColors.electricBlue, strokeWidth: 2));
     }
 
     // Check KYC status from dashboard
@@ -383,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final isKycVerified = verificationStatus == 'verified';
 
     return RefreshIndicator(
-      color: AppColors.amber,
+      color: AppColors.electricBlue,
       backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: _fetchAll,
       child: CustomScrollView(
@@ -467,12 +483,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: AppColors.amber.withValues(alpha: 0.15),
+                      color: AppColors.electricBlue.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${_jobs.length}',
-                      style: TextStyle(color: AppColors.amber,
+                      style: TextStyle(color: AppColors.electricBlue,
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
                       ),
@@ -567,10 +583,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.amber.withValues(alpha: 0.12),
+                    color: AppColors.electricBlue.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.build_rounded, color: AppColors.amber, size: 22),
+                  child: Icon(Icons.build_rounded, color: AppColors.electricBlue, size: 22),
                 ),
                 SizedBox(width: 12),
                 Expanded(
@@ -623,14 +639,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                     decoration: BoxDecoration(
-                      color: AppColors.green,
+                      color: AppColors.electricBlue,
                       borderRadius: BorderRadius.circular(30),
-                      boxShadow: AppShadows.green,
+                      boxShadow: AppShadows.glow,
                     ),
                     child: Text(
                       'Accept',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.navyDeep,
                         fontWeight: FontWeight.w700,
                         fontSize: 14,
                       ),
@@ -690,14 +706,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.amber.withValues(alpha: 0.5), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.amber.withValues(alpha: 0.3),
-            blurRadius: 40,
-            spreadRadius: 0,
-          ),
-        ],
+        border: Border.all(color: AppColors.electricBlue.withValues(alpha: 0.5), width: 1.5),
+        boxShadow: AppShadows.glow,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -707,7 +717,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: LinearProgressIndicator(
               value: _countdown / 20,
               backgroundColor: Theme.of(context).colorScheme.outline,
-              color: _countdown > 8 ? AppColors.green : AppColors.red,
+              color: _countdown > 8 ? AppColors.electricBlue : AppColors.red,
               minHeight: 4,
             ),
           ),
@@ -721,18 +731,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: AppColors.amber.withValues(alpha: 0.15),
+                        color: AppColors.electricBlue.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.notifications_active_rounded, color: AppColors.amber, size: 14),
+                          Icon(Icons.notifications_active_rounded, color: AppColors.electricBlue, size: 14),
                           SizedBox(width: 4),
                           Text(
                             'NEW JOB REQUEST',
                             style: TextStyle(
-                              color: AppColors.amber,
+                              color: AppColors.electricBlue,
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               letterSpacing: 0.5,

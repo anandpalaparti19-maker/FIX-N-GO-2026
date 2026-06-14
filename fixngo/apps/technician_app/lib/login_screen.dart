@@ -93,23 +93,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   children: [
                     SizedBox(height: 48),
                     Center(
-                      child: Container(
-                        width: 140,
-                        height: 140,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(70),
-                          boxShadow: AppShadows.amber,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(70),
-                          child: Container(
-                            color: AppColors.navyDeep,
-                            child: Image.asset(
-                              'assets/images/logo.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                      child: Image.asset(
+                        'assets/images/logo4.png',
+                        width: 180,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     SizedBox(height: 32),
@@ -176,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                               TextSpan(
                                 text: 'Register',
                                 style: TextStyle(
-                                  color: AppColors.amber,
+                                  color: AppColors.electricBlue,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),

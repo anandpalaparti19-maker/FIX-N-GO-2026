@@ -81,6 +81,31 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       setState(() => _loading = false);
     }
 
+    if (_currentStep == 2) {
+      if (_checklist.contains(false)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please complete all checklist items first')),
+        );
+        return;
+      }
+      
+      setState(() => _loading = true);
+      if (_job?['_id'] != null) {
+        final checklistData = _checklistItems.asMap().entries.map((e) => {
+          'key': 'item_${e.key}',
+          'label': e.value,
+          'done': _checklist[e.key],
+        }).toList();
+        await _api.updateChecklist(_job!['_id'], checklistData);
+      }
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _currentStep++;
+      });
+      return;
+    }
+
     if (_currentStep < 3) {
       setState(() => _currentStep++);
       return;

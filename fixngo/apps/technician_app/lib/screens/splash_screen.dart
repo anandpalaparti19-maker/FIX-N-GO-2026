@@ -84,13 +84,13 @@ class _SplashScreenState extends State<SplashScreen>
         children: [
           Center(
             child: Container(
-              width: 400,
-              height: 400,
+              width: 500,
+              height: 500,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.amber.withValues(alpha: 0.12),
+                    AppColors.electricBlue.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -105,51 +105,13 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _opacityAnim.value,
                   child: Transform.scale(
                     scale: _scaleAnim.value,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Transform.scale(
-                          scale: _pulseAnim.value,
-                          child: Container(
-                            width: 140,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(70),
-                              boxShadow: AppShadows.amber,
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(70),
-                              child: Container(
-                                color: AppColors.navyDeep,
-                                child: Image.asset(
-                                  'assets/images/logo.png',
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          'FixTech',
-                          style: TextStyle(
-                            color: AppColors.textPrimary,
-                            fontSize: 36,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 6,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Technician Partner App',
-                          style: TextStyle(
-                            color: AppColors.grey,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ],
+                    child: Transform.scale(
+                      scale: _pulseAnim.value,
+                      child: Image.asset(
+                        'assets/images/logo4.png',
+                        width: 300,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 );

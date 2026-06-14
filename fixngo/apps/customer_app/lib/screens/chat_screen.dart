@@ -108,7 +108,7 @@ class _ChatScreenState extends State<ChatScreen> {
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             Text(
@@ -174,7 +174,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             child: Text(
                               msg['message'],
                               style: GoogleFonts.poppins(
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                                 fontSize: 14,
                               ),
                             ),

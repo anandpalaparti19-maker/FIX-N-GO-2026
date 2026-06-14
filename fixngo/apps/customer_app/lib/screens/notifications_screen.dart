@@ -99,7 +99,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
         actions: [
           if (_notifications.any(
               (n) => (n as Map)['read'] != true))
@@ -167,7 +167,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                       style: GoogleFonts.poppins(
                                         fontSize: 14,
                                         fontWeight: read ? FontWeight.w500 : FontWeight.w700,
-                                        color: Colors.white,
+                                        color: AppColors.textPrimary,
                                       ),
                                     ),
                                     if (n['message'] != null)

@@ -72,7 +72,7 @@ class HelpFaqScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       body: ListView.separated(
         physics: const BouncingScrollPhysics(),
@@ -126,7 +126,7 @@ class _FaqTileState extends State<_FaqTile> {
                       style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: Colors.white)),
+                          color: AppColors.textPrimary)),
                 ),
                 Icon(
                   _expanded

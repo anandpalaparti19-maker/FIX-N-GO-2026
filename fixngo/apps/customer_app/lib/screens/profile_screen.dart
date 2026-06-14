@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           'Edit Profile',
-          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
         ),
         content: SingleChildScrollView(
           child: Column(
@@ -138,7 +138,7 @@ class ProfileScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontSize: 26,
                                   fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                 )),
                             GestureDetector(
                               onTap: () => _showEditProfileDialog(context, auth),
@@ -196,7 +196,7 @@ class ProfileScreen extends StatelessWidget {
                             style: GoogleFonts.poppins(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: AppColors.textPrimary,
                             )),
                         if (email.isNotEmpty)
                           Text(email,
@@ -374,7 +374,7 @@ class _StatItem extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             )),
         Text(label,
             style: GoogleFonts.poppins(

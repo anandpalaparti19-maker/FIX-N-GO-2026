@@ -76,7 +76,7 @@ class _EarningsScreenState extends State<EarningsScreen>
           style: GoogleFonts.poppins(
             fontSize: 18,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         actions: [
@@ -89,7 +89,7 @@ class _EarningsScreenState extends State<EarningsScreen>
           controller: _tabController,
           indicatorColor: AppColors.green,
           indicatorSize: TabBarIndicatorSize.label,
-          labelColor: Colors.white,
+          labelColor: AppColors.textPrimary,
           unselectedLabelColor: AppColors.grey,
           labelStyle: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
           tabs: [
@@ -193,7 +193,7 @@ class _EarningsScreenState extends State<EarningsScreen>
                     style: GoogleFonts.poppins(
                       fontSize: 40,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       height: 1,
                     ),
                   ),
@@ -216,7 +216,7 @@ class _EarningsScreenState extends State<EarningsScreen>
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               ),
             ),
             SizedBox(height: 14),
@@ -305,7 +305,7 @@ class _EarningsScreenState extends State<EarningsScreen>
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     )),
                 Text('$orders job${orders != 1 ? 's' : ''} completed',
                     style: GoogleFonts.poppins(
@@ -456,7 +456,7 @@ class _WithdrawTabState extends State<_WithdrawTab> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               )),
           SizedBox(height: 10),
           _field(_amountCtrl, 'e.g. 500',
@@ -468,7 +468,7 @@ class _WithdrawTabState extends State<_WithdrawTab> {
               style: GoogleFonts.poppins(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.textPrimary,
               )),
           SizedBox(height: 10),
           _field(_nameCtrl, 'Account Holder Name'),
@@ -529,11 +529,11 @@ class _WithdrawTabState extends State<_WithdrawTab> {
       controller: controller,
       keyboardType: keyboardType,
       textCapitalization: textCapitalization,
-      style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+      style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
       decoration: InputDecoration(
         hintText: hint,
         prefixText: prefix,
-        prefixStyle: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+        prefixStyle: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
         hintStyle:
             GoogleFonts.poppins(color: AppColors.grey, fontSize: 14),
         filled: true,

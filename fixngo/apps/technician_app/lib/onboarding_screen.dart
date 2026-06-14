@@ -79,16 +79,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             color: Theme.of(context).colorScheme.surface,
                             shape: BoxShape.circle,
                             border: Border.all(color: Theme.of(context).colorScheme.outline),
-                            boxShadow: AppShadows.red,
+                            boxShadow: AppShadows.amber,
                           ),
-                          child: Icon(slide['icon'] as IconData, size: 54, color: AppColors.red),
+                          child: Icon(slide['icon'] as IconData, size: 54, color: AppColors.amber),
                         ),
                         SizedBox(height: 28),
                         Text(
                           slide['title'] as String,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
                             height: 1.2,
@@ -118,7 +118,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     width: _page == index ? 22 : 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: _page == index ? AppColors.red : Theme.of(context).colorScheme.outline,
+                      color: _page == index ? AppColors.amber : Theme.of(context).colorScheme.outline,
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
@@ -129,8 +129,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.red,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.amber,
+                    foregroundColor: AppColors.navyDeep,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),

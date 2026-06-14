@@ -91,7 +91,7 @@ class _KycScreenState extends State<KycScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Text('KYC Verification'),
@@ -119,7 +119,7 @@ class _KycScreenState extends State<KycScreen> {
             SizedBox(height: 24),
             Text(
               'KYC Submitted!',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 12),
             Text(
@@ -171,7 +171,7 @@ class _KycScreenState extends State<KycScreen> {
             controller: _aadhaarCtrl,
             keyboardType: TextInputType.number,
             maxLength: 12,
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: '12-digit Aadhaar number',
               prefixIcon: Icon(Icons.badge_outlined),
@@ -246,12 +246,12 @@ class _KycScreenState extends State<KycScreen> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: (uploaded ? AppColors.green : AppColors.red).withValues(alpha: 0.12),
+                    color: (uploaded ? AppColors.green : AppColors.amber).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(
                     uploaded ? Icons.check_circle_rounded : icon,
-                    color: uploaded ? AppColors.green : AppColors.red,
+                    color: uploaded ? AppColors.green : AppColors.amber,
                     size: 18,
                   ),
                 ),
@@ -259,7 +259,7 @@ class _KycScreenState extends State<KycScreen> {
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],

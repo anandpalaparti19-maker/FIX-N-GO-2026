@@ -56,7 +56,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
       appBar: AppBar(
         title: Text('Withdraw Funds'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.textPrimary,
       ),
       body: SafeArea(
         child: Padding(
@@ -68,7 +68,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               TextField(
                 controller: _amountCtrl,
                 keyboardType: TextInputType.number,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Enter amount',
                   prefixIcon: Icon(Icons.currency_rupee_rounded),
@@ -78,7 +78,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
               const SectionLabel('Bank Account'),
               TextField(
                 controller: _bankCtrl,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Bank account number',
                   prefixIcon: Icon(Icons.account_balance_rounded),

@@ -52,7 +52,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       body: Padding(
         padding: EdgeInsets.all(24),
@@ -81,7 +81,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
         SizedBox(height: 8),
         Text('Your feedback helps us improve Fix-N-Go',
             style: GoogleFonts.poppins(
@@ -183,7 +183,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
               style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white)),
+                  color: AppColors.textPrimary)),
           SizedBox(height: 8),
           Text('Your feedback has been recorded.',
               style: GoogleFonts.poppins(

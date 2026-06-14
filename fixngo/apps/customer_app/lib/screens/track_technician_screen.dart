@@ -114,7 +114,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
         ),
         title: Text('Track Technician',
             style: GoogleFonts.poppins(
-                fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)),
+                fontSize: 20, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
         actions: [
           Container(
             margin: EdgeInsets.only(right: 16),
@@ -221,7 +221,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
                                         style: GoogleFonts.poppins(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
-                                          color: Colors.white,
+                                          color: AppColors.textPrimary,
                                         )),
                                     Row(
                                       children: [
@@ -299,7 +299,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    color: AppColors.textPrimary,
                                   )),
                               SizedBox(height: 12),
                               _StatusStep(

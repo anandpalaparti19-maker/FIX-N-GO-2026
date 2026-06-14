@@ -108,7 +108,7 @@ class _SupportScreenState extends State<SupportScreen> {
       appBar: AppBar(
         title: Text('Help & Support'),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        foregroundColor: AppColors.white,
+        foregroundColor: AppColors.textPrimary,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
           child: Container(
@@ -121,7 +121,7 @@ class _SupportScreenState extends State<SupportScreen> {
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
               size: 18,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ),
@@ -158,7 +158,7 @@ class _SupportScreenState extends State<SupportScreen> {
               const SectionLabel('Raise a Request'),
               TextField(
                 controller: _subjectCtrl,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Subject',
                   prefixIcon: Icon(Icons.subject_rounded),
@@ -169,7 +169,7 @@ class _SupportScreenState extends State<SupportScreen> {
                 controller: _messageCtrl,
                 minLines: 4,
                 maxLines: 6,
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.textPrimary),
                 decoration: const InputDecoration(
                   hintText: 'Describe your issue',
                   prefixIcon: Icon(Icons.message_rounded),
@@ -215,8 +215,8 @@ class _SupportScreenState extends State<SupportScreen> {
                 child: ElevatedButton(
                   onPressed: _submitting ? null : _submitTicket,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.red,
-                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.amber,
+                    foregroundColor: AppColors.navyDeep,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
@@ -224,7 +224,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ? SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.navyDeep),
                         )
                       : Text('Send Support Request'),
                 ),
@@ -234,7 +234,7 @@ class _SupportScreenState extends State<SupportScreen> {
               if (_loading)
                 Padding(
                   padding: EdgeInsets.only(top: 16),
-                  child: Center(child: CircularProgressIndicator(color: AppColors.red, strokeWidth: 2)),
+                  child: Center(child: CircularProgressIndicator(color: AppColors.amber, strokeWidth: 2)),
                 )
               else if (_tickets.isEmpty)
                 Padding(
@@ -260,7 +260,7 @@ class _SupportScreenState extends State<SupportScreen> {
                             Expanded(
                               child: Text(
                                 item['subject'] as String? ?? 'Support',
-                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
                               ),
                             ),
                             Text(
@@ -283,7 +283,7 @@ class _SupportScreenState extends State<SupportScreen> {
               Icons.email_rounded,
               'Email Support',
               'support@fixngo.in • Usually within 24 hours',
-              AppColors.red,
+              AppColors.amber,
               () {},
               fullWidth: true,
             ),
@@ -301,7 +301,7 @@ class _SupportScreenState extends State<SupportScreen> {
                     color: open ? Theme.of(context).colorScheme.surface : Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: open ? AppColors.red.withValues(alpha: 0.3) : Theme.of(context).colorScheme.outline,
+                      color: open ? AppColors.amber.withValues(alpha: 0.3) : Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   child: Column(
@@ -313,7 +313,7 @@ class _SupportScreenState extends State<SupportScreen> {
                             child: Text(
                               _faqs[i]['q']!,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: AppColors.textPrimary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -321,7 +321,7 @@ class _SupportScreenState extends State<SupportScreen> {
                           ),
                           Icon(
                             open ? Icons.remove_rounded : Icons.add_rounded,
-                            color: open ? AppColors.red : AppColors.grey,
+                            color: open ? AppColors.amber : AppColors.grey,
                             size: 20,
                           ),
                         ],
@@ -387,7 +387,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                     ),
@@ -412,12 +412,12 @@ class _SupportScreenState extends State<SupportScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text(title, style: TextStyle(color: Colors.white)),
+        title: Text(title, style: TextStyle(color: AppColors.textPrimary)),
         content: Text(message, style: TextStyle(color: AppColors.greyLight)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK', style: TextStyle(color: AppColors.red)),
+            child: Text('OK', style: TextStyle(color: AppColors.amber)),
           ),
         ],
       ),

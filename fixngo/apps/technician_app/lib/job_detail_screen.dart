@@ -118,7 +118,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                      child: Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 18),
                     ),
                   ),
                   SizedBox(width: 12),
@@ -129,7 +129,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         Text(
                           serviceType,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
@@ -170,13 +170,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   color: done
                                       ? AppColors.green
                                       : active
-                                          ? AppColors.red
+                                          ? AppColors.amber
                                           : AppColors.card,
                                   border: Border.all(
                                     color: done
                                         ? AppColors.green
                                         : active
-                                            ? AppColors.red
+                                            ? AppColors.amber
                                             : AppColors.border,
                                     width: 1.5,
                                   ),
@@ -191,7 +191,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               Text(
                                 e.value,
                                 style: TextStyle(
-                                  color: active ? Colors.white : AppColors.grey,
+                                  color: active ? AppColors.textPrimary : AppColors.grey,
                                   fontSize: 8,
                                   fontWeight: active ? FontWeight.w700 : FontWeight.w400,
                                 ),
@@ -228,10 +228,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             width: 52,
                             height: 52,
                             decoration: BoxDecoration(
-                              color: AppColors.red.withValues(alpha: 0.1),
+                              color: AppColors.amber.withValues(alpha: 0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: Icon(Icons.person_rounded, color: AppColors.red, size: 26),
+                            child: Icon(Icons.person_rounded, color: AppColors.amber, size: 26),
                           ),
                           SizedBox(width: 12),
                           Expanded(
@@ -241,7 +241,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 Text(
                                   customerName,
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: AppColors.textPrimary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -344,7 +344,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   Text(
                     'Navigation',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -369,9 +369,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: AppColors.red,
+                              color: AppColors.amber,
                               shape: BoxShape.circle,
-                              boxShadow: AppShadows.red,
+                              boxShadow: AppShadows.amber,
                             ),
                             child: Icon(Icons.my_location_rounded, color: Colors.white, size: 24),
                           ),
@@ -397,7 +397,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               SizedBox(height: 12),
               Row(
                 children: [
-                  Icon(Icons.location_on_rounded, color: AppColors.red, size: 16),
+                  Icon(Icons.location_on_rounded, color: AppColors.amber, size: 16),
                   SizedBox(width: 6),
                   Expanded(
                     child: Text(

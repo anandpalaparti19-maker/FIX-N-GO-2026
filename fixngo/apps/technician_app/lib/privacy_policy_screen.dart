@@ -18,7 +18,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: Colors.white),
+            child: Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppColors.textPrimary),
           ),
         ),
         title: Text('Privacy Policy'),
@@ -30,7 +30,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
           children: [
             Text(
               'Privacy Policy',
-              style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 24, fontWeight: FontWeight.w800),
             ),
             SizedBox(height: 8),
             Text(
@@ -57,7 +57,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w700),
           ),
           SizedBox(height: 12),
           Text(

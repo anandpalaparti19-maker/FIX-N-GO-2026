@@ -81,7 +81,7 @@ class _PaymentScreenState extends State<PaymentScreen>
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
               size: 18,
-              color: Colors.white,
+              color: AppColors.textPrimary,
             ),
           ),
         ),
@@ -120,7 +120,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                         Text(
                           '₹$price',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -1,
@@ -208,7 +208,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                               Text(
                                 'Cash Collection Tips',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
                                 ),
@@ -260,7 +260,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                         Text(
                           'Payment Collected!',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
                           ),
@@ -315,7 +315,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                   Text(
                     title,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),

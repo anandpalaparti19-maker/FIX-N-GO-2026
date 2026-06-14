@@ -146,7 +146,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         size: 18,
                       ),
                     ),
@@ -159,7 +159,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text(
                           _step == 0 ? 'Personal Info' : 'Your Skills',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: AppColors.textPrimary,
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
                           ),
@@ -182,7 +182,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Container(
                       height: 4,
                       decoration: BoxDecoration(
-                        color: AppColors.red,
+                        color: AppColors.amber,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -192,7 +192,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Container(
                       height: 4,
                       decoration: BoxDecoration(
-                        color: _step >= 1 ? AppColors.red : Theme.of(context).colorScheme.outline,
+                        color: _step >= 1 ? AppColors.amber : Theme.of(context).colorScheme.outline,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -240,7 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SectionLabel('Full Name'),
         TextField(
           controller: _nameCtrl,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(
             hintText: 'Enter your full name',
             prefixIcon: Icon(Icons.person_outline_rounded),
@@ -251,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         TextField(
           controller: _phoneCtrl,
           keyboardType: TextInputType.phone,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(
             labelText: 'Phone Number',
             hintText: 'Enter your phone number',
@@ -263,7 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         TextField(
           controller: _emailCtrl,
           keyboardType: TextInputType.emailAddress,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: const InputDecoration(
             hintText: 'your@email.com',
             prefixIcon: Icon(Icons.mail_outline_rounded),
@@ -274,7 +274,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         TextField(
           controller: _passCtrl,
           obscureText: _obscure,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: AppColors.textPrimary),
           decoration: InputDecoration(
             hintText: '••••••••',
             prefixIcon: Icon(Icons.lock_outline_rounded),
@@ -300,7 +300,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   TextSpan(
                     text: 'Sign In',
-                    style: TextStyle(color: AppColors.red, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.amber, fontWeight: FontWeight.w700),
                   ),
                 ],
               ),
@@ -340,10 +340,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 duration: const Duration(milliseconds: 200),
                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: selected ? AppColors.red.withValues(alpha: 0.15) : Theme.of(context).colorScheme.surface,
+                  color: selected ? AppColors.amber.withValues(alpha: 0.15) : Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(30),
                   border: Border.all(
-                    color: selected ? AppColors.red : Theme.of(context).colorScheme.outline,
+                    color: selected ? AppColors.amber : Theme.of(context).colorScheme.outline,
                     width: selected ? 1.5 : 1,
                   ),
                 ),
@@ -353,12 +353,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (selected)
                       Padding(
                         padding: EdgeInsets.only(right: 6),
-                        child: Icon(Icons.check_circle_rounded, color: AppColors.red, size: 16),
+                        child: Icon(Icons.check_circle_rounded, color: AppColors.amber, size: 16),
                       ),
                     Text(
                       skill,
                       style: TextStyle(
-                        color: selected ? AppColors.red : AppColors.greyLight,
+                        color: selected ? AppColors.amber : AppColors.greyLight,
                         fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                         fontSize: 13,
                       ),
@@ -398,16 +398,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: AppColors.red.withValues(alpha: 0.12),
+                    color: AppColors.amber.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, color: AppColors.red, size: 18),
+                  child: Icon(icon, color: AppColors.amber, size: 18),
                 ),
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],

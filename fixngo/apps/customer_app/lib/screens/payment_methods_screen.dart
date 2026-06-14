@@ -49,7 +49,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
             style: GoogleFonts.poppins(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: Colors.white)),
+                color: AppColors.textPrimary)),
       ),
       body: Padding(
         padding: EdgeInsets.all(20),
@@ -97,7 +97,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                             style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white)),
+                                color: AppColors.textPrimary)),
                       ),
                       if (selected)
                         Icon(Icons.check_circle_rounded, color: AppColors.brandBlue, size: 22)

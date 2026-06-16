@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
-import '../services/socket_service.dart';
+import '../services/mqtt_service.dart';
 import '../models/order_model.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
@@ -19,7 +19,7 @@ class FindingTechScreen extends StatefulWidget {
 
 class _FindingTechScreenState extends State<FindingTechScreen>
     with TickerProviderStateMixin {
-  final SocketService _socketService = SocketService();
+  final MqttService _socketService = MqttService();
   final ApiService _apiService = ApiService();
   final StorageService _storageService = StorageService();
 
@@ -238,7 +238,7 @@ class _FindingTechScreenState extends State<FindingTechScreen>
       ),
       children: [
         TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          urlTemplate: const String.fromEnvironment('TILESERVER_URL', defaultValue: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'),
           userAgentPackageName: 'com.fixngo.customerapp',
         ),
         MarkerLayer(

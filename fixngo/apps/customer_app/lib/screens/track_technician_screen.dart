@@ -1,6 +1,6 @@
 import '../models/order_model.dart';
 import '../services/api_service.dart';
-import '../services/socket_service.dart';
+import '../services/mqtt_service.dart';
 import '../services/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,7 +21,7 @@ class TrackTechnicianScreen extends StatefulWidget {
 class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     with TickerProviderStateMixin {
   final ApiService _apiService = ApiService();
-  final SocketService _socketService = SocketService();
+  final MqttService _socketService = MqttService();
   final StorageService _storageService = StorageService();
 
   late AnimationController _moveController;
@@ -351,7 +351,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
           ),
           children: [
             TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              urlTemplate: const String.fromEnvironment('TILESERVER_URL', defaultValue: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png'),
               userAgentPackageName: 'com.fixngo.customerapp',
             ),
             MarkerLayer(

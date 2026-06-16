@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'api_service_new.dart';
-import 'utils/socket_service.dart';
+import 'utils/mqtt_service.dart';
 import 'widgets/common_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,7 +32,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    SocketService().connect();
+    MqttService().connect();
+    
+    MqttService().onNotification((data) {
+      if (data['type'] == 'kyc_approved') {
+        _fetchAll();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['title'] ?? 'KYC Approved'),
+              backgroundColor: AppColors.green,
+            ),
+          );
+        }
+      } else if (data['type'] == 'new_order_offer' || data['type'] == 'order_assigned') {
+        _fetchAll();
+      }
+    });
+
     _popupCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),
@@ -53,6 +70,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     final jobs = await _api.getAvailableJobs();
     final dash = await _api.getDashboard();
     if (!mounted) return;
+    
+    if (dash != null && dash['_id'] != null) {
+      MqttService().subscribeToUserNotifications(dash['_id']);
+    }
+
     setState(() {
       _jobs = jobs;
       _dashboard = dash;

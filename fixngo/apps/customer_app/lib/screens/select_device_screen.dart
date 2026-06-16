@@ -189,167 +189,175 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
         child: Padding(
           padding: EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Brand',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  )),
-              SizedBox(height: 12),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: brands.map((brand) {
-                  final isSelected = selectedBrand == brand;
-                  return GestureDetector(
-                    onTap: () => setState(() {
-                      selectedBrand = brand;
-                      if (brand == 'Other') {
-                        selectedModel = '';
-                        _customModelCtrl.clear();
-                      } else {
-                        selectedModel = models[brand]!.first;
-                      }
-                    }),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
-                          width: isSelected ? 1.5 : 1,
-                        ),
-                        boxShadow: isSelected
-                            ? [BoxShadow(
-                                color: AppColors.brandBlue.withValues(alpha: 0.3),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4))]
-                            : [],
-                      ),
-                      child: Text(
-                        brand,
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.white : AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              SizedBox(height: 28),
-              Text('Model',
-                  style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  )),
-              SizedBox(height: 12),
-              if (selectedBrand == 'Other') ...[  
-                // Custom model text input
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: _customModelCtrl.text.isEmpty
-                          ? Theme.of(context).colorScheme.outline
-                          : AppColors.brandBlue,
-                    ),
-                  ),
-                  child: TextField(
-                    controller: _customModelCtrl,
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'e.g. Samsung Galaxy M15',
-                      hintStyle: GoogleFonts.poppins(
-                          color: AppColors.textMuted, fontSize: 14),
-                      border: InputBorder.none,
-                      suffixIcon: Icon(Icons.edit_rounded, color: AppColors.textMuted, size: 18),
-                    ),
-                    onChanged: (val) => setState(() => selectedModel = val.trim()),
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Type your exact phone model name above',
-                  style: GoogleFonts.poppins(
-                      fontSize: 12, color: AppColors.textMuted),
-                ),
-              ] else ...[  
-                // Normal dropdown
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline),
-                  ),
-                  child: DropdownButton<String>(
-                    value: selectedModel,
-                    isExpanded: true,
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    underline: SizedBox(),
-                    icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    items: (models[selectedBrand] ?? []).map((model) {
-                      return DropdownMenuItem(value: model, child: Text(model));
-                    }).toList(),
-                    onChanged: (val) => setState(() => selectedModel = val!),
-                  ),
-                ),
-              ],
-              const Spacer(),
-              // Phone preview
-              Center(
-                child: Container(
-                  width: 120,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline, width: 2),
-                  ),
+              Expanded(
+                child: SingleChildScrollView(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        selectedBrand == 'iPhone' || selectedBrand == 'Google Pixel'
-                            ? Icons.phone_iphone_rounded
-                            : selectedBrand == 'Asus ROG'
-                                ? Icons.sports_esports_rounded
-                                : Icons.smartphone_rounded,
-                        size: 60,
-                        color: AppColors.brandBlue.withValues(alpha: 0.6),
+                      Text('Brand',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          )),
+                      SizedBox(height: 12),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: brands.map((brand) {
+                          final isSelected = selectedBrand == brand;
+                          return GestureDetector(
+                            onTap: () => setState(() {
+                              selectedBrand = brand;
+                              if (brand == 'Other') {
+                                selectedModel = '';
+                                _customModelCtrl.clear();
+                              } else {
+                                selectedModel = models[brand]!.first;
+                              }
+                            }),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.brandBlue : Theme.of(context).colorScheme.outline,
+                                  width: isSelected ? 1.5 : 1,
+                                ),
+                                boxShadow: isSelected
+                                    ? [BoxShadow(
+                                        color: AppColors.brandBlue.withValues(alpha: 0.3),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4))]
+                                    : [],
+                              ),
+                              child: Text(
+                                brand,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      SizedBox(height: 8),
-                      Text(
-                        selectedBrand ?? '',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
+                      SizedBox(height: 28),
+                      Text('Model',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          )),
+                      SizedBox(height: 12),
+                      if (selectedBrand == 'Other') ...[  
+                        // Custom model text input
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: _customModelCtrl.text.isEmpty
+                                  ? Theme.of(context).colorScheme.outline
+                                  : AppColors.brandBlue,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _customModelCtrl,
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            decoration: InputDecoration(
+                              hintText: 'e.g. Samsung Galaxy M15',
+                              hintStyle: GoogleFonts.poppins(
+                                  color: AppColors.textMuted, fontSize: 14),
+                              border: InputBorder.none,
+                              suffixIcon: Icon(Icons.edit_rounded, color: AppColors.textMuted, size: 18),
+                            ),
+                            onChanged: (val) => setState(() => selectedModel = val.trim()),
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Type your exact phone model name above',
+                          style: GoogleFonts.poppins(
+                              fontSize: 12, color: AppColors.textMuted),
+                        ),
+                      ] else ...[  
+                        // Normal dropdown
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
+                          ),
+                          child: DropdownButton<String>(
+                            value: selectedModel,
+                            isExpanded: true,
+                            dropdownColor: Theme.of(context).colorScheme.surface,
+                            underline: SizedBox(),
+                            icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textSecondary),
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            items: (models[selectedBrand] ?? []).map((model) {
+                              return DropdownMenuItem(value: model, child: Text(model));
+                            }).toList(),
+                            onChanged: (val) => setState(() => selectedModel = val!),
+                          ),
+                        ),
+                      ],
+                      SizedBox(height: 24),
+                      // Phone preview
+                      Center(
+                        child: Container(
+                          width: 120,
+                          height: 180,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(color: Theme.of(context).colorScheme.outline, width: 2),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                selectedBrand == 'iPhone' || selectedBrand == 'Google Pixel'
+                                    ? Icons.phone_iphone_rounded
+                                    : selectedBrand == 'Asus ROG'
+                                        ? Icons.sports_esports_rounded
+                                        : Icons.smartphone_rounded,
+                                size: 60,
+                                color: AppColors.brandBlue.withValues(alpha: 0.6),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                selectedBrand ?? '',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 11,
+                                  color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                      SizedBox(height: 20),
                     ],
                   ),
                 ),
               ),
-              const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

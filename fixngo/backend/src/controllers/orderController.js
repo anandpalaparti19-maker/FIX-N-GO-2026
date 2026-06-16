@@ -1,7 +1,7 @@
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
 const { defaultChecklist, technicianCut, pushStatusHistory, assignServiceCoords, formatOrderForTech, haversineKm } = require('../utils/orderHelpers');
-const { emitNotification } = require('../utils/socketService');
+const { emitNotification } = require('../utils/mqttService');
 
 const dispatchToNearestTechnician = async (order) => {
   try {

@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 
@@ -12,6 +14,7 @@ class ApiException implements Exception {
 
 class ApiService {
   String? _token;
+  static const Duration _timeout = Duration(seconds: 15);
 
   void setToken(String? token) => _token = token;
 
@@ -114,26 +117,47 @@ class ApiService {
   Future<Map<String, dynamic>> patch(String path, Map<String, dynamic> body) => _patch(path, body);
 
   Future<Map<String, dynamic>> _patch(String path, Map<String, dynamic> body) async {
-    final res = await http.patch(
-      Uri.parse('${ApiConfig.baseUrl}$path'),
-      headers: _headers,
-      body: jsonEncode(body),
-    );
-    return _decode(res);
+    try {
+      final res = await http.patch(
+        Uri.parse('${ApiConfig.baseUrl}$path'),
+        headers: _headers,
+        body: jsonEncode(body),
+      ).timeout(_timeout);
+      return _decode(res);
+    } on TimeoutException {
+      throw ApiException('Request timed out. Please check your internet connection and try again.');
+    } on SocketException {
+      throw ApiException('No internet connection. Please check your network and try again.');
+    }
   }
 
   Future<Map<String, dynamic>> _get(String path) async {
-    final res = await http.get(Uri.parse('${ApiConfig.baseUrl}$path'), headers: _headers);
-    return _decode(res);
+    try {
+      final res = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}$path'),
+        headers: _headers,
+      ).timeout(_timeout);
+      return _decode(res);
+    } on TimeoutException {
+      throw ApiException('Request timed out. Please check your internet connection and try again.');
+    } on SocketException {
+      throw ApiException('No internet connection. Please check your network and try again.');
+    }
   }
 
   Future<Map<String, dynamic>> _post(String path, Map<String, dynamic> body) async {
-    final res = await http.post(
-      Uri.parse('${ApiConfig.baseUrl}$path'),
-      headers: _headers,
-      body: jsonEncode(body),
-    );
-    return _decode(res);
+    try {
+      final res = await http.post(
+        Uri.parse('${ApiConfig.baseUrl}$path'),
+        headers: _headers,
+        body: jsonEncode(body),
+      ).timeout(_timeout);
+      return _decode(res);
+    } on TimeoutException {
+      throw ApiException('Request timed out. Please check your internet connection and try again.');
+    } on SocketException {
+      throw ApiException('No internet connection. Please check your network and try again.');
+    }
   }
 
   dynamic _decode(http.Response res) {
@@ -149,3 +173,4 @@ class ApiService {
     return decoded;
   }
 }
+

@@ -20,7 +20,7 @@ dependencies:
   shared_preferences: ^2.3.2
   provider: ^6.1.5+1
   flutter_stripe: ^12.6.0
-  socket_io_client: ^2.0.3
+  mqtt_client: ^10.4.2
   geolocator: ^10.1.0
   geocoding: ^2.1.1
   url_launcher: ^6.2.5

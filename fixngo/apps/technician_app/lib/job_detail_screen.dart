@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'api_service_new.dart';
-import 'utils/socket_service.dart';
+import 'utils/mqtt_service.dart';
 import 'widgets/common_widgets.dart';
 
 class JobDetailScreen extends StatefulWidget {
@@ -55,7 +55,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       );
       _jobLocationStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
         if (!mounted) return;
-        SocketService().emitLocationUpdate(_job!['_id'], position.latitude, position.longitude);
+        MqttService().emitLocationUpdate(_job!['_id'], position.latitude, position.longitude);
       });
     }
   }

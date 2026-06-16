@@ -382,6 +382,7 @@ const getDashboard = async (req, res, next) => {
     );
 
     res.json({
+      _id: user._id,
       name: user.name,
       isOnline: user.isOnline,
       rating: user.technicianMeta?.rating ?? 4.8,
@@ -391,6 +392,7 @@ const getDashboard = async (req, res, next) => {
       todayEarnings,
       pendingEarnings: user.technicianMeta?.pendingEarnings ?? 0,
       walletBalance: user.technicianMeta?.walletBalance ?? 0,
+      verification: user.technicianMeta?.verification ?? { status: 'unverified' }
     });
   } catch (error) {
     next(error);

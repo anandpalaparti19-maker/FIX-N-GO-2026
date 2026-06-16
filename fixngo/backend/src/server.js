@@ -19,7 +19,7 @@ const path = require('path');
 const connectDB = require('./config/db');
 const routes = require('./routes');
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { initializeSocket } = require('./utils/socketService');
+const { initializeMqtt } = require('./utils/mqttService');
 
 const app = express();
 app.set('trust proxy', 1);
@@ -36,14 +36,12 @@ const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http:
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow server-to-server (no origin) in dev only
-      if (!origin && process.env.NODE_ENV !== 'production') return callback(null, true);
+      // In development, allow all origins (mobile apps, tunnels, localhost)
+      if (process.env.NODE_ENV !== 'production') return callback(null, true);
+      // Allow no-origin requests (mobile apps, server-to-server)
+      if (!origin) return callback(null, true);
       // Allow allowedOrigins from env
       if (allowedOrigins.includes(origin)) return callback(null, true);
-      // Allow any localhost/127.0.0.1 in development
-      if (process.env.NODE_ENV !== 'production' && origin && (origin.startsWith('http://localhost') || origin.startsWith('http://127.0.0.1'))) {
-        return callback(null, true);
-      }
       callback(new Error(`CORS blocked: ${origin}`));
     },
     credentials: true,
@@ -83,9 +81,9 @@ app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 // ── Database ─────────────────────────────────────────────────────────────────
 connectDB();
 
-// ── Socket.io ────────────────────────────────────────────────────────────────
-initializeSocket(server);
-console.log('Socket.io initialized'.cyan);
+// ── MQTT ────────────────────────────────────────────────────────────────
+initializeMqtt();
+console.log('MQTT client initialized'.cyan);
 
 // ── Routes ───────────────────────────────────────────────────────────────────
 app.use(routes);
@@ -97,7 +95,6 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold);
-  console.log(`WebSocket server ready on port ${PORT}`.cyan);
 });
 
 module.exports = { app, server };

@@ -299,201 +299,39 @@ const rejectOrder = async (req, res, next) => {
     }
 
     const order = await Order.findById(req.params.id);
-brand,
-      model,
-      issues,
-      total,
-      technician,
-      customerPhone,
-      serviceAddress,
-      city,
-      pincode,
-      serviceLat,
-      serviceLng,
-      description,
-      estimatedDateTime,
-    } = req.body;
-
-    // Validate required fields
-    if (!brand || !model || !issues || issues.length === 0 || !total) {
-      return res
-        .status(400)
-        .json({ success: false, message: 'Order data is incomplete' });
-    }
-
-    // Check for conflicting orders
-    const conflictingOrder = await Order.findOne({
-      user: req.user._id,
-      status: { $in: ['pending', 'assigned', 'in_progress'] },
-    });
-
-    if (conflictingOrder) {
-      return res.status(400).json({
-        success: false,
-        message:
-          'You have an active order. Please complete or cancel it before creating a new one.',
-      });
-    }
-
-    // Calculate pricing splits
-    const actualBasePrice = Number(req.body.basePrice) || Number(total);
-    const customerFee = actualBasePrice * 0.10;
-    const technicianCommission = actualBasePrice * 0.10;
-    const customerTotal = actualBasePrice + customerFee;
-
-    // Create order
-    const order = await Order.create({
-      user: req.user._id,
-      brand,
-      model,
-      issues,
-      basePrice: actualBasePrice,
-      customerFee,
-      technicianCommission,
-      customerTotal,
-      total: customerTotal, // Legacy compat
-      description: description || '',
-      estimatedDateTime: estimatedDateTime || null,
-      status: 'pending',
-      technician: technician || '',
-      customerPhone: customerPhone || req.user.phone || '',
-      serviceAddress: serviceAddress || req.user.address || '',
-      city: city || req.user.city || '',
-      pincode: pincode || req.user.pincode || '',
-      statusHistory: [{ status: 'pending', note: 'Order placed', at: new Date() }],
-    });
-
-    // Set service coordinates
-    if (serviceLat != null && serviceLng != null) {
-      order.serviceLat = Number(serviceLat);
-      order.serviceLng = Number(serviceLng);
-    } else {
-      assignServiceCoords(order, `${req.user._id}-${Date.now()}`);
-    }
-
-    order.location = {
-      type: 'Point',
-      coordinates: [order.serviceLng, order.serviceLat],
-    };
-
-    await order.save();
-
-    // Assign technician if provided, otherwise broadcast to nearby
-    if (technician) {
-      await assignTechnicianToOrder(order, technician);
-      await order.save();
-    } else {
-      await broadcastToTechnicians(order, 3); // 3km radius
-    }
-
-    // Populate and return
-    const populated = await Order.findById(order._id).populate(
-      'technicianUser',
-      'name phone technicianMeta lastLat lastLng'
-    );
-
-    res.status(201).json({
-      success: true,
-      message: 'Order created successfully',
-      data: formatOrderForCustomer(populated),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Get order by ID
-const getOrderById = async (req, res, next) => {
-  try {
-    const order = await Order.findById(req.params.id).populate(
-      'technicianUser',
-      'name phone technicianMeta lastLat lastLng'
-    );
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Authorization check
-    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      if (order.technicianUser?.toString() !== req.user._id.toString()) {
-        return res.status(403).json({ success: false, message: 'Not authorized' });
-      }
+    // Verify order is in offered state
+    if (order.status !== 'assigned' || order.dispatchStatus !== 'offered') {
+      return res.status(400).json({
+        success: false,
+        message: 'Order is not available for rejection',
+      });
     }
+
+    // Reset to pending
+    order.status = 'pending';
+    order.dispatchStatus = 'declined';
+    order.technicianUser = null;
+    order.technician = '';
+    order.checklist = [];
+
+    pushStatusHistory(order, 'pending', `Declined by technician`);
+
+    await order.save();
 
     res.json({
       success: true,
+      message: 'Order rejected successfully',
       data: formatOrderForCustomer(order),
     });
   } catch (error) {
     next(error);
   }
 };
-
-// Technician accepts order (Atomic First-Accept-Wins)
-const acceptOrder = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'technician') {
-      return res.status(403).json({ success: false, message: 'Only technicians can accept orders' });
-    }
-
-    // Atomic update: only succeed if status is still 'pending'
-    const order = await Order.findOneAndUpdate(
-      { _id: req.params.id, status: 'pending' },
-      { 
-        $set: {
-          status: 'assigned',
-          dispatchStatus: 'accepted',
-          technicianUser: req.user._id,
-          technician: req.user.name,
-        }
-      },
-      { new: true } // Return the updated document
-    );
-
-    if (!order) {
-      return res.status(400).json({ success: false, message: 'Job is no longer available or already accepted by someone else.' });
-    }
-
-    // Generate checklist and calculate earnings
-    if (!order.checklist || order.checklist.length === 0) {
-      order.checklist = defaultChecklist(order.issues);
-    }
-    
-    // Legacy support for technicianEarning, though we now use basePrice commissions
-    order.technicianEarning = order.basePrice ? (order.basePrice - order.technicianCommission) : technicianCut(order.total);
-    
-    pushStatusHistory(order, 'assigned', `Accepted by ${req.user.name}`);
-    await order.save();
-
-    // Update technician's job count
-    await User.findByIdAndUpdate(
-      req.user._id,
-      { $inc: { 'technicianMeta.jobsDone': 1 } },
-      { new: true }
-    );
-
-    // Re-fetch with populated tech data
-    const populated = await Order.findById(order._id).populate('technicianUser', 'name phone technicianMeta lastLat lastLng');
-
-    res.json({
-      success: true,
-      message: 'Order accepted successfully',
-      data: formatOrderForTech(populated, req.user),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-// Technician rejects order
-const rejectOrder = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'technician') {
-      return res.status(403).json({ success: false, message: 'Only technicians can reject orders' });
-    }
-
-    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found' });
@@ -579,13 +417,14 @@ const updateOrderStatus = async (req, res, next) => {
     
     order.status = status;
     
+    let finalNote = note || '';
     if (status === 'in_progress' && !order.completionOtp) {
       // Generate a 4 digit OTP
       order.completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
-      note = note ? `${note} (OTP Generated)` : 'OTP Generated';
+      finalNote = finalNote ? `${finalNote} (OTP Generated)` : 'OTP Generated';
     }
 
-    pushStatusHistory(order, status, note || '');
+    pushStatusHistory(order, status, finalNote);
 
     await order.save();
 

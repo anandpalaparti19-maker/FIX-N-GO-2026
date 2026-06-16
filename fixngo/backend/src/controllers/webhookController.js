@@ -7,8 +7,21 @@ const { emitNotification } = require('../utils/mqttService');
 
 const razorpayWebhook = async (req, res) => {
   try {
+    const crypto = require('crypto');
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_test_webhook_secret';
-    // In production, validate req.headers['x-razorpay-signature'] using crypto
+    
+    const signature = req.headers['x-razorpay-signature'];
+    if (!signature) {
+      return res.status(400).send('Missing signature');
+    }
+    
+    const expectedSignature = crypto.createHmac('sha256', secret)
+                                    .update(JSON.stringify(req.body))
+                                    .digest('hex');
+                                    
+    if (signature !== expectedSignature) {
+      return res.status(400).send('Invalid signature');
+    }
 
     const event = req.body;
     

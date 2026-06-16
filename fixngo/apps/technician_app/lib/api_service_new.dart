@@ -230,7 +230,7 @@ class ApiService {
   Future<bool> completeJob(String orderId, String otp) async {
     try {
       final res = await http.post(
-        Uri.parse('$apiBaseUrl/tech/jobs/$orderId/complete'),
+        Uri.parse('$apiBaseUrl/orders/$orderId/complete'),
         headers: await _getHeaders(),
         body: jsonEncode({'otp': otp}),
       );

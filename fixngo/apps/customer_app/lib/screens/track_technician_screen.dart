@@ -118,7 +118,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     try {
       _razorpay.open(options);
     } catch (e) {
-      debugPrint('Error: e');
+      debugPrint('Error: $e');
     }
   }
 

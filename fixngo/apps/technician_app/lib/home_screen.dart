@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           );
         }
-      } else if (data['type'] == 'new_order_offer' || data['type'] == 'order_assigned') {
+      } else if (data['type'] == 'new_order_offer' || data['type'] == 'order_assigned' || data['type'] == 'new_order_broadcast') {
         _fetchAll();
       }
     });

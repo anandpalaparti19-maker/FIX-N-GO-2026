@@ -227,9 +227,13 @@ class ApiService {
     }
   }
 
-  Future<bool> completeJob(String orderId) async {
+  Future<bool> completeJob(String orderId, String otp) async {
     try {
-      final res = await http.post(Uri.parse('$apiBaseUrl/tech/jobs/$orderId/complete'), headers: await _getHeaders());
+      final res = await http.post(
+        Uri.parse('$apiBaseUrl/orders/$orderId/complete'),
+        headers: await _getHeaders(),
+        body: jsonEncode({'otp': otp}),
+      );
       return res.statusCode == 200;
     } catch (e) {
       return false;
@@ -422,9 +426,9 @@ class ApiService {
     }
   }
 
-  Future<bool> updateOrderStatus(String orderId, String status) async {
-    if (status == 'completed') {
-      return completeJob(orderId);
+  Future<bool> updateOrderStatus(String orderId, String status, {String? otp}) async {
+    if (status == 'completed' && otp != null) {
+      return completeJob(orderId, otp);
     } else if (status == 'in_progress' || status == 'started') {
       return startJob(orderId);
     }

@@ -7,6 +7,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import '../theme/app_theme.dart';
+import 'chat_screen.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
 
@@ -30,12 +35,18 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
   
   OrderModel? _order;
   bool _isLoading = true;
+  late Razorpay _razorpay;
 
   @override
   void initState() {
     super.initState();
     _fetchOrder();
     _setupSocket();
+
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
     _moveController = AnimationController(
       vsync: this,
@@ -57,6 +68,13 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
       _socketService.onOrderUpdated((data) {
         if (data['orderId'] == widget.orderId) {
           _fetchOrder();
+        }
+      });
+
+      _socketService.onNotification((data) {
+        if (data['type'] == 'order_completed' && data['orderId'] == widget.orderId) {
+          _fetchOrder();
+          _openRazorpayCheckout(data['checkoutSession']);
         }
       });
 
@@ -85,11 +103,45 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     }
   }
 
+  void _openRazorpayCheckout(Map<String, dynamic> session) {
+    var options = {
+      'key': 'rzp_test_replace_me', // Replace with your key
+      'amount': session['amount'], // in paise
+      'name': 'Fix-N-Go',
+      'order_id': session['id'],
+      'description': 'Repair Service Payment',
+      'prefill': {
+        'contact': _order?.customerPhone ?? '',
+        'email': 'customer@example.com'
+      }
+    };
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment Successful!')));
+    _fetchOrder();
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment Failed. Please try again.')));
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('External Wallet Selected: ${response.walletName}')));
+  }
+
   @override
   void dispose() {
     _socketService.off('order-updated');
     _socketService.off('technician-location');
+    _socketService.off('notification');
     _pulseController.dispose();
+    _razorpay.clear();
     super.dispose();
   }
 
@@ -284,6 +336,24 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
                           ),
                         ),
                         SizedBox(height: 12),
+                        // OTP Display if in progress
+                        if (_order?.status == 'in_progress' && _order?.completionOtp != null)
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            margin: EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              color: AppColors.brandGreen.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.brandGreen),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Completion PIN:', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.brandGreen)),
+                                Text(_order!.completionOtp!, style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4, color: AppColors.brandGreen)),
+                              ],
+                            ),
+                          ),
                         // Progress steps
                         Container(
                           padding: EdgeInsets.all(16),

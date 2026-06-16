@@ -111,7 +111,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       style: GoogleFonts.poppins(
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textPrimary,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -137,7 +137,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   borderRadius: BorderRadius.circular(10),
                 ),
                 indicatorPadding: EdgeInsets.all(4),
-                labelColor: AppColors.textPrimary,
+                labelColor: Theme.of(context).colorScheme.onSurface,
                 unselectedLabelColor: AppColors.textMuted,
                 labelStyle: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
                 unselectedLabelStyle: GoogleFonts.poppins(fontSize: 13),
@@ -266,7 +266,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                               style: GoogleFonts.poppins(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.textPrimary,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             if (issues.isNotEmpty)
@@ -287,7 +287,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
                           Container(

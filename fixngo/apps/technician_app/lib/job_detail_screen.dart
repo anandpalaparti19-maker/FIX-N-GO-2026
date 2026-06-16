@@ -18,6 +18,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Map<String, dynamic>? _job;
   bool _loading = false;
   int _currentStep = 0;
+  final TextEditingController _otpController = TextEditingController();
 
   final List<String> _steps = [
     'Navigate to Customer',
@@ -63,6 +64,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   @override
   void dispose() {
     _jobLocationStream?.cancel();
+    _otpController.dispose();
     super.dispose();
   }
 
@@ -111,8 +113,27 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       return;
     }
 
-    if (!mounted) return;
-    Navigator.pushNamed(context, '/payment', arguments: _job);
+    if (_currentStep == 3) {
+      if (_otpController.text.length != 4) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please enter the 4-digit PIN from the customer')));
+        return;
+      }
+      setState(() => _loading = true);
+      if (_job?['_id'] != null) {
+        final success = await _api.completeJob(_job!['_id'], _otpController.text);
+        if (success) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Job Completed Successfully!')));
+          Navigator.pop(context);
+          return;
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to complete job. Invalid PIN?')));
+        }
+      }
+      if (!mounted) return;
+      setState(() => _loading = false);
+    }
   }
 
   @override
@@ -602,6 +623,34 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             ],
+          ),
+          SizedBox(height: 24),
+          Text(
+            'Ask the customer for the 4-digit Completion PIN displayed on their screen to mark this job as complete and request payment.',
+            style: TextStyle(color: AppColors.amber, fontSize: 13, height: 1.4),
+          ),
+          SizedBox(height: 12),
+          TextField(
+            controller: _otpController,
+            keyboardType: TextInputType.number,
+            maxLength: 4,
+            style: TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              counterText: '',
+              hintText: '----',
+              hintStyle: TextStyle(color: AppColors.grey.withValues(alpha: 0.5), letterSpacing: 8),
+              filled: true,
+              fillColor: AppColors.bg,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.border),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: AppColors.green),
+              ),
+            ),
           ),
         ],
       ),

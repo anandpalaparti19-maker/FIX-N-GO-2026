@@ -16,6 +16,7 @@ class OrderModel {
   final double? serviceLat;
   final double? serviceLng;
   final List<StatusHistory>? statusHistory;
+  final String? completionOtp;
 
   OrderModel({
     required this.id,
@@ -35,6 +36,7 @@ class OrderModel {
     this.serviceLat,
     this.serviceLng,
     this.statusHistory,
+    this.completionOtp,
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,7 @@ class OrderModel {
       statusHistory: (json['statusHistory'] as List?)
           ?.map((e) => StatusHistory.fromJson(e))
           .toList(),
+      completionOtp: json['completionOtp'],
     );
   }
 }

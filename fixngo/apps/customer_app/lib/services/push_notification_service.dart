@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
-import 'auth_provider.dart';
-import '../utils/constants.dart';
+import '../providers/auth_provider.dart';
+import '../config/api_config.dart';
 
 /// Top-level background message handler for FCM
 @pragma('vm:entry-point')
@@ -102,7 +102,7 @@ class PushNotificationService {
 
     try {
       final response = await http.post(
-        Uri.parse('${Constants.apiBaseUrl}/auth/fcm-token'),
+        Uri.parse('${ApiConfig.baseUrl}/api/auth/fcm-token'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',

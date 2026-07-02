@@ -8,9 +8,9 @@ class ApiConfig {
 
   static String get baseUrl {
     if (_overrideBaseUrl.isNotEmpty) return _overrideBaseUrl;
-    if (kIsWeb) return 'http://localhost:5000';
-    if (defaultTargetPlatform == TargetPlatform.android) return 'https://adjustments-glasses-gender-problems.trycloudflare.com';
-    return 'http://localhost:5000';
+    if (kIsWeb) return 'https://nasty-socks-yell.loca.lt';
+    if (defaultTargetPlatform == TargetPlatform.android) return 'https://nasty-socks-yell.loca.lt';
+    return 'https://nasty-socks-yell.loca.lt';
   }
 
   static String get apiBaseUrl => '$baseUrl/api';

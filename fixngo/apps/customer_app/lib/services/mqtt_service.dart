@@ -28,7 +28,7 @@ class MqttService {
   }
 
   MqttService._internal() {
-    final host = const String.fromEnvironment('MQTT_HOST', defaultValue: '10.0.2.2');
+    final host = const String.fromEnvironment('MQTT_HOST', defaultValue: 'chatty-showers-invent.loca.lt');
     client = setupMqttClient(host, 'customer_client_${DateTime.now().millisecondsSinceEpoch}', 9001);
   }
 

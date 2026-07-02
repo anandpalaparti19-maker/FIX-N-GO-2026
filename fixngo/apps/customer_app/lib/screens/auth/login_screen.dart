@@ -6,6 +6,7 @@ import '../../theme/app_theme.dart';
 import '../main_navigation.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import '../../config/api_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -77,6 +78,44 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // Server Config Gear
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white70),
+                        onPressed: () {
+                          final urlController = TextEditingController(text: 'https://');
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text('Server URL'),
+                              content: TextField(
+                                controller: urlController,
+                                decoration: InputDecoration(hintText: 'https://xyz.ngrok-free.app'),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final url = urlController.text.trim();
+                                    if (url.isNotEmpty) {
+                                      await ApiConfig.setBaseUrl(url);
+                                      if (!ctx.mounted) return;
+                                      ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('URL Updated!')));
+                                      Navigator.pop(ctx);
+                                    }
+                                  },
+                                  child: Text('Save'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                     // Brand Logo / Icon
                     Center(
                       child: Container(

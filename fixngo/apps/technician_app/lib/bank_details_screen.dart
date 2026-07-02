@@ -3,7 +3,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class BankDetailsScreen extends StatefulWidget {
-  BankDetailsScreen({super.key});
+  const BankDetailsScreen({super.key});
 
   @override
   State<BankDetailsScreen> createState() => _BankDetailsScreenState();

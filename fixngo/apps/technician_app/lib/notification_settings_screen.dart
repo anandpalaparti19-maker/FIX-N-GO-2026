@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'widgets/common_widgets.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
-  NotificationSettingsScreen({super.key});
+  const NotificationSettingsScreen({super.key});
 
   @override
   State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
@@ -93,11 +93,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ],
             ),
           ),
-          SizedBox(width: 16),
+          const SizedBox(width: 16),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: AppColors.green,
+            activeThumbColor: AppColors.electricBlue,
             activeTrackColor: AppColors.green.withValues(alpha: 0.3),
             inactiveThumbColor: AppColors.grey,
             inactiveTrackColor: Theme.of(context).colorScheme.surface,

@@ -23,9 +23,19 @@ const { initializeMqtt } = require('./utils/mqttService');
 const { logger, requestLogger, updateRequestContext } = require('./utils/logger');
 const Order = require('./models/orderModel');
 const { startDispatch } = require('./controllers/orderController');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
 app.set('trust proxy', 1);
+
+// MQTT Websocket Proxy (Must be before body-parser and helmet)
+app.use('/mqtt', createProxyMiddleware({
+  target: 'http://127.0.0.1:9001',
+  ws: true,
+  changeOrigin: true,
+  logLevel: 'silent',
+}));
+
 const server = http.createServer(app);
 
 // ── Security middleware ──────────────────────────────────────────────────────
@@ -165,7 +175,7 @@ app.use(errorHandler);
 
 // ── Start ─────────────────────────────────────────────────────────────────────
 if (process.env.NODE_ENV !== 'test') {
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.PORT || 9001;
   server.listen(PORT, () => {
     logger.info(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   });

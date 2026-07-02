@@ -3,7 +3,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen({super.key});
+  const EditProfileScreen({super.key});
 
   @override
   State<EditProfileScreen> createState() => _EditProfileScreenState();

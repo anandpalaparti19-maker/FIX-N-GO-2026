@@ -345,32 +345,18 @@ class _FindingTechScreenState extends State<FindingTechScreen>
 }
 
 class _TechMarker extends StatelessWidget {
-  final double? top;
-  final double? bottom;
-  final double? left;
-  final double? right;
   final String name;
   final bool isActive;
   final int delay;
 
   const _TechMarker({
-    this.top,
-    this.bottom,
-    this.left,
-    this.right,
     required this.name,
-    required this.isActive,
-    required this.delay,
+    this.isActive = false,
+    this.delay = 0,
   });
-
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      top: top,
-      bottom: bottom,
-      left: left,
-      right: right,
-      child: AnimatedContainer(
+    return AnimatedContainer(
         duration: const Duration(milliseconds: 500),
         width: 44,
         height: 44,
@@ -394,10 +380,17 @@ class _TechMarker extends StatelessWidget {
               : [],
         ),
         child: Center(
-          child: Icon(Icons.person_rounded,
-              color: isActive ? Colors.white : AppColors.textMuted, size: 22),
+          child: Text(
+            name,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: isActive
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
         ),
-      ),
     );
   }
 }

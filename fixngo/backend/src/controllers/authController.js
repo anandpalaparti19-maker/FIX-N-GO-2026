@@ -108,6 +108,38 @@ const registerUser = async (req, res, next) => {
           : undefined,
     });
 
+    if (userRole === 'technician') {
+      try {
+        const admins = await User.find({ role: 'admin' });
+        if (admins.length > 0) {
+          const Notification = require('../models/notificationModel');
+          const { emitNotification } = require('../utils/mqttService');
+          
+          const notifications = admins.map((admin) => ({
+            userId: admin._id,
+            role: 'admin',
+            title: 'New Technician Registration',
+            message: `A new technician (${user.name}) has registered and is awaiting approval.`,
+            type: 'system',
+            relatedId: user._id,
+            relatedModel: 'User',
+          }));
+          await Notification.insertMany(notifications);
+          
+          admins.forEach((admin) => {
+            emitNotification(admin._id.toString(), {
+              title: 'New Technician Registration',
+              message: `A new technician (${user.name}) has registered and is awaiting approval.`,
+              type: 'system',
+              relatedId: user._id,
+            });
+          });
+        }
+      } catch (err) {
+        logger.error(`Failed to send admin notification for new technician: ${err.message}`);
+      }
+    }
+
     const accessToken = generateToken(user._id, user.role);
     const refreshToken = await issueRefreshToken(user._id);
     res.status(201).json(userResponse(user, accessToken, refreshToken));

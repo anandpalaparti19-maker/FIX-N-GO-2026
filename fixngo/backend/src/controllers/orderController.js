@@ -27,19 +27,10 @@ exports.scheduleDispatch = scheduleDispatch;
 
 const broadcastToTechnicians = async (order, radius = 3) => {
   try {
-    // Find online technicians near the service location
+    // Find all online technicians (Ignore radius for testing/demo purposes)
     const nearbyTechs = await User.find({
       role: 'technician',
       isOnline: true,
-      location: {
-        $nearSphere: {
-          $geometry: {
-            type: 'Point',
-            coordinates: [order.serviceLng, order.serviceLat],
-          },
-          $maxDistance: radius * 1000, // Convert km to meters
-        },
-      },
     });
 
     if (nearbyTechs.length === 0) return [];
@@ -71,6 +62,7 @@ const startDispatch = async (orderId) => {
 
   const currentRadius = order.searchRadius || 3;
   const nearbyTechs = await broadcastToTechnicians(order, currentRadius);
+  console.log(`[START DISPATCH] Order ${orderId}: found ${nearbyTechs.length} online technicians`);
 
   if (nearbyTechs.length === 0) {
     if (currentRadius < MAX_SEARCH_RADIUS_KM) {
@@ -262,31 +254,14 @@ const createOrder = async (req, res, next) => {
 
     await order.save();
 
-    // Assign technician if provided, otherwise start automated dispatch loop
-    if (technician) {
-      await assignTechnicianToOrder(order, technician);
-      order.dispatchStatus = 'accepted';
-      await order.save();
-      emitOrderUpdate(order._id.toString(), {
-        status: 'assigned',
-        dispatchStatus: 'accepted',
-        technicianName: order.technician,
-      });
-      emitNotification(order.user.toString(), {
-        type: 'order_assigned',
-        title: 'Technician Assigned',
-        message: `${order.technician} has been assigned to your repair request.`,
-        orderId: order._id,
-      });
-    } else {
-      order.dispatchStatus = 'searching';
-      order.searchRadius = 3;
-      order.dispatchAttempt = 1;
-      order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
-      pushStatusHistory(order, 'pending', 'Searching for nearby technicians');
-      await order.save();
-      startDispatch(order._id);
-    }
+    // Force Rapido-style automated dispatch loop
+    order.dispatchStatus = 'searching';
+    order.searchRadius = 3;
+    order.dispatchAttempt = 1;
+    order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
+    pushStatusHistory(order, 'pending', 'Searching for nearby technicians');
+    await order.save();
+    startDispatch(order._id);
 
     // Populate and return
     const populated = await Order.findById(order._id).populate(
@@ -646,13 +621,12 @@ const getAvailableOrders = async (req, res, next) => {
         .populate('user', 'name phone')
         .sort({ createdAt: -1 });
 
-      // Filter by distance and sort
+      // Filter by distance and sort (Ignore radius for testing)
       orders = orders
         .map((order) => {
           const distance = haversineKm(techLat, techLng, order.serviceLat, order.serviceLng);
           return { order, distance };
         })
-        .filter(({ distance }) => distance <= radius)
         .sort((a, b) => a.distance - b.distance)
         .slice(skip, skip + limit)
         .map(({ order }) => formatOrderForTech(order, req.user));
@@ -719,4 +693,6 @@ module.exports = {
   getAvailableOrders,
   getTechnicianOrders,
   completeOrder,
+  startDispatch,
+  clearDispatchTimer,
 };

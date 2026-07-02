@@ -14,8 +14,11 @@ import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 import 'l10n/app_localizations.dart';
 
+import 'config/api_config.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiConfig.init();
   try {
     if (kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS))) {
       await Firebase.initializeApp(

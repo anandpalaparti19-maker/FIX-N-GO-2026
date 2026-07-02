@@ -43,11 +43,15 @@ class AuthProvider with ChangeNotifier {
 
   Future<bool> login(String email, String password) async {
     try {
-      // _apiService.login() already persists both tokens internally
       final data = await _apiService.login(email, password);
-      final tokenStr = data['token'] as String;
-      final refreshToken = data['refreshToken'] as String?;
-      final name = (data['name'] as String?) ?? '';
+      final tokenStr = data['token']?.toString();
+      if (tokenStr == null || tokenStr.isEmpty) {
+        _errorMessage = 'Invalid server response. Ensure your Serveo/Ngrok URL is correct.';
+        notifyListeners();
+        return false;
+      }
+      final refreshToken = data['refreshToken']?.toString();
+      final name = data['name']?.toString() ?? '';
       final emailNorm = email.trim().toLowerCase();
 
       await _storageService.saveSession(
@@ -63,6 +67,8 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      _errorMessage = e.toString().replaceAll('ApiException: ', '');
+      notifyListeners();
       return false;
     }
   }
@@ -71,8 +77,13 @@ class AuthProvider with ChangeNotifier {
     try {
       _errorMessage = null;
       final data = await _apiService.register(name, email, password);
-      final tokenStr = data['token'] as String;
-      final refreshToken = data['refreshToken'] as String?;
+      final tokenStr = data['token']?.toString();
+      if (tokenStr == null || tokenStr.isEmpty) {
+        _errorMessage = 'Invalid server response. Ensure your Serveo/Ngrok URL is correct.';
+        notifyListeners();
+        return false;
+      }
+      final refreshToken = data['refreshToken']?.toString();
       final emailNorm = email.trim().toLowerCase();
 
       await _storageService.saveSession(
@@ -94,7 +105,7 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = e.toString().replaceAll('ApiException: ', '');
       notifyListeners();
       return false;
     }

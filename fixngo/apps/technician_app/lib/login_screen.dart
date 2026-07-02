@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'api_service_new.dart';
 import 'utils/app_theme.dart';
 import 'widgets/common_widgets.dart';
+import 'config/api_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -91,7 +92,45 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: 48),
+                    // Server Config Gear
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                        icon: Icon(Icons.settings, color: Colors.white70),
+                        onPressed: () {
+                          final urlController = TextEditingController(text: 'https://');
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text('Server URL'),
+                              content: TextField(
+                                controller: urlController,
+                                decoration: InputDecoration(hintText: 'https://xyz.ngrok-free.app'),
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: Text('Cancel'),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    final url = urlController.text.trim();
+                                    if (url.isNotEmpty) {
+                                      await ApiConfig.setBaseUrl(url);
+                                      if (!ctx.mounted) return;
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('URL Updated!')));
+                                      Navigator.pop(ctx);
+                                    }
+                                  },
+                                  child: Text('Save'),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 16),
                     Center(
                       child: Image.asset(
                         'assets/images/logo4.png',

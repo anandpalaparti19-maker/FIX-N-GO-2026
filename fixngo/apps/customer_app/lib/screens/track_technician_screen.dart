@@ -26,7 +26,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
   final MqttService _socketService = MqttService();
   final StorageService _storageService = StorageService();
 
-  late AnimationController _moveController;
+
   late AnimationController _pulseController;
   late Animation<double> _pulseAnim;
   
@@ -47,10 +47,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
 
-    _moveController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    )..repeat();
+
 
     _pulseController = AnimationController(
       vsync: this,

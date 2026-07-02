@@ -4,6 +4,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'mqtt_client_stub.dart'
     if (dart.library.html) 'mqtt_client_web.dart'
     if (dart.library.io) 'mqtt_client_io.dart';
+import '../config/api_config.dart';
 
 class MqttService {
   static final MqttService _instance = MqttService._internal();
@@ -23,8 +24,19 @@ class MqttService {
   }
 
   MqttService._internal() {
-    final host = const String.fromEnvironment('MQTT_HOST', defaultValue: 'chatty-showers-invent.loca.lt');
-    client = setupMqttClient(host, 'tech_client_${DateTime.now().millisecondsSinceEpoch}', 9001);
+    String host = const String.fromEnvironment('MQTT_HOST', defaultValue: '');
+    int port = 9001;
+    if (host.isEmpty) {
+      final base = ApiConfig.baseUrl.replaceAll('https://', '').replaceAll('http://', '');
+      if (base.contains(':')) {
+        host = base.split(':')[0];
+        port = int.tryParse(base.split(':')[1]) ?? 9001;
+      } else {
+        host = base;
+        port = 80; // Default to 80 for wss/ws via standard tunnels
+      }
+    }
+    client = setupMqttClient(host, 'tech_client_${DateTime.now().millisecondsSinceEpoch}', port);
   }
 
   Future<void> connect() async {

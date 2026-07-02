@@ -23,7 +23,7 @@ router.post('/:id/complete', protect, completeOrder);
 
 // Customer/General Routes
 router.route('/').get(protect, getOrders).post(protect, createOrder);
-router.route('/:id').get(protect, getOrderById);
+router.route('/:id').get(protect, getOrderById).patch(protect, updateOrderStatus);
 router.put('/:id/status', protect, updateOrderStatus);
 
 module.exports = router;

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 import '../api_service_new.dart';
 import '../theme/app_theme.dart';
 
 class EarningsScreen extends StatefulWidget {
-  EarningsScreen({super.key});
+  const EarningsScreen({super.key});
 
   @override
   State<EarningsScreen> createState() => _EarningsScreenState();
@@ -344,7 +344,7 @@ class _WithdrawTab extends StatefulWidget {
   final ApiService paymentService;
   final VoidCallback onWithdrawn;
 
-  _WithdrawTab({
+  const _WithdrawTab({
     required this.walletBalance,
     required this.paymentService,
     required this.onWithdrawn,

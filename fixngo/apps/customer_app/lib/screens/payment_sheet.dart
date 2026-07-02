@@ -35,7 +35,7 @@ class _PaymentSheet extends StatefulWidget {
   final String paymentIntentId;
   final num amount;
 
-  _PaymentSheet({
+  const _PaymentSheet({
     required this.orderId,
     required this.paymentId,
     required this.paymentIntentId,

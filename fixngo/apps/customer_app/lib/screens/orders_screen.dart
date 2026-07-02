@@ -6,7 +6,7 @@ import '../theme/app_theme.dart';
 import 'order_detail_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
-  OrdersScreen({super.key});
+  const OrdersScreen({super.key});
 
   @override
   State<OrdersScreen> createState() => _OrdersScreenState();
@@ -55,7 +55,7 @@ class _OrdersScreenState extends State<OrdersScreen>
         setState(() { _loading = false; _allOrders = []; });
       }
     } catch (e) {
-      print('ORDERS LOAD ERROR: $e');
+      debugPrint('ORDERS LOAD ERROR: $e');
       setState(() { _loading = false; _errorMsg = e.toString(); });
     }
   }

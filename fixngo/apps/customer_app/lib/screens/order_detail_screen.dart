@@ -74,7 +74,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
         _loading = false;
       });
     } catch (e) {
-      print('ORDER DETAIL LOAD ERROR: $e');
+      debugPrint('ORDER DETAIL LOAD ERROR: $e');
       setState(() { _loading = false; _errorMsg = 'Failed to load order. Please try again.'; });
     }
   }

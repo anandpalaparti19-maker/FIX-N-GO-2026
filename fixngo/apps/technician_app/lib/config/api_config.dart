@@ -1,15 +1,31 @@
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiConfig {
-  static const String _overrideBaseUrl = String.fromEnvironment(
+  static const String _compileTimeBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
     defaultValue: '',
   );
 
+  static String _dynamicBaseUrl = '';
+
+  static Future<void> init() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _dynamicBaseUrl = prefs.getString('custom_api_url') ?? '';
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  static Future<void> setBaseUrl(String url) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('custom_api_url', url);
+    _dynamicBaseUrl = url;
+  }
+
   static String get baseUrl {
-    if (_overrideBaseUrl.isNotEmpty) return _overrideBaseUrl;
-    if (kIsWeb) return 'https://nasty-socks-yell.loca.lt';
-    if (defaultTargetPlatform == TargetPlatform.android) return 'https://nasty-socks-yell.loca.lt';
+    if (_dynamicBaseUrl.isNotEmpty) return _dynamicBaseUrl;
+    if (_compileTimeBaseUrl.isNotEmpty) return _compileTimeBaseUrl;
     return 'https://nasty-socks-yell.loca.lt';
   }
 

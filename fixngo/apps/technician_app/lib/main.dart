@@ -23,12 +23,14 @@ import 'notification_settings_screen.dart';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'theme/app_theme.dart';
 import 'theme_provider.dart';
 
+import 'config/api_config.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await ApiConfig.init();
   try {
     if (kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS))) {
       await Firebase.initializeApp(
@@ -41,11 +43,6 @@ void main() async {
       );
     } else {
       await Firebase.initializeApp();
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
-      PlatformDispatcher.instance.onError = (error, stack) {
-        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-        return true;
-      };
     }
   } catch (e) {
     debugPrint('Firebase initialization failed: $e');

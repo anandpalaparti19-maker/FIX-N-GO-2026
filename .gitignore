@@ -42,3 +42,13 @@ fixngo/backend/mongodb_data/
 fixngo/apps/technician_app/analyze_output*.txt
 fixngo/apps/technician_app/*.py
 fixngo/apps/technician_app/flutter_version.txt
+*.apk
+apps/build_customer/
+apps/technician_app/android/app/google-services.json
+
+
+*.apk
+**/build_customer/
+**/build/
+**/google-services.json
+

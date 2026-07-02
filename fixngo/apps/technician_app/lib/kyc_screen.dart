@@ -5,7 +5,7 @@ import 'api_service_new.dart';
 import 'widgets/common_widgets.dart';
 
 class KycScreen extends StatefulWidget {
-  KycScreen({super.key});
+  const KycScreen({super.key});
 
   @override
   State<KycScreen> createState() => _KycScreenState();

@@ -129,10 +129,14 @@ class ApiService {
           'role': 'technician',
         }),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        await saveToken(data['token'] as String);
-        final refresh = data['refreshToken'] as String?;
+        final tokenStr = data['token']?.toString();
+        if (tokenStr == null || tokenStr.isEmpty) {
+          throw Exception('Invalid server response. Ensure your Serveo/Ngrok URL is correct.');
+        }
+        await saveToken(tokenStr);
+        final refresh = data['refreshToken']?.toString();
         if (refresh != null && refresh.isNotEmpty) await _saveRefreshToken(refresh);
         return true;
       } else {
@@ -158,7 +162,13 @@ class ApiService {
   }
 
   Future<List<dynamic>> getAvailableJobs() async {
-    return getIncomingOffers();
+    try {
+      final res = await _execute((h) => http.get(Uri.parse('$apiBaseUrl/orders/available'), headers: h));
+      if (res.statusCode == 401) return [];
+      return jsonDecode(res.body);
+    } catch (e) {
+      return [];
+    }
   }
 
   Future<bool> acceptJob(String orderId) async {
@@ -273,10 +283,10 @@ class ApiService {
             Uri.parse('$apiBaseUrl/auth/profile'),
             headers: h,
             body: jsonEncode({
-              if (name != null) 'name': name,
-              if (phone != null) 'phone': phone,
-              if (email != null) 'email': email,
-            }),
+              'name': name,
+              'phone': phone,
+              'email': email,
+            }..removeWhere((k, v) => v == null)),
           ));
       return res.statusCode == 200;
     } catch (e) {
@@ -464,10 +474,14 @@ class ApiService {
         }),
       );
 
-      if (res.statusCode == 201) {
+      if (res.statusCode == 201 || res.statusCode == 200) {
         final data = jsonDecode(res.body) as Map<String, dynamic>;
-        await saveToken(data['token'] as String);
-        final refresh = data['refreshToken'] as String?;
+        final tokenStr = data['token']?.toString();
+        if (tokenStr == null || tokenStr.isEmpty) {
+          throw Exception('Invalid server response. Ensure your Serveo/Ngrok URL is correct.');
+        }
+        await saveToken(tokenStr);
+        final refresh = data['refreshToken']?.toString();
         if (refresh != null && refresh.isNotEmpty) await _saveRefreshToken(refresh);
         return data;
       } else {

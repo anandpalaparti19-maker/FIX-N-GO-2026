@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_service_new.dart';
@@ -14,7 +14,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _api = ApiService();
-  final _picker = ImagePicker();
+
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -23,8 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _loading = false;
   bool _obscure = true;
   int _step = 0;
-  XFile? _aadhaarFront;
-  XFile? _aadhaarBack;
+
 
   final List<String> _allSkills = [
     'Screen Replacement',
@@ -50,17 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  Future<void> _pickAadhaarImage(bool front) async {
-    final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-    if (image == null || !mounted) return;
-    setState(() {
-      if (front) {
-        _aadhaarFront = image;
-      } else {
-        _aadhaarBack = image;
-      }
-    });
-  }
+
 
   void _register() async {
     if (_selectedSkills.isEmpty) {
@@ -374,58 +363,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _uploadTile({
-    required String title,
-    required IconData icon,
-    required VoidCallback onTap,
-    String? fileName,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Theme.of(context).colorScheme.outline),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.amber.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(icon, color: AppColors.amber, size: 18),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Text(
-              fileName ?? 'Tap to upload',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: fileName == null ? AppColors.grey : AppColors.green,
-                fontSize: 12,
-                fontWeight: fileName == null ? FontWeight.w400 : FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+
 }

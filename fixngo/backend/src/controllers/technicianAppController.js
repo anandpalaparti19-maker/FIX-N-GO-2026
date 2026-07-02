@@ -100,9 +100,12 @@ const getJobs = async (req, res, next) => {
 
 const getIncomingOffers = async (req, res, next) => {
   try {
+    // Return both manual assignments AND globally broadcasted jobs (Rapido-style)
     const orders = await Order.find({
-      technicianUser: req.user._id,
-      dispatchStatus: 'offered',
+      $or: [
+        { technicianUser: req.user._id, dispatchStatus: 'offered' },
+        { dispatchStatus: 'searching' },
+      ],
       status: { $in: ['pending', 'assigned'] },
     })
       .populate('user', 'name phone')
@@ -154,12 +157,17 @@ const acceptJob = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Job not found' });
-    if (!orderBelongsToTech(order, req.user._id)) {
-      return res.status(403).json({ message: 'Not your job' });
-    }
-    if (order.dispatchStatus !== 'offered') {
+    // Allow if it's explicitly offered to them OR if it's globally searching
+    const isExplicitlyOffered = orderBelongsToTech(order, req.user._id) && order.dispatchStatus === 'offered';
+    const isSearching = order.dispatchStatus === 'searching';
+    
+    if (!isExplicitlyOffered && !isSearching) {
       return res.status(400).json({ message: 'Job is not available to accept' });
     }
+
+    // Assign to this tech
+    order.technicianUser = req.user._id;
+    order.technician = req.user.name;
 
     order.dispatchStatus = 'accepted';
     order.status = 'assigned';

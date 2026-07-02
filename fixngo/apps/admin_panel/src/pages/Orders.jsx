@@ -10,80 +10,7 @@ const STATUS_COLORS = {
   cancelled: 'danger',
 };
 
-function AssignModal({ order, onClose, onAssigned }) {
-  const [technicians, setTechnicians] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [assigning, setAssigning] = useState(null);
 
-  useEffect(() => {
-    api.get('/admin/technicians')
-      .then(res => setTechnicians((res.data.data || []).filter(t => t.accountStatus === 'active')))
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  const assign = async (techId) => {
-    setAssigning(techId);
-    try {
-      await api.post('/admin/orders/assign', { orderId: order._id, technicianId: techId });
-      onAssigned();
-      onClose();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to assign');
-    } finally {
-      setAssigning(null);
-    }
-  };
-
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-    }}>
-      <div className="glass-panel" style={{ width: 520, maxHeight: '80vh', overflowY: 'auto', padding: '2rem', borderRadius: '1rem' }}>
-        <h2 style={{ marginBottom: '0.5rem' }}>Assign Technician</h2>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
-          Order: <strong>{order.brand} {order.model}</strong>
-        </p>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-            <Loader size={24} style={{ animation: 'spin 1s linear infinite' }} />
-          </div>
-        ) : technicians.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)', textAlign: 'center' }}>No active technicians found.</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {technicians.map(t => (
-              <div key={t._id} style={{
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.04)',
-                borderRadius: '0.5rem', border: '1px solid var(--border-light)'
-              }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{t.name}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                    {t.phone} · {(t.technicianMeta?.specialization || []).join(', ') || 'General'}
-                  </div>
-                </div>
-                <button
-                  className="btn btn-primary"
-                  style={{ padding: '0.35rem 0.9rem', fontSize: '0.8rem' }}
-                  onClick={() => assign(t._id)}
-                  disabled={assigning === t._id}
-                >
-                  {assigning === t._id ? '...' : 'Assign'}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
-          <button className="btn btn-outline" onClick={onClose}>Cancel</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -91,7 +18,6 @@ export default function Orders() {
   const [expanded, setExpanded] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [search, setSearch] = useState('');
-  const [assignModal, setAssignModal] = useState(null);
   const [forceStatusId, setForceStatusId] = useState(null);
 
   const fetchOrders = useCallback(() => {
@@ -212,15 +138,7 @@ export default function Orders() {
                         {expanded === order._id ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                         Details
                       </button>
-                      {!order.technicianUser && (
-                        <button
-                          className="btn btn-primary"
-                          style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}
-                          onClick={() => setAssignModal(order)}
-                        >
-                          <UserCheck size={12} /> Assign
-                        </button>
-                      )}
+
                       <button
                         className="btn btn-outline"
                         style={{ padding: '0.25rem 0.6rem', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--warning)' }}
@@ -265,13 +183,6 @@ export default function Orders() {
         </table>
       </div>
 
-      {assignModal && (
-        <AssignModal
-          order={assignModal}
-          onClose={() => setAssignModal(null)}
-          onAssigned={fetchOrders}
-        />
-      )}
     </div>
   );
 }

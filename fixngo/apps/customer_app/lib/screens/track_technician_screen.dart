@@ -152,7 +152,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
       'order_id': session['id'],
       'description': 'Repair Service Payment',
       'prefill': {
-        'contact': _order?.customerPhone ?? '',
+        'contact': '',
         'email': 'customer@example.com'
       }
     };

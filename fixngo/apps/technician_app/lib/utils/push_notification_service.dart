@@ -77,7 +77,7 @@ class PushNotificationService {
 
   /// Sends the FCM token to the backend server
   Future<void> _sendTokenToBackend(String fcmToken) async {
-    final authToken = _apiService.token;
+    final authToken = await _apiService.getToken();
     if (authToken == null || authToken.isEmpty) {
       debugPrint('FCM: User not logged in, cannot save FCM token to backend');
       return;
@@ -85,7 +85,7 @@ class PushNotificationService {
 
     try {
       final response = await http.post(
-        Uri.parse('${_apiService.baseUrl}/auth/fcm-token'),
+        Uri.parse('${ApiService.apiBaseUrl}/auth/fcm-token'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $authToken',

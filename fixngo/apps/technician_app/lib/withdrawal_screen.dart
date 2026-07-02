@@ -33,7 +33,7 @@ class _WithdrawalScreenState extends State<WithdrawalScreen> {
     }
 
     setState(() => _loading = true);
-    final success = await _api.requestWithdrawal(amount, _bankCtrl.text.trim());
+    final success = await _api.requestWithdrawal(amount: amount.toDouble(), bankAccount: {'accountNumber': _bankCtrl.text.trim()});
     if (!mounted) return;
     setState(() => _loading = false);
 

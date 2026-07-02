@@ -5,7 +5,7 @@ const generateToken = (id, role) => {
     throw new Error('JWT_SECRET environment variable is not set');
   }
   return jwt.sign({ id, role }, process.env.JWT_SECRET, {
-    expiresIn: '7d',
+    expiresIn: '15m', // Short-lived access token — use refresh token rotation for session continuity
   });
 };
 

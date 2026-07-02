@@ -29,9 +29,13 @@ const orderSchema = mongoose.Schema(
     technicianUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     dispatchStatus: {
       type: String,
-      enum: ['none', 'offered', 'accepted', 'declined'],
+      enum: ['none', 'searching', 'offered', 'accepted', 'declined', 'no_tech'],
       default: 'none',
     },
+    searchRadius: { type: Number, default: 3 },         // km
+    dispatchExpiresAt: { type: Date, default: null },   // server-side countdown
+    noTechnicianFound: { type: Boolean, default: false },
+    dispatchAttempt: { type: Number, default: 0 },      // rebroadcast attempt counter
     customerPhone: { type: String, default: '' },
     serviceAddress: { type: String, default: '' },
     city: { type: String, default: '' },

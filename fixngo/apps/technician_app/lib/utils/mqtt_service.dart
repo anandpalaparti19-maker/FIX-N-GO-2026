@@ -118,8 +118,9 @@ class MqttService {
     }
   }
 
-  void emitLocationUpdate(String orderId, double latitude, double longitude) {
-    publish('client/user/tech_id/location', {
+  void emitLocationUpdate(String technicianId, String orderId, double latitude, double longitude) {
+    publish('client/user/$technicianId/location', {
+      'userId': technicianId,
       'orderId': orderId,
       'latitude': latitude,
       'longitude': longitude,

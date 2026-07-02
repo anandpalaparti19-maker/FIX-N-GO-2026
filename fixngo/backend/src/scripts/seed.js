@@ -21,13 +21,19 @@ const technicians = [
 const run = async () => {
   await connectDB();
 
+  // Use env-configurable seed password — warn about weak defaults
+  const seedPassword = process.env.SEED_PASSWORD || 'FixNGo_Dev_2026!';
+  if (seedPassword === 'password123' || seedPassword.length < 8) {
+    console.warn('⚠️  WARNING: Using a weak seed password. Set SEED_PASSWORD env var for production-grade seeds.');
+  }
+
   await Service.deleteMany();
   await Order.deleteMany();
   await User.deleteMany();
 
   await Service.insertMany(services);
 
-  const passwordHash = await bcrypt.hash('password123', 10);
+  const passwordHash = await bcrypt.hash(seedPassword, 10);
 
   const admin = await User.create({
     name: 'Admin User',
@@ -123,9 +129,9 @@ const run = async () => {
   await completedOrder.save();
 
   console.log('Seed data created');
-  console.log('Admin: admin@fixngo.com / password123');
-  console.log('Customer: customer@fixngo.com / password123');
-  console.log('Technician: tech@fixngo.com / password123');
+  console.log(`Admin: admin@fixngo.com / ${seedPassword}`);
+  console.log(`Customer: customer@fixngo.com / ${seedPassword}`);
+  console.log(`Technician: tech@fixngo.com / ${seedPassword}`);
   process.exit(0);
 };
 

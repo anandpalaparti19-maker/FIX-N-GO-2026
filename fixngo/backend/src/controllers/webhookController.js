@@ -8,6 +8,7 @@ const { emitNotification } = require('../utils/mqttService');
 const razorpayWebhook = async (req, res) => {
   try {
     const crypto = require('crypto');
+const { logger } = require('../utils/logger');
     const secret = process.env.RAZORPAY_WEBHOOK_SECRET || 'rzp_test_webhook_secret';
     
     const signature = req.headers['x-razorpay-signature'];
@@ -82,14 +83,14 @@ const razorpayWebhook = async (req, res) => {
       } catch (err) {
         await session.abortTransaction();
         session.endSession();
-        console.error('Webhook transaction failed', err);
+        logger.error('Webhook transaction failed', err);
         return res.status(500).send('Webhook Processing Error');
       }
     }
     
     res.status(200).send('OK');
   } catch (error) {
-    console.error('Webhook error:', error);
+    logger.error('Webhook error:', error);
     res.status(500).send('Error handling webhook');
   }
 };

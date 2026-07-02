@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api_service_new.dart';
 import '../theme/app_theme.dart';
 
 class EarningsScreen extends StatefulWidget {
@@ -13,7 +14,8 @@ class EarningsScreen extends StatefulWidget {
 
 class _EarningsScreenState extends State<EarningsScreen>
     with SingleTickerProviderStateMixin {
-  
+  final ApiService _paymentService = ApiService();
+
 
   Map<String, dynamic> _earnings = {};
   List<dynamic> _monthly = [];
@@ -339,7 +341,7 @@ class _EarningsScreenState extends State<EarningsScreen>
 
 class _WithdrawTab extends StatefulWidget {
   final double walletBalance;
-  
+  final ApiService paymentService;
   final VoidCallback onWithdrawn;
 
   _WithdrawTab({

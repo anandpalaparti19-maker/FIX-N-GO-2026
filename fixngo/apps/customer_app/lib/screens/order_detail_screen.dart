@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
 import '../services/payment_service.dart';
+import '../services/mqtt_service.dart';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
 import 'payment_sheet.dart';
@@ -16,18 +17,45 @@ class OrderDetailScreen extends StatefulWidget {
   State<OrderDetailScreen> createState() => _OrderDetailScreenState();
 }
 
-class _OrderDetailScreenState extends State<OrderDetailScreen> {
+class _OrderDetailScreenState extends State<OrderDetailScreen>
+    with TickerProviderStateMixin {
   final ApiService _api = ApiService();
   final StorageService _storage = StorageService();
+  final MqttService _mqtt = MqttService();
   Map<String, dynamic>? _order;
   bool _loading = true;
   String? _errorMsg;
   bool _payLoading = false;
+  late AnimationController _radarController;
 
   @override
   void initState() {
     super.initState();
+    _radarController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat();
     _load();
+    _setupMqtt();
+  }
+
+  void _setupMqtt() {
+    _mqtt.connect().then((_) {
+      _mqtt.onOrderUpdated((data) {
+        if (data['orderId'] == widget.orderId) _load();
+      });
+      _mqtt.onNotification((data) {
+        if (data['orderId'] == widget.orderId && mounted) _load();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _radarController.dispose();
+    _mqtt.off('order-updated');
+    _mqtt.off('notification');
+    super.dispose();
   }
 
   Future<void> _load() async {
@@ -125,10 +153,165 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  Widget _buildSearchingState(Map<String, dynamic> o) {
+    final radius = (o['searchRadius'] as num?)?.toInt() ?? 3;
+    final attempt = (o['dispatchAttempt'] as num?)?.toInt() ?? 1;
+    final message = (o['message'] as String?) ??
+        'Notifying nearby technicians within $radius km';
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedBuilder(
+              animation: _radarController,
+              builder: (context, child) {
+                return Container(
+                  width: 160,
+                  height: 160,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: AppColors.brandBlue.withValues(
+                          alpha: 1 - _radarController.value),
+                      width: 2,
+                    ),
+                  ),
+                  child: Center(
+                    child: Container(
+                      width: 80 + (40 * _radarController.value),
+                      height: 80 + (40 * _radarController.value),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.brandBlue.withValues(
+                            alpha: 0.2 * (1 - _radarController.value)),
+                      ),
+                      child: Center(
+                        child: Icon(Icons.radar_rounded,
+                            color: AppColors.brandBlue, size: 40),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+            SizedBox(height: 32),
+            Text(
+              'Finding a technician for you',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppColors.textMuted,
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              'Attempt $attempt · Search radius ${radius}km',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => _cancelOrder(),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.statusRed,
+                  side: BorderSide(color: AppColors.statusRed),
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text('Cancel Request',
+                    style: GoogleFonts.poppins(
+                        fontSize: 14, fontWeight: FontWeight.w600)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNoTechnicianState(Map<String, dynamic> o) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.person_off_rounded,
+                color: AppColors.statusRed, size: 80),
+            SizedBox(height: 24),
+            Text(
+              'No technicians nearby',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'We could not find any available technicians in your area right now. Please try again in a few minutes.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: AppColors.textMuted,
+              ),
+            ),
+            SizedBox(height: 40),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () => _cancelOrder(),
+                icon: Icon(Icons.close_rounded),
+                label: Text('Close Request',
+                    style: GoogleFonts.poppins(
+                        fontSize: 14, fontWeight: FontWeight.w700)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.statusRed,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildBody() {
     final o = _order!;
     final status = (o['status'] as String?) ?? 'pending';
+    final dispatchStatus = (o['dispatchStatus'] as String?) ?? 'none';
     final brand = (o['brand'] as String?) ?? '';
+
+    if (status == 'pending' && dispatchStatus == 'searching') {
+      return _buildSearchingState(o);
+    }
+
+    if (dispatchStatus == 'no_tech') {
+      return _buildNoTechnicianState(o);
+    }
     final model = (o['model'] as String?) ?? '';
     final issues = (o['issues'] as List<dynamic>?) ?? [];
     final total = o['total'] ?? 0;

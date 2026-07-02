@@ -9,6 +9,7 @@ const {
   sendPhoneOtp,
   verifyPhoneOtp,
   refreshAccessToken,
+  updateFcmToken,
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -30,5 +31,9 @@ router.post('/verify-otp', verifyPhoneOtp);
 // Token refresh
 router.post('/refresh', refreshAccessToken);
 
+// FCM push notification token
+router.post('/fcm-token', protect, updateFcmToken);
+
 module.exports = router;
+
 

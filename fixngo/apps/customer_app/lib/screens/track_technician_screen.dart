@@ -8,10 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import '../theme/app_theme.dart';
-import 'chat_screen.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'dart:math';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
 
@@ -36,6 +33,8 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
   OrderModel? _order;
   bool _isLoading = true;
   late Razorpay _razorpay;
+  LatLng? _technicianPosition;
+  String _etaText = 'Calculating...';
 
   @override
   void initState() {
@@ -79,9 +78,19 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
       });
 
       _socketService.onTechnicianLocation((data) {
-        // Location data received - used for real map integration
-        // ignore: unused_local_variable
-        if (data['orderId'] == widget.orderId) setState(() {});
+        if (data['orderId'] == widget.orderId) {
+          final lat = data['latitude'];
+          final lng = data['longitude'];
+          if (lat != null && lng != null) {
+            setState(() {
+              _technicianPosition = LatLng(
+                (lat as num).toDouble(),
+                (lng as num).toDouble(),
+              );
+            });
+            _updateEta();
+          }
+        }
       });
     });
   }
@@ -97,15 +106,47 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
           _order = order;
           _isLoading = false;
         });
+        _updateEta();
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  void _updateEta() {
+    if (_order == null) return;
+    final customerLat = _order!.serviceLat;
+    final customerLng = _order!.serviceLng;
+    final techLat = _technicianPosition?.latitude ?? _order!.technicianLat;
+    final techLng = _technicianPosition?.longitude ?? _order!.technicianLng;
+    if (customerLat == null || customerLng == null || techLat == null || techLng == null) return;
+
+    final distanceKm = _haversineKm(techLat, techLng, customerLat, customerLng);
+    // Assume ~20 km/h average two-wheeler speed in city traffic
+    final minutes = (distanceKm / 20 * 60).ceil();
+
+    if (mounted) {
+      setState(() {
+        _etaText = minutes <= 1 ? 'Arrives in 1 min' : 'Arrives in $minutes mins';
+      });
+    }
+  }
+
+  double _haversineKm(double lat1, double lng1, double lat2, double lng2) {
+    const R = 6371.0;
+    final dLat = _toRad(lat2 - lat1);
+    final dLng = _toRad(lng2 - lng1);
+    final a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRad(lat1)) * cos(_toRad(lat2)) * sin(dLng / 2) * sin(dLng / 2);
+    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    return R * c;
+  }
+
+  double _toRad(double deg) => deg * pi / 180;
+
   void _openRazorpayCheckout(Map<String, dynamic> session) {
     var options = {
-      'key': 'rzp_test_replace_me', // Replace with your key
+      'key': const String.fromEnvironment('RAZORPAY_KEY', defaultValue: 'rzp_test_REPLACE_WITH_YOUR_KEY'),
       'amount': session['amount'], // in paise
       'name': 'Fix-N-Go',
       'order_id': session['id'],
@@ -220,7 +261,11 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
                                     Icon(Icons.timer_rounded, color: AppColors.brandGreen, size: 14),
                                     SizedBox(width: 4),
                                     Text(
-                                      _order?.status == 'assigned' ? 'Coming soon' : 'On site',
+                                      _order?.status == 'assigned'
+                                          ? _etaText
+                                          : _order?.status == 'in_progress'
+                                              ? 'Repairing'
+                                              : 'On site',
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
@@ -408,9 +453,13 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     final customerLat = _order?.serviceLat ?? 17.4065;
     final customerLng = _order?.serviceLng ?? 78.4772;
     
-    // Fallback to customer location if tech location is unknown
-    final techLat = _order?.technicianLat ?? customerLat + 0.005;
-    final techLng = _order?.technicianLng ?? customerLng + 0.005;
+    // Prefer live MQTT position, then order snapshot, then fallback offset
+    final techLat = _technicianPosition?.latitude
+        ?? _order?.technicianLat
+        ?? customerLat + 0.005;
+    final techLng = _technicianPosition?.longitude
+        ?? _order?.technicianLng
+        ?? customerLng + 0.005;
 
     return Stack(
       children: [

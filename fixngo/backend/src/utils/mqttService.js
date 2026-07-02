@@ -7,11 +7,17 @@ let client;
 const onlineUsers = new Set(); // To track online users (simple memory tracking)
 const lastDbWriteTime = new Map(); // To throttle location DB writes
 
+const mongoose = require('mongoose');
+
 const initializeMqtt = () => {
-  // Connect to Mosquitto broker
+  // Connect to Mosquitto broker with reconnect options
   client = mqtt.connect(process.env.MQTT_BROKER_URL || 'mqtt://localhost:1883', {
     username: process.env.MQTT_USER || 'fixngo_app',
-    password: process.env.MQTT_PASSWORD || 'fixngo_secure_2026'
+    password: process.env.MQTT_PASSWORD || 'fixngo_secure_2026',
+    reconnectPeriod: 5000,      // Retry every 5 seconds
+    connectTimeout: 30000,       // 30 second connection timeout
+    keepalive: 60,               // 60 second keepalive
+    clean: true,
   });
 
   client.on('connect', () => {
@@ -27,8 +33,21 @@ const initializeMqtt = () => {
 
   client.on('message', async (topic, message) => {
     try {
-      const data = JSON.parse(message.toString());
+      let data;
+      try {
+        data = JSON.parse(message.toString());
+      } catch (parseErr) {
+        console.warn(`MQTT: Ignoring malformed message on ${topic}`);
+        return;
+      }
+
+      // Validate userId format from topic (must be valid MongoDB ObjectId)
       const topicParts = topic.split('/');
+      const topicUserId = topicParts[2];
+      if (topicUserId && !mongoose.Types.ObjectId.isValid(topicUserId)) {
+        console.warn(`MQTT: Ignoring message with invalid userId in topic: ${topic}`);
+        return;
+      }
 
       // client/user/:userId/online
       if (topic.startsWith('client/user/') && topic.endsWith('/online')) {
@@ -71,7 +90,18 @@ const initializeMqtt = () => {
         
         // Write to DB at most once every 5 seconds per user
         if (now - lastWrite > 5000) {
-          await User.findByIdAndUpdate(userId, { lastLat: latitude, lastLng: longitude, lastLocationUpdate: new Date() });
+          const lat = Number(latitude);
+          const lng = Number(longitude);
+          await User.findByIdAndUpdate(userId, {
+            lastLat: lat,
+            lastLng: lng,
+            lastLocationUpdate: new Date(),
+            // Populate GeoJSON field so $nearSphere dispatch queries work
+            location: {
+              type: 'Point',
+              coordinates: [lng, lat], // GeoJSON is [longitude, latitude]
+            },
+          });
           lastDbWriteTime.set(userId, now);
         }
         
@@ -105,7 +135,19 @@ const initializeMqtt = () => {
   });
 
   client.on('error', (err) => {
-    console.error('MQTT Client Error:', err);
+    console.error('MQTT Client Error:', err.message);
+  });
+
+  client.on('reconnect', () => {
+    console.warn('MQTT: Attempting to reconnect...');
+  });
+
+  client.on('offline', () => {
+    console.warn('MQTT: Client went offline');
+  });
+
+  client.on('close', () => {
+    console.warn('MQTT: Connection closed');
   });
 };
 
@@ -126,6 +168,14 @@ const emitNotification = (userId, data) => {
       ...data,
       timestamp: new Date()
     }));
+  }
+
+  // Automatically trigger FCM push notification if it has title/message
+  // (unless skipPush is explicitly requested, e.g., for multicasts)
+  if (!data.skipPush && data.title && data.message) {
+    const { sendPush } = require('./fcmService');
+    // Fire and forget
+    sendPush(userId, { title: data.title, body: data.message }, data).catch(() => {});
   }
 };
 

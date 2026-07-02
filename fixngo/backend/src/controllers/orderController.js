@@ -1,7 +1,29 @@
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
 const { defaultChecklist, technicianCut, pushStatusHistory, assignServiceCoords, formatOrderForTech, haversineKm } = require('../utils/orderHelpers');
-const { emitNotification } = require('../utils/mqttService');
+const { emitOrderUpdate, emitNotification } = require('../utils/mqttService');
+const { logger } = require('../utils/logger');
+
+// In-memory dispatch timer registry (cleared on accept/reject/cancel/completion)
+const dispatchTimers = new Map();
+const DISPATCH_TIMEOUT_MS = 30000;
+const MAX_SEARCH_RADIUS_KM = 15;
+
+const clearDispatchTimer = (orderId) => {
+  const id = orderId.toString();
+  if (dispatchTimers.has(id)) {
+    clearTimeout(dispatchTimers.get(id));
+    dispatchTimers.delete(id);
+  }
+};
+
+const scheduleDispatch = (orderId, ms, callback) => {
+  clearDispatchTimer(orderId);
+  dispatchTimers.set(orderId.toString(), setTimeout(callback, ms));
+};
+
+exports.clearDispatchTimer = clearDispatchTimer;
+exports.scheduleDispatch = scheduleDispatch;
 
 const broadcastToTechnicians = async (order, radius = 3) => {
   try {
@@ -15,17 +37,12 @@ const broadcastToTechnicians = async (order, radius = 3) => {
             type: 'Point',
             coordinates: [order.serviceLng, order.serviceLat],
           },
-          $maxDistance: radius * 1000 // Convert km to meters
+          $maxDistance: radius * 1000, // Convert km to meters
         },
       },
     });
 
-    if (nearbyTechs.length === 0) return null;
-
-    // Set order status to searching
-    order.dispatchStatus = 'none'; // Will wait for accept
-    order.status = 'pending';
-    await order.save();
+    if (nearbyTechs.length === 0) return [];
 
     // Broadcast to all nearby techs simultaneously
     nearbyTechs.forEach(tech => {
@@ -34,15 +51,77 @@ const broadcastToTechnicians = async (order, radius = 3) => {
         title: 'New Job Available!',
         message: `A new repair job for ${order.brand} ${order.model} is available near you. First to accept gets it!`,
         orderId: order._id,
+        distance: haversineKm(tech.lastLat, tech.lastLng, order.serviceLat, order.serviceLng),
+        estimatedPrice: order.customerTotal,
       });
     });
 
     return nearbyTechs;
   } catch (error) {
-    console.error('Broadcast error:', error);
-    return null;
+    logger.error('Broadcast error:', error);
+    return [];
   }
 };
+
+const startDispatch = async (orderId) => {
+  const order = await Order.findById(orderId);
+  if (!order || order.status !== 'pending' || order.dispatchStatus !== 'searching') return;
+
+  clearDispatchTimer(orderId);
+
+  const currentRadius = order.searchRadius || 3;
+  const nearbyTechs = await broadcastToTechnicians(order, currentRadius);
+
+  if (nearbyTechs.length === 0) {
+    if (currentRadius < MAX_SEARCH_RADIUS_KM) {
+      order.searchRadius = Math.min(currentRadius * 2, MAX_SEARCH_RADIUS_KM);
+      order.dispatchAttempt += 1;
+      order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
+      await order.save();
+      emitOrderUpdate(order._id.toString(), {
+        status: 'pending',
+        dispatchStatus: 'searching',
+        searchRadius: order.searchRadius,
+        dispatchAttempt: order.dispatchAttempt,
+        message: `Expanding search to ${order.searchRadius} km`,
+      });
+      scheduleDispatch(order._id, DISPATCH_TIMEOUT_MS, () => startDispatch(order._id));
+    } else {
+      order.dispatchStatus = 'no_tech';
+      order.noTechnicianFound = true;
+      await order.save();
+      emitOrderUpdate(order._id.toString(), {
+        status: 'pending',
+        dispatchStatus: 'no_tech',
+        message: 'No technicians available nearby. Please try again later.',
+      });
+      emitNotification(order.user.toString(), {
+        type: 'dispatch_failed',
+        title: 'No technicians found',
+        message: 'We could not find any available technicians near you. Please try again.',
+        orderId: order._id,
+      });
+    }
+    return;
+  }
+
+  order.dispatchAttempt += 1;
+  order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
+  await order.save();
+
+  emitOrderUpdate(order._id.toString(), {
+    status: 'pending',
+    dispatchStatus: 'searching',
+    searchRadius: order.searchRadius,
+    dispatchAttempt: order.dispatchAttempt,
+    technicianCount: nearbyTechs.length,
+    message: `Notifying ${nearbyTechs.length} nearby technician${nearbyTechs.length > 1 ? 's' : ''}`,
+  });
+
+  scheduleDispatch(order._id, DISPATCH_TIMEOUT_MS, () => startDispatch(order._id));
+};
+
+exports.startDispatch = startDispatch;
 
 const assignTechnicianToOrder = async (order, technicianName) => {
   if (!technicianName) return;
@@ -183,12 +262,30 @@ const createOrder = async (req, res, next) => {
 
     await order.save();
 
-    // Assign technician if provided, otherwise broadcast to nearby
+    // Assign technician if provided, otherwise start automated dispatch loop
     if (technician) {
       await assignTechnicianToOrder(order, technician);
+      order.dispatchStatus = 'accepted';
       await order.save();
+      emitOrderUpdate(order._id.toString(), {
+        status: 'assigned',
+        dispatchStatus: 'accepted',
+        technicianName: order.technician,
+      });
+      emitNotification(order.user.toString(), {
+        type: 'order_assigned',
+        title: 'Technician Assigned',
+        message: `${order.technician} has been assigned to your repair request.`,
+        orderId: order._id,
+      });
     } else {
-      await broadcastToTechnicians(order, 3); // 3km radius
+      order.dispatchStatus = 'searching';
+      order.searchRadius = 3;
+      order.dispatchAttempt = 1;
+      order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
+      pushStatusHistory(order, 'pending', 'Searching for nearby technicians');
+      await order.save();
+      startDispatch(order._id);
     }
 
     // Populate and return
@@ -242,16 +339,29 @@ const acceptOrder = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Only technicians can accept orders' });
     }
 
-    // Atomic update: only succeed if status is still 'pending'
+    // Prevent accepting if technician already has an active order
+    const activeJob = await Order.findOne({
+      technicianUser: req.user._id,
+      status: { $in: ['assigned', 'in_progress'] },
+    });
+    if (activeJob) {
+      return res.status(400).json({ success: false, message: 'You already have an active job. Complete or cancel it first.' });
+    }
+
+    // Atomic update: only succeed if status is still 'pending' AND dispatch is still 'searching'
     const order = await Order.findOneAndUpdate(
-      { _id: req.params.id, status: 'pending' },
-      { 
+      {
+        _id: req.params.id,
+        status: 'pending',
+        dispatchStatus: { $in: ['searching', 'offered'] },
+      },
+      {
         $set: {
           status: 'assigned',
           dispatchStatus: 'accepted',
           technicianUser: req.user._id,
           technician: req.user.name,
-        }
+        },
       },
       { new: true } // Return the updated document
     );
@@ -260,14 +370,19 @@ const acceptOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Job is no longer available or already accepted by someone else.' });
     }
 
+    // Stop the dispatch loop now that a technician accepted
+    clearDispatchTimer(order._id);
+
     // Generate checklist and calculate earnings
     if (!order.checklist || order.checklist.length === 0) {
       order.checklist = defaultChecklist(order.issues);
     }
-    
+
     // Legacy support for technicianEarning, though we now use basePrice commissions
-    order.technicianEarning = order.basePrice ? (order.basePrice - order.technicianCommission) : technicianCut(order.total);
-    
+    order.technicianEarning = order.basePrice
+      ? order.basePrice - order.technicianCommission
+      : technicianCut(order.total);
+
     pushStatusHistory(order, 'assigned', `Accepted by ${req.user.name}`);
     await order.save();
 
@@ -277,6 +392,19 @@ const acceptOrder = async (req, res, next) => {
       { $inc: { 'technicianMeta.jobsDone': 1 } },
       { new: true }
     );
+
+    // Notify customer in real-time
+    emitOrderUpdate(order._id.toString(), {
+      status: 'assigned',
+      technicianName: req.user.name,
+      technicianId: req.user._id,
+    });
+    emitNotification(order.user.toString(), {
+      type: 'order_assigned',
+      title: 'Technician Found!',
+      message: `${req.user.name} has accepted your repair request and is on the way.`,
+      orderId: order._id,
+    });
 
     // Re-fetch with populated tech data
     const populated = await Order.findById(order._id).populate('technicianUser', 'name phone technicianMeta lastLat lastLng');
@@ -304,57 +432,25 @@ const rejectOrder = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Verify order is in offered state
-    if (order.status !== 'assigned' || order.dispatchStatus !== 'offered') {
+    // Allow declining a job that is currently being broadcast (searching) or was offered directly
+    if (order.status !== 'pending' || !['searching', 'offered'].includes(order.dispatchStatus)) {
       return res.status(400).json({
         success: false,
         message: 'Order is not available for rejection',
       });
     }
 
-    // Reset to pending
-    order.status = 'pending';
-    order.dispatchStatus = 'declined';
-    order.technicianUser = null;
-    order.technician = '';
-    order.checklist = [];
+    pushStatusHistory(order, 'pending', `Declined by ${req.user.name}`);
 
-    pushStatusHistory(order, 'pending', `Declined by technician`);
-
+    // Continue dispatch loop — preserve current search radius instead of resetting to 3km
+    // so we don't throw away expanded radius when a tech declines after radius expansion
+    order.dispatchStatus = 'searching';
+    order.dispatchAttempt += 1;
+    order.dispatchExpiresAt = new Date(Date.now() + DISPATCH_TIMEOUT_MS);
     await order.save();
 
-    res.json({
-      success: true,
-      message: 'Order rejected successfully',
-      data: formatOrderForCustomer(order),
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-    if (!order) {
-      return res.status(404).json({ success: false, message: 'Order not found' });
-    }
-
-    // Verify order is in offered state
-    if (order.status !== 'assigned' || order.dispatchStatus !== 'offered') {
-      return res.status(400).json({
-        success: false,
-        message: 'Order is not available for rejection',
-      });
-    }
-
-    // Reset to pending
-    order.status = 'pending';
-    order.dispatchStatus = 'declined';
-    order.technicianUser = null;
-    order.technician = '';
-    order.checklist = [];
-
-    pushStatusHistory(order, 'pending', `Declined by technician`);
-
-    await order.save();
+    clearDispatchTimer(order._id);
+    startDispatch(order._id);
 
     res.json({
       success: true,
@@ -414,12 +510,18 @@ const updateOrderStatus = async (req, res, next) => {
     if (status === 'completed') {
       return res.status(400).json({ success: false, message: 'Please use the /complete endpoint with OTP to complete jobs' });
     }
-    
+
     order.status = status;
-    
+
+    if (status === 'cancelled') {
+      clearDispatchTimer(order._id);
+      order.dispatchStatus = 'none';
+      order.noTechnicianFound = false;
+    }
+
     let finalNote = note || '';
     if (status === 'in_progress' && !order.completionOtp) {
-      // Generate a 4 digit OTP
+      // Generate a 4-digit OTP
       order.completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
       finalNote = finalNote ? `${finalNote} (OTP Generated)` : 'OTP Generated';
     }
@@ -427,6 +529,20 @@ const updateOrderStatus = async (req, res, next) => {
     pushStatusHistory(order, status, finalNote);
 
     await order.save();
+
+    // Broadcast real-time status update to both parties
+    emitOrderUpdate(order._id.toString(), { status, note: finalNote });
+    const recipientId = req.user.role === 'technician'
+      ? order.user?.toString()
+      : order.technicianUser?.toString();
+    if (recipientId) {
+      emitNotification(recipientId, {
+        type: 'order_status_changed',
+        title: 'Order Updated',
+        message: `Your order is now ${status}`,
+        orderId: order._id,
+      });
+    }
 
     res.json({
       success: true,
@@ -441,36 +557,36 @@ const updateOrderStatus = async (req, res, next) => {
 const completeOrder = async (req, res, next) => {
   try {
     const { otp } = req.body;
-    
+
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
-    
+
     if (req.user.role !== 'technician' || order.technicianUser?.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized to complete this order' });
     }
-    
+
     if (order.status !== 'in_progress') {
       return res.status(400).json({ success: false, message: 'Order is not in progress' });
     }
-    
+
     if (!otp || order.completionOtp !== otp) {
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }
-    
+
     // Create Razorpay Order
     const razorpay = require('../utils/razorpay');
-    
+
     const rpOrder = await razorpay.orders.create({
       amount: order.customerTotal * 100, // paise
       currency: 'INR',
-      receipt: `receipt_order_${order._id}`
+      receipt: `receipt_order_${order._id}`,
     });
-    
+
     order.status = 'completed';
     order.completedAt = new Date();
     order.paymentGatewayOrderId = rpOrder.id;
     pushStatusHistory(order, 'completed', 'Job marked complete via OTP');
-    
+
     await order.save();
 
     // Notify customer via MQTT to trigger payment checkout
@@ -483,10 +599,10 @@ const completeOrder = async (req, res, next) => {
         id: rpOrder.id,
         amount: rpOrder.amount,
         currency: rpOrder.currency,
-        customerTotal: order.customerTotal
-      }
+        customerTotal: order.customerTotal,
+      },
     });
-    
+
     res.json({
       success: true,
       message: 'Order completed, awaiting payment',
@@ -495,9 +611,9 @@ const completeOrder = async (req, res, next) => {
         checkoutSession: {
           id: rpOrder.id,
           amount: rpOrder.amount,
-          currency: rpOrder.currency
-        }
-      }
+          currency: rpOrder.currency,
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -602,5 +718,5 @@ module.exports = {
   updateOrderStatus,
   getAvailableOrders,
   getTechnicianOrders,
-  completeOrder
+  completeOrder,
 };

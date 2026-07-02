@@ -27,8 +27,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     'Collect Payment',
   ];
 
-  final List<bool> _checklist = [false, false, false, false, false];
-  final List<String> _checklistItems = [
+  List<bool> _checklist = [false, false, false, false, false];
+  List<String> _checklistItems = [
     'Inspect device condition',
     'Diagnose issue',
     'Replace/repair component',
@@ -44,6 +44,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is Map<String, dynamic> && _job == null) {
       _job = args;
+      // Populate checklist from backend order data if available
+      final backendChecklist = _job?['checklist'];
+      if (backendChecklist is List && backendChecklist.isNotEmpty) {
+        final labels = backendChecklist
+            .map<String>((item) => item['label']?.toString() ?? '')
+            .where((label) => label.isNotEmpty)
+            .toList();
+        if (labels.isNotEmpty) {
+          _checklistItems = labels;
+          _checklist = List<bool>.filled(labels.length, false);
+        }
+      }
       _initNavigationStream();
     }
   }
@@ -56,7 +68,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       );
       _jobLocationStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
         if (!mounted) return;
-        MqttService().emitLocationUpdate(_job!['_id'], position.latitude, position.longitude);
+        MqttService().emitLocationUpdate(
+          _job!['technicianUser'].toString(),
+          _job!['_id'],
+          position.latitude,
+          position.longitude,
+        );
       });
     }
   }

@@ -1,10 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:vibration/vibration.dart';
 
 import 'api_service_new.dart';
 import 'utils/mqtt_service.dart';
+import 'utils/push_notification_service.dart';
 import 'widgets/common_widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -33,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     MqttService().connect();
+    PushNotificationService.instance.initialize();
     
     MqttService().onNotification((data) {
       if (data['type'] == 'kyc_approved') {
@@ -91,15 +95,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _countdown = 20;
     });
     _popupCtrl.forward(from: 0);
+
+    // Strong haptic + vibration so the technician doesn't miss the request
+    HapticFeedback.heavyImpact();
+    HapticFeedback.vibrate();
+    Vibration.hasVibrator().then((hasVibrator) {
+      if (hasVibrator == true) {
+        Vibration.vibrate(pattern: [0, 500, 200, 500, 200, 500]);
+      }
+    });
+
     _countdownTimer?.cancel();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
       if (_countdown <= 0) {
         t.cancel();
-        _dismissJobRequest();
+        _autoDeclineJob();
       } else if (mounted) {
         setState(() => _countdown--);
       }
     });
+  }
+
+  void _autoDeclineJob() async {
+    final job = _incomingJob;
+    _dismissJobRequest();
+    if (job != null && job['_id'] != null) {
+      await _api.rejectJob(job['_id'].toString());
+    }
   }
 
   void _dismissJobRequest() {
@@ -697,17 +719,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return AnimatedBuilder(
       animation: _popupCtrl,
       builder: (context, child) {
-        return Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: Opacity(
-            opacity: _popupCtrl.value.clamp(0.0, 1.0),
-            child: Transform.scale(
-              scale: 0.85 + (0.15 * _popupCtrl.value),
-              alignment: Alignment.bottomCenter,
-              child: child,
-            ),
+        return Opacity(
+          opacity: _popupCtrl.value.clamp(0.0, 1.0),
+          child: Container(
+            color: Colors.black.withValues(alpha: 0.75 * _popupCtrl.value),
+            alignment: Alignment.center,
+            child: SafeArea(child: child!),
           ),
         );
       },
@@ -843,7 +860,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: _dismissJobRequest,
+                        onTap: _autoDeclineJob,
                         child: Container(
                           height: 52,
                           decoration: BoxDecoration(

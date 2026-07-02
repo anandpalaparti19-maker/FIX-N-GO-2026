@@ -17,11 +17,34 @@ const supportRoutes = require('./supportRoutes');
 const webhookRoutes = require('./webhookRoutes');
 const walletRoutes = require('./walletRoutes');
 
+const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
+
+function getUserKey(req) {
+  try {
+    const auth = req.headers.authorization;
+    if (auth && auth.startsWith('Bearer ')) {
+      const decoded = jwt.decode(auth.split(' ')[1]);
+      if (decoded && decoded.id) return `user_${decoded.id}`;
+    }
+  } catch (_) {}
+  return req.ip;
+}
+
+const strictPerUser = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  keyGenerator: getUserKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests on this endpoint. Please wait a moment.' },
+});
+
 const router = express.Router();
 
 router.use('/api/auth', authRoutes);
 router.use('/api/orders', orderRoutes);
-router.use('/api/payments', paymentRoutes);
+router.use('/api/payments', strictPerUser, paymentRoutes);
 router.use('/api/ratings', ratingRoutes);
 router.use('/api/technician-profile', technicianProfileRoutes);
 router.use('/api/technician', technicianRoutes);

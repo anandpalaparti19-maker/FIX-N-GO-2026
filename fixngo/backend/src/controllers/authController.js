@@ -7,6 +7,7 @@ const RefreshToken = require('../models/refreshTokenModel');
 const generateToken = require('../utils/generateToken');
 const { sendPasswordResetEmail, generateOTP, generateResetToken } = require('../utils/emailService');
 const { sendOtpSms, generateOTP: generateOtpSms } = require('../utils/smsService');
+const { logger } = require('../utils/logger');
 
 const normalizeEmail = (value) => String(value || '').trim().toLowerCase();
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -251,7 +252,7 @@ const forgotPassword = async (req, res, next) => {
       resetToken: token, // Client needs this to verify OTP
     });
   } catch (error) {
-    console.error('Forgot password error:', error);
+    logger.error('Forgot password error:', error);
     next(error);
   }
 };
@@ -299,7 +300,7 @@ const resetPassword = async (req, res, next) => {
 
     res.json({ success: true, message: 'Password reset successfully' });
   } catch (error) {
-    console.error('Reset password error:', error);
+    logger.error('Reset password error:', error);
     next(error);
   }
 };
@@ -336,7 +337,7 @@ const sendPhoneOtp = async (req, res, next) => {
       return res.status(500).json({ success: false, message: 'Failed to send OTP' });
     }
 
-    console.log(`OTP sent to ${phone}: ${otp}`);
+    logger.info(`OTP sent to ${phone}: ${otp}`);
 
     res.json({
       success: true,
@@ -344,7 +345,7 @@ const sendPhoneOtp = async (req, res, next) => {
       otpId: otpRecord._id, // For tracking verification
     });
   } catch (error) {
-    console.error('Send OTP error:', error);
+    logger.error('Send OTP error:', error);
     next(error);
   }
 };
@@ -421,7 +422,7 @@ const verifyPhoneOtp = async (req, res, next) => {
       data: userResponse(user, accessToken, refreshToken),
     });
   } catch (error) {
-    console.error('Verify OTP error:', error);
+    logger.error('Verify OTP error:', error);
     next(error);
   }
 };
@@ -472,7 +473,7 @@ const refreshAccessToken = async (req, res, next) => {
       refreshToken: newRefreshTokenStr,
     });
   } catch (error) {
-    console.error('Refresh token error:', error);
+    logger.error('Refresh token error:', error);
     next(error);
   }
 };
@@ -488,6 +489,20 @@ const issueRefreshToken = async (userId) => {
   return token;
 };
 
+// ── FCM Token ─────────────────────────────────────────────────────────────────
+const updateFcmToken = async (req, res, next) => {
+  try {
+    const { fcmToken } = req.body;
+    if (!fcmToken) {
+      return res.status(400).json({ success: false, message: 'fcmToken is required' });
+    }
+    await User.findByIdAndUpdate(req.user._id, { fcmToken });
+    res.json({ success: true, message: 'FCM token updated' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -499,4 +514,5 @@ module.exports = {
   verifyPhoneOtp,
   refreshAccessToken,
   issueRefreshToken,
+  updateFcmToken,
 };

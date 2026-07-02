@@ -52,7 +52,7 @@ const createPaymentIntent = async (req, res, next) => {
       },
     });
 
-    console.log(`Payment intent created: ${paymentIntent.id}`);
+    logger.info(`Payment intent created: ${paymentIntent.id}`);
 
     // Store payment in DB
     const payment = await Payment.create({
@@ -75,7 +75,7 @@ const createPaymentIntent = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Payment intent error:', error);
+    logger.error('Payment intent error:', error);
     next(error);
   }
 };
@@ -101,6 +101,20 @@ const confirmPayment = async (req, res, next) => {
       });
     }
 
+    // Idempotency: if payment already completed, return success without re-processing
+    if (payment.status === 'completed') {
+      return res.json({
+        success: true,
+        message: 'Payment already confirmed',
+        data: {
+          paymentId: payment._id,
+          status: payment.status,
+          amount: payment.amount,
+          orderId: payment.orderId,
+        },
+      });
+    }
+
     // Verify payment belongs to user
     if (payment.customerId.toString() !== req.user._id.toString()) {
       return res.status(403).json({
@@ -109,23 +123,32 @@ const confirmPayment = async (req, res, next) => {
       });
     }
 
-    // In test/mock mode, accept any payment intent starting with pi_test
+    // Verify payment amount matches order total (prevent client-side tampering)
+    const order = await Order.findById(payment.orderId);
+    if (order && Math.abs(payment.amount - order.customerTotal) > 0.01) {
+      logger.error(`Payment amount mismatch: payment=${payment.amount}, order=${order.customerTotal}`);
+      return res.status(400).json({
+        success: false,
+        message: 'Payment amount does not match order total',
+      });
+    }
+
     let paymentSucceeded = false;
     
     if (paymentIntentId.startsWith('pi_test')) {
-      // Mock mode - accept test payment intents
-      paymentSucceeded = true;
-      console.log(`[MOCK] Payment intent ${paymentIntentId} accepted in test mode`);
-    } else {
-      try {
-        // Get payment intent from Stripe
-        const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-        paymentSucceeded = paymentIntent.status === 'succeeded';
-      } catch (stripeError) {
-        console.log(`[MOCK] Stripe error (using mock mode):`, stripeError.message);
-        // In case Stripe fails, accept in mock mode
-        paymentSucceeded = true;
+      // Mock mode for testing only — accept test payment intents
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(400).json({
+          success: false,
+          message: 'Test payment intents are not allowed in production',
+        });
       }
+      paymentSucceeded = true;
+      logger.info(`[MOCK] Payment intent ${paymentIntentId} accepted in test mode`);
+    } else {
+      // Get payment intent from Stripe — failures MUST propagate, never silently succeed
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+      paymentSucceeded = paymentIntent.status === 'succeeded';
     }
 
     if (!paymentSucceeded) {
@@ -141,7 +164,6 @@ const confirmPayment = async (req, res, next) => {
     await payment.save();
 
     // Update order
-    const order = await Order.findById(payment.orderId);
     if (order) {
       order.paymentStatus = 'collected';
       order.stripePaymentIntentId = paymentIntentId;
@@ -177,7 +199,7 @@ const confirmPayment = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Confirm payment error:', error);
+    logger.error('Confirm payment error:', error);
     next(error);
   }
 };
@@ -352,7 +374,7 @@ const requestWithdrawal = async (req, res, next) => {
       data: withdrawal,
     });
   } catch (error) {
-    console.error('Request withdrawal error:', error);
+    logger.error('Request withdrawal error:', error);
     next(error);
   }
 };
@@ -381,7 +403,7 @@ const handleStripeWebhook = async (req, res) => {
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-      console.error('Webhook signature verification failed:', err.message);
+      logger.error('Webhook signature verification failed:', err.message);
       return res.status(400).json({ error: `Webhook Error: ${err.message}` });
     }
   } else {
@@ -397,7 +419,7 @@ const handleStripeWebhook = async (req, res) => {
   switch (event.type) {
     case 'payment_intent.succeeded': {
       const paymentIntent = event.data.object;
-      console.log(`[Webhook] PaymentIntent succeeded: ${paymentIntent.id}`);
+      logger.info(`[Webhook] PaymentIntent succeeded: ${paymentIntent.id}`);
 
       // Find and update payment record
       const payment = await Payment.findOne({ stripePaymentIntentId: paymentIntent.id });
@@ -412,6 +434,7 @@ const handleStripeWebhook = async (req, res) => {
           order.stripePaymentIntentId = paymentIntent.id;
           order.paymentMethod = 'card';
           const { technicianCut } = require('../utils/orderHelpers');
+const { logger } = require('../utils/logger');
           order.technicianEarning = technicianCut(order.total);
           await order.save();
 
@@ -429,7 +452,7 @@ const handleStripeWebhook = async (req, res) => {
     }
     case 'payment_intent.payment_failed': {
       const failedIntent = event.data.object;
-      console.log(`[Webhook] PaymentIntent failed: ${failedIntent.id}`);
+      logger.info(`[Webhook] PaymentIntent failed: ${failedIntent.id}`);
 
       const failedPayment = await Payment.findOne({ stripePaymentIntentId: failedIntent.id });
       if (failedPayment) {
@@ -439,7 +462,7 @@ const handleStripeWebhook = async (req, res) => {
       break;
     }
     default:
-      console.log(`[Webhook] Unhandled event type: ${event.type}`);
+      logger.info(`[Webhook] Unhandled event type: ${event.type}`);
   }
 
   res.json({ received: true });

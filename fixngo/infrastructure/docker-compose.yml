@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # MQTT Broker (Eclipse Mosquitto)
+  # MQTT Broker (Eclipse Mosquitto) — authenticated
   mosquitto:
     image: eclipse-mosquitto:2.0
     container_name: fixngo-mosquitto
@@ -10,8 +10,36 @@ services:
       - "9001:9001"   # WebSocket port for Flutter apps
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./mosquitto/acl.conf:/mosquitto/config/acl.conf
+      - ./mosquitto/passwd:/mosquitto/config/passwd
       - mosquitto-data:/mosquitto/data
       - mosquitto-log:/mosquitto/log
+    restart: unless-stopped
+
+  # Nginx Reverse Proxy with SSL termination
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: fixngo-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl/certs:/etc/nginx/ssl:ro
+      - ./ssl/dhparam.pem:/etc/nginx/ssl/dhparam.pem:ro
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  # Certbot for automatic SSL certificate renewal
+  certbot:
+    image: certbot/certbot:latest
+    container_name: fixngo-certbot
+    volumes:
+      - ./ssl/certs:/etc/letsencrypt
+      - ./ssl/webroot:/var/www/certbot
+    # Renew certificates every 12 hours (only acts if renewal is due)
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --quiet; sleep 12h; done'"
     restart: unless-stopped
 
   # Map Tile Server (TileServer GL)

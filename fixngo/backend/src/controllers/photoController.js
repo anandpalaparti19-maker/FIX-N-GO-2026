@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const Order = require('../models/orderModel');
+const { logger } = require('../utils/logger');
 
 // Upload directory
 const uploadDir = path.join(__dirname, '../../uploads');
@@ -84,10 +85,10 @@ const uploadServicePhoto = async (req, res, next) => {
       try {
         fs.unlinkSync(req.file.path);
       } catch (unlinkError) {
-        console.error('Error deleting file:', unlinkError);
+        logger.error('Error deleting file:', unlinkError);
       }
     }
-    console.error('Error uploading photo:', error);
+    logger.error('Error uploading photo:', error);
     next(error);
   }
 };
@@ -119,7 +120,7 @@ const getServicePhotos = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Error getting photos:', error);
+    logger.error('Error getting photos:', error);
     next(error);
   }
 };
@@ -164,7 +165,7 @@ const addServiceNotes = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Error adding notes:', error);
+    logger.error('Error adding notes:', error);
     next(error);
   }
 };

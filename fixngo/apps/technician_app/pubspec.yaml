@@ -19,6 +19,11 @@ dependencies:
   latlong2: ^0.9.1
   mqtt_client: ^10.4.2
   provider: ^6.1.5+1
+  vibration: ^3.1.3
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.6.0
+  firebase_messaging: ^15.2.7
+  firebase_crashlytics: ^4.3.5
 
 dev_dependencies:
   flutter_test:

@@ -49,7 +49,7 @@ class _PaymentScreenState extends State<PaymentScreen>
     setState(() => _loading = true);
     await Future.delayed(const Duration(seconds: 1));
     if (_job?['_id'] != null) {
-      await _api.completeJob(_job!['_id']);
+      await _api.completeJob(_job!['_id'], '');
     }
     if (!mounted) return;
     setState(() {

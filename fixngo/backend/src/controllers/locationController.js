@@ -1,6 +1,7 @@
 const axios = require('axios');
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
+const { logger } = require('../utils/logger');
 
 // Google Maps API Key
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || 'AIzaSyDemoKey123'; // Demo key for now
@@ -20,7 +21,7 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
   return R * c;
 };
 
-// Get nearby orders for technician
+// Get nearby orders for technician — uses 2dsphere geospatial index
 const getNearbyOrders = async (req, res, next) => {
   try {
     const { latitude, longitude, radiusKm = 50 } = req.body;
@@ -33,26 +34,33 @@ const getNearbyOrders = async (req, res, next) => {
       });
     }
 
-    // Get available orders (status = pending, not assigned to anyone)
-    const orders = await Order.find({ status: 'pending' });
+    const radiusMeters = Number(radiusKm) * 1000;
 
-    // Filter and calculate distances
-    const nearbyOrders = orders
-      .map((order) => {
-        if (order.serviceLat && order.serviceLng) {
-          const distance = calculateDistance(
-            latitude,
-            longitude,
-            order.serviceLat,
-            order.serviceLng
-          );
-          return { ...order.toObject(), distance };
-        }
-        return null;
-      })
-      .filter((order) => order && order.distance <= radiusKm)
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 20);
+    // Use MongoDB $nearSphere with the 2dsphere index on Order.location
+    const orders = await Order.find({
+      status: 'pending',
+      location: {
+        $nearSphere: {
+          $geometry: {
+            type: 'Point',
+            coordinates: [Number(longitude), Number(latitude)],
+          },
+          $maxDistance: radiusMeters,
+        },
+      },
+    })
+      .limit(20);
+
+    // Attach computed distance for each order
+    const nearbyOrders = orders.map((order) => {
+      const distance = calculateDistance(
+        latitude,
+        longitude,
+        order.serviceLat,
+        order.serviceLng
+      );
+      return { ...order.toObject(), distance };
+    });
 
     res.status(200).json({
       success: true,
@@ -62,7 +70,7 @@ const getNearbyOrders = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Error getting nearby orders:', error);
+    logger.error('Error getting nearby orders:', error);
     next(error);
   }
 };
@@ -113,7 +121,7 @@ const getLocationSuggestions = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error('Error getting location suggestions:', error);
+    logger.error('Error getting location suggestions:', error);
     next(error);
   }
 };
@@ -170,7 +178,7 @@ const getPlaceDetails = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error('Error getting place details:', error);
+    logger.error('Error getting place details:', error);
     next(error);
   }
 };
@@ -233,12 +241,12 @@ const getRoute = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error('Error getting route:', error);
+    logger.error('Error getting route:', error);
     next(error);
   }
 };
 
-// Update technician location
+// Update technician location — populates both flat fields AND GeoJSON for 2dsphere queries
 const updateTechnicianLocation = async (req, res, next) => {
   try {
     const { latitude, longitude } = req.body;
@@ -251,13 +259,21 @@ const updateTechnicianLocation = async (req, res, next) => {
       });
     }
 
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+
     const user = await User.findByIdAndUpdate(
       technicianId,
       {
         $set: {
-          lastLat: latitude,
-          lastLng: longitude,
+          lastLat: lat,
+          lastLng: lng,
           lastLocationUpdate: new Date(),
+          // Populate GeoJSON field so $nearSphere dispatch queries work
+          location: {
+            type: 'Point',
+            coordinates: [lng, lat], // GeoJSON is [longitude, latitude]
+          },
         },
       },
       { new: true }
@@ -274,7 +290,7 @@ const updateTechnicianLocation = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error('Error updating location:', error);
+    logger.error('Error updating location:', error);
     next(error);
   }
 };

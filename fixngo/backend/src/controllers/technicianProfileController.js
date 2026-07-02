@@ -3,6 +3,7 @@ const Order = require('../models/orderModel');
 const Rating = require('../models/ratingModel');
 const fs = require('fs');
 const path = require('path');
+const { logger } = require('../utils/logger');
 
 const uploadDir = path.join(__dirname, '../../uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -171,7 +172,7 @@ const updateTechnicianPhoto = async (req, res, next) => {
       try {
         fs.unlinkSync(req.file.path);
       } catch (unlinkError) {
-        console.error('Error deleting temp photo:', unlinkError);
+        logger.error('Error deleting temp photo:', unlinkError);
       }
     }
     next(error);
@@ -237,7 +238,7 @@ const updateTechnicianKyc = async (req, res, next) => {
           try {
             fs.unlinkSync(file.path);
           } catch (unlinkError) {
-            console.error('Error deleting temp KYC file:', unlinkError);
+            logger.error('Error deleting temp KYC file:', unlinkError);
           }
         }
       }

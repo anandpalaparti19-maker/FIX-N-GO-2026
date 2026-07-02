@@ -20,11 +20,37 @@ import 'terms_of_service_screen.dart';
 import 'edit_profile_screen.dart';
 import 'bank_details_screen.dart';
 import 'notification_settings_screen.dart';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'theme/app_theme.dart';
 import 'theme_provider.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    if (kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS))) {
+      await Firebase.initializeApp(
+        options: const FirebaseOptions(
+          apiKey: 'AIzaSyA-dummy-api-key',
+          appId: '1:1234567890:web:1234567890abcdef',
+          messagingSenderId: '1234567890',
+          projectId: 'dummy-project-id',
+        ),
+      );
+    } else {
+      await Firebase.initializeApp();
+      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+      PlatformDispatcher.instance.onError = (error, stack) {
+        FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+        return true;
+      };
+    }
+  } catch (e) {
+    debugPrint('Firebase initialization failed: $e');
+  }
+
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(

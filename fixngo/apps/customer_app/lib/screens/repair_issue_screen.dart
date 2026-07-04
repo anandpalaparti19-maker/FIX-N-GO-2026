@@ -78,6 +78,9 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
         .fold(0, (sum, i) => sum + (i['price'] as int));
   }
 
+  int get platformFee => (totalPrice * 0.1).round();
+  int get finalTotal => totalPrice + platformFee;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,6 +242,43 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                 ),
               ),
               SizedBox(height: 14),
+              if (totalPrice > 0)
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Base Price', style: TextStyle(color: AppColors.textMuted)),
+                          Text('₹$totalPrice', style: TextStyle(color: AppColors.textPrimary)),
+                        ],
+                      ),
+                      SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Platform Fee (10%)', style: TextStyle(color: AppColors.textMuted)),
+                          Text('₹$platformFee', style: TextStyle(color: AppColors.textPrimary)),
+                        ],
+                      ),
+                      Divider(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+                          Text('₹$finalTotal', style: TextStyle(color: AppColors.brandBlue, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              if (totalPrice > 0) SizedBox(height: 14),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -261,7 +301,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                           ),
                         )
                       : Text(
-                          'Continue · ₹$totalPrice est.',
+                          'Continue · ₹$finalTotal est.',
                           style: GoogleFonts.poppins(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -316,7 +356,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
         brand: brand,
         model: model,
         issues: selectedIssues.toList(),
-        total: totalPrice,
+        total: finalTotal,
         serviceAddress: address,
         city: 'Hyderabad',
         serviceLat: lat,

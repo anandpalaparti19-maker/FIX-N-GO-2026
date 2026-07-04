@@ -11,9 +11,7 @@ class ApiService {
 
   static String get serverOrigin {
     if (_overrideBaseUrl.isNotEmpty) return _overrideBaseUrl;
-    if (kIsWeb) return 'http://localhost:5000';
-    if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:5000';
-    return 'http://localhost:5000';
+    return 'https://bernard-intimate-hosts-massive.trycloudflare.com';
   }
 
   static String get baseUrl {

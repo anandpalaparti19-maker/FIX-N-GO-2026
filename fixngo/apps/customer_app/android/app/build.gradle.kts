@@ -19,7 +19,7 @@ android {
     defaultConfig {
         // Professional Application ID for Fix-N-Go Private Limited
         applicationId = "com.fixngo.customer"
-        minSdk = flutter.minSdkVersion
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -34,6 +34,7 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }

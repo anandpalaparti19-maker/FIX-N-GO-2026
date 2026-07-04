@@ -1,4 +1,4 @@
-# Fix-N-Go Technician App — ProGuard Rules
+# Fix-N-Go Customer App — ProGuard Rules
 # Flutter-specific rules
 
 # Keep Flutter engine classes

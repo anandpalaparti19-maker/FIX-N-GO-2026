@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'dart:io' show Platform;
 import 'package:provider/provider.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'providers/auth_provider.dart';
@@ -41,14 +40,6 @@ void main() async {
     }
   } catch (e) {
     debugPrint('Firebase initialization failed: $e');
-  }
-
-  if (kIsWeb || (!kIsWeb && (Platform.isAndroid || Platform.isIOS))) {
-    const stripePk = String.fromEnvironment(
-      'STRIPE_PK',
-      defaultValue: 'pk_test_REPLACE_WITH_YOUR_STRIPE_PUBLISHABLE_KEY',
-    );
-    Stripe.publishableKey = stripePk;
   }
 
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

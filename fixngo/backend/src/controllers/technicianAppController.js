@@ -217,8 +217,17 @@ const startJob = async (req, res, next) => {
     }
 
     order.status = 'in_progress';
+    
+    // Generate completion OTP when job starts
+    if (!order.completionOtp) {
+      order.completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    }
+    
     pushStatusHistory(order, 'in_progress', 'Technician started job');
     await order.save();
+    
+    const { emitOrderUpdate } = require('../utils/mqttService');
+    emitOrderUpdate(order._id.toString(), { status: 'in_progress', completionOtp: order.completionOtp });
 
     const populated = await Order.findById(order._id).populate('user', 'name phone');
     res.json(formatOrderForTech(populated, req.user));

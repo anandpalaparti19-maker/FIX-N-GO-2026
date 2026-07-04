@@ -33,7 +33,7 @@ class MqttService {
         port = int.tryParse(base.split(':')[1]) ?? 9001;
       } else {
         host = base;
-        port = 80; // Default to 80 for wss/ws via standard tunnels
+        port = host.contains('cloudflare') ? 443 : 80; // Default to 443 for cloudflare, 80 otherwise
       }
     }
     client = setupMqttClient(host, 'tech_client_${DateTime.now().millisecondsSinceEpoch}', port);

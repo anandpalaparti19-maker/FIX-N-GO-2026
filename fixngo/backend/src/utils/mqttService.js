@@ -71,12 +71,18 @@ const initializeMqtt = () => {
         const order = await Order.findById(orderId);
         if (order && (order.user?.toString() === userId || order.technicianUser?.toString() === userId)) {
           order.status = status;
+          if (status === 'in_progress' && !order.completionOtp) {
+            order.completionOtp = Math.floor(1000 + Math.random() * 9000).toString();
+          }
           if (note) {
             order.statusHistory?.push({ status, timestamp: new Date(), note });
           }
           await order.save();
           // Broadcast order update
-          client.publish(`server/order/${orderId}/updated`, JSON.stringify({ orderId, status, note, timestamp: new Date() }));
+          client.publish(`server/order/${orderId}/updated`, JSON.stringify({ 
+            orderId, status, note, timestamp: new Date(),
+            completionOtp: order.completionOtp 
+          }));
           console.log(`Order ${orderId} updated to ${status}`);
         }
       }

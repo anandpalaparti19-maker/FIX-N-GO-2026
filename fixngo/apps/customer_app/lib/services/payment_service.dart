@@ -25,28 +25,28 @@ class PaymentService {
 
   /// Confirm a card or UPI payment after user completes it
   Future<Map<String, dynamic>> confirmPayment({
-    required String paymentIntentId,
+    required String cashfreeOrderId,
     required String paymentId,
     required String orderId,
   }) async {
     await _ensureToken();
     final res = await _api.post('/api/payments/confirm', {
-      'paymentIntentId': paymentIntentId,
+      'cashfreeOrderId': cashfreeOrderId,
       'paymentId': paymentId,
       'orderId': orderId,
     });
     return (res['data'] as Map<String, dynamic>?) ?? {};
   }
 
-  /// Confirm cash-on-delivery payment (uses mock pi_test_ prefix)
+  /// Confirm cash-on-delivery payment (uses mock prefix)
   Future<Map<String, dynamic>> confirmCashPayment({
     required String paymentId,
     required String orderId,
   }) async {
     await _ensureToken();
-    final mockId = 'pi_test_cash_${DateTime.now().millisecondsSinceEpoch}';
+    final mockId = 'cf_test_cash_${DateTime.now().millisecondsSinceEpoch}';
     final res = await _api.post('/api/payments/confirm', {
-      'paymentIntentId': mockId,
+      'cashfreeOrderId': mockId,
       'paymentId': paymentId,
       'orderId': orderId,
     });

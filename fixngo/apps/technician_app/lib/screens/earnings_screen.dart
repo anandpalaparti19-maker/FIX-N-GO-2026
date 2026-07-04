@@ -18,6 +18,7 @@ class _EarningsScreenState extends State<EarningsScreen>
 
 
   Map<String, dynamic> _earnings = {};
+  Map<String, dynamic>? _profile;
   List<dynamic> _monthly = [];
   bool _loading = true;
   String? _error;
@@ -43,10 +44,12 @@ class _EarningsScreenState extends State<EarningsScreen>
       final results = await Future.wait([
         _paymentService.getTechnicianEarnings(),
         _paymentService.getMonthlyEarnings(),
+        _paymentService.getProfile(),
       ]);
       setState(() {
         _earnings = results[0] as Map<String, dynamic>;
         _monthly = results[1] as List<dynamic>;
+        _profile = results[2] as Map<String, dynamic>?;
         _loading = false;
       });
     } catch (e) {
@@ -329,8 +332,10 @@ class _EarningsScreenState extends State<EarningsScreen>
   }
 
   Widget _buildWithdraw() {
+    final bankDetails = _profile?['technicianMeta']?['bankDetails'];
     return _WithdrawTab(
       walletBalance: (_earnings['walletBalance'] ?? 0).toDouble(),
+      bankDetails: bankDetails as Map<String, dynamic>?,
       paymentService: _paymentService,
       onWithdrawn: _load,
     );
@@ -341,11 +346,13 @@ class _EarningsScreenState extends State<EarningsScreen>
 
 class _WithdrawTab extends StatefulWidget {
   final double walletBalance;
+  final Map<String, dynamic>? bankDetails;
   final ApiService paymentService;
   final VoidCallback onWithdrawn;
 
   const _WithdrawTab({
     required this.walletBalance,
+    this.bankDetails,
     required this.paymentService,
     required this.onWithdrawn,
   });
@@ -356,32 +363,27 @@ class _WithdrawTab extends StatefulWidget {
 
 class _WithdrawTabState extends State<_WithdrawTab> {
   final _amountCtrl = TextEditingController();
-  final _accountCtrl = TextEditingController();
-  final _ifscCtrl = TextEditingController();
-  final _nameCtrl = TextEditingController();
   bool _submitting = false;
 
   @override
   void dispose() {
     _amountCtrl.dispose();
-    _accountCtrl.dispose();
-    _ifscCtrl.dispose();
-    _nameCtrl.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     final amount = double.tryParse(_amountCtrl.text);
-    if (amount == null || amount <= 0) {
-      _snack('Enter a valid amount');
+    if (amount == null || amount < 500) {
+      _snack('Minimum withdrawal amount is ₹500');
       return;
     }
     if (amount > widget.walletBalance) {
       _snack('Amount exceeds wallet balance');
       return;
     }
-    if (_accountCtrl.text.isEmpty || _ifscCtrl.text.isEmpty || _nameCtrl.text.isEmpty) {
-      _snack('Fill in all bank details');
+
+    if (widget.bankDetails == null || widget.bankDetails!['accountNumber'] == null) {
+      _snack('Please add bank details in your profile first');
       return;
     }
 
@@ -389,11 +391,6 @@ class _WithdrawTabState extends State<_WithdrawTab> {
     try {
       await widget.paymentService.requestWithdrawal(
         amount: amount,
-        bankAccount: {
-          'accountNumber': _accountCtrl.text.trim(),
-          'ifsc': _ifscCtrl.text.trim().toUpperCase(),
-          'accountHolder': _nameCtrl.text.trim(),
-        },
       );
       widget.onWithdrawn();
       if (mounted) {
@@ -419,11 +416,13 @@ class _WithdrawTabState extends State<_WithdrawTab> {
 
   @override
   Widget build(BuildContext context) {
+    final hasBank = widget.bankDetails != null && widget.bankDetails!['accountNumber'] != null && widget.bankDetails!['accountNumber'].toString().isNotEmpty;
+    
     return SingleChildScrollView(
       padding: EdgeInsets.all(20),
       physics: BouncingScrollPhysics(),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Balance
           Container(
@@ -452,40 +451,130 @@ class _WithdrawTabState extends State<_WithdrawTab> {
               ],
             ),
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 40),
 
-          Text('Withdrawal Amount',
+          Text('Amount to Withdraw',
               style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               )),
-          SizedBox(height: 10),
-          _field(_amountCtrl, 'e.g. 500',
+          SizedBox(height: 16),
+          
+          // Modern Fintech Amount Input
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: TextField(
+              controller: _amountCtrl,
               keyboardType: TextInputType.number,
-              prefix: '₹ '),
-          SizedBox(height: 20),
-
-          Text('Bank Details',
+              textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              )),
-          SizedBox(height: 10),
-          _field(_nameCtrl, 'Account Holder Name'),
-          SizedBox(height: 10),
-          _field(_accountCtrl, 'Account Number',
-              keyboardType: TextInputType.number),
-          SizedBox(height: 10),
-          _field(_ifscCtrl, 'IFSC Code',
-              textCapitalization: TextCapitalization.characters),
-          SizedBox(height: 28),
+                  fontSize: 48,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: '0',
+                hintStyle: GoogleFonts.poppins(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.grey.withValues(alpha: 0.3)),
+                prefixText: '₹ ',
+                prefixStyle: GoogleFonts.poppins(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.grey),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+            ),
+          ),
+          
+          SizedBox(height: 40),
+
+          // Linked Bank Account Card
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Linked Bank Account',
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                )),
+          ),
+          SizedBox(height: 12),
+          
+          if (hasBank)
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.green.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.account_balance_rounded, color: AppColors.green),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(widget.bankDetails!['accountName'] ?? 'Bank Account',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            )),
+                        SizedBox(height: 4),
+                        Text('•••• ${(widget.bankDetails!['accountNumber'] as String).length > 4 ? (widget.bankDetails!['accountNumber'] as String).substring((widget.bankDetails!['accountNumber'] as String).length - 4) : widget.bankDetails!['accountNumber']}',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: AppColors.grey,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.check_circle_rounded, color: AppColors.green),
+                ],
+              ),
+            )
+          else
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.red.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: AppColors.red),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text('No bank account linked. Please add bank details in your profile first.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: AppColors.red,
+                        )),
+                  ),
+                ],
+              ),
+            ),
+            
+          SizedBox(height: 40),
 
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: _submitting ? null : _submit,
+              onPressed: (_submitting || !hasBank) ? null : _submit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.green,
                 foregroundColor: Colors.white,
@@ -507,55 +596,16 @@ class _WithdrawTabState extends State<_WithdrawTab> {
             ),
           ),
           SizedBox(height: 12),
-          Center(
-            child: Text(
-              'Withdrawals are processed within 1-2 business days',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                  fontSize: 11, color: AppColors.grey),
-            ),
+          Text(
+            'Minimum withdrawal is ₹500. Processed within 1-2 business days.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+                fontSize: 11, color: AppColors.grey),
           ),
         ],
       ),
     );
   }
 
-  Widget _field(
-    TextEditingController controller,
-    String hint, {
-    TextInputType? keyboardType,
-    TextCapitalization textCapitalization = TextCapitalization.none,
-    String? prefix,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      textCapitalization: textCapitalization,
-      style: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixText: prefix,
-        prefixStyle: GoogleFonts.poppins(color: AppColors.textPrimary, fontSize: 14),
-        hintStyle:
-            GoogleFonts.poppins(color: AppColors.grey, fontSize: 14),
-        filled: true,
-        fillColor: Theme.of(context).colorScheme.surface,
-        contentPadding:
-            EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide:
-              BorderSide(color: AppColors.green, width: 1.5),
-        ),
-      ),
-    );
-  }
+  // Removed unused _field helper method
 }

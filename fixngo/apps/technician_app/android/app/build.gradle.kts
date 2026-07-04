@@ -3,6 +3,7 @@ import java.io.FileInputStream
 
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -63,8 +64,8 @@ android {
                 signingConfigs.getByName("debug")
             }
             // Enable code shrinking for smaller APK
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

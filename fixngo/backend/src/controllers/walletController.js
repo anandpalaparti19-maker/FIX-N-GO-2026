@@ -2,10 +2,9 @@ const User = require('../models/userModel');
 const Withdrawal = require('../models/withdrawalModel');
 const WalletTransaction = require('../models/walletTransactionModel');
 const mongoose = require('mongoose');
-const razorpay = require('../utils/razorpay');
+const cashfreePayout = require('../utils/cashfreePayout');
 
-const PAYOUTS_ENABLED = process.env.RAZORPAY_PAYOUTS_ENABLED === 'true';
-const RAZORPAYX_ACCOUNT_NUMBER = process.env.RAZORPAYX_ACCOUNT_NUMBER;
+const PAYOUTS_ENABLED = process.env.CASHFREE_PAYOUTS_ENABLED === 'true' || process.env.RAZORPAY_PAYOUTS_ENABLED === 'true';
 
 /**
  * Reverse a withdrawal debit when the downstream payout gateway fails.
@@ -40,62 +39,33 @@ const reverseWithdrawal = async (withdrawalDoc, userId, amount, reason) => {
 };
 
 /**
- * Create or reuse a RazorpayX contact + fund account for the technician.
- * Returns the fund account id.
- */
-const getOrCreateFundAccount = async (user, bankDetails) => {
-  const contact = await razorpay.contacts.create({
-    name: user.name,
-    email: user.email,
-    contact: user.phone || '0000000000',
-    type: 'vendor',
-    reference_id: `tech_${user._id.toString()}`,
-    notes: { source: 'Fix-N-Go withdrawal' }
-  });
-
-  const fundAccount = await razorpay.fundAccount.create({
-    contact_id: contact.id,
-    account_type: 'bank_account',
-    bank_account: {
-      name: bankDetails.accountName || user.name,
-      ifsc: bankDetails.ifscCode,
-      account_number: bankDetails.accountNumber
-    }
-  });
-
-  return fundAccount.id;
-};
-
-/**
- * Submit the withdrawal to RazorpayX Payouts.
+ * Submit the withdrawal to Cashfree Payouts.
  * On gateway failure the debit is reversed.
  */
 const submitPayout = async (withdrawalDoc, user, amount) => {
-  if (!PAYOUTS_ENABLED || !RAZORPAYX_ACCOUNT_NUMBER) {
+  if (!PAYOUTS_ENABLED) {
     return { skipped: true };
   }
 
   const bankDetails = user.technicianMeta.bankDetails;
   try {
-    const fundAccountId = await getOrCreateFundAccount(user, bankDetails);
+    const token = await cashfreePayout.authorize();
+    const beneId = await cashfreePayout.addBeneficiary(token, user, bankDetails);
+    
+    // Use the withdrawal document ID as the unique transfer ID
+    const transferId = withdrawalDoc._id.toString();
 
-    const payout = await razorpay.payouts.create({
-      account_number: RAZORPAYX_ACCOUNT_NUMBER,
-      fund_account_id: fundAccountId,
-      amount: Math.round(amount * 100), // paise
-      currency: 'INR',
-      mode: 'IMPS',
-      purpose: 'payout',
-      queue_if_low_balance: true,
-      reference_id: withdrawalDoc._id.toString(),
-      narration: 'Fix-N-Go Withdrawal'
-    });
+    const payoutResult = await cashfreePayout.requestTransfer(token, beneId, amount, transferId);
+
+    if (!payoutResult.success) {
+       throw new Error(payoutResult.error);
+    }
 
     withdrawalDoc.status = 'processing';
-    withdrawalDoc.payoutGatewayId = payout.id;
+    withdrawalDoc.payoutGatewayId = payoutResult.referenceId || transferId;
     await withdrawalDoc.save();
 
-    return { success: true, payoutId: payout.id };
+    return { success: true, payoutId: withdrawalDoc.payoutGatewayId };
   } catch (err) {
     await reverseWithdrawal(
       withdrawalDoc,

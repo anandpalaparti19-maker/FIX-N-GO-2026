@@ -131,7 +131,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
                   SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Online payment via Stripe will be available soon.',
+                      'Online payment via Cashfree will be available soon.',
                       style: GoogleFonts.poppins(
                           fontSize: 12, color: AppColors.textMuted),
                     ),

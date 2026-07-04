@@ -71,7 +71,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> _fetchAll() async {
     setState(() => _loading = true);
-    final jobs = await _api.getAvailableJobs();
+    final available = await _api.getAvailableJobs();
+    final offers = await _api.getIncomingOffers();
+    final jobs = [...offers, ...available];
     final dash = await _api.getDashboard();
     if (!mounted) return;
     

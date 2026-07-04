@@ -36,6 +36,12 @@
 @import firebase_messaging;
 #endif
 
+#if __has_include(<flutter_cashfree_pg_sdk/FlutterCashfreePgSdkPlugin.h>)
+#import <flutter_cashfree_pg_sdk/FlutterCashfreePgSdkPlugin.h>
+#else
+@import flutter_cashfree_pg_sdk;
+#endif
+
 #if __has_include(<geocoding_ios/GeocodingPlugin.h>)
 #import <geocoding_ios/GeocodingPlugin.h>
 #else
@@ -66,12 +72,6 @@
 @import shared_preferences_foundation;
 #endif
 
-#if __has_include(<stripe_ios/StripeIosPlugin.h>)
-#import <stripe_ios/StripeIosPlugin.h>
-#else
-@import stripe_ios;
-#endif
-
 #if __has_include(<url_launcher_ios/URLLauncherPlugin.h>)
 #import <url_launcher_ios/URLLauncherPlugin.h>
 #else
@@ -86,12 +86,12 @@
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FLTFirebaseCrashlyticsPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCrashlyticsPlugin"]];
   [FLTFirebaseMessagingPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseMessagingPlugin"]];
+  [FlutterCashfreePgSdkPlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterCashfreePgSdkPlugin"]];
   [GeocodingPlugin registerWithRegistrar:[registry registrarForPlugin:@"GeocodingPlugin"]];
   [GeolocatorPlugin registerWithRegistrar:[registry registrarForPlugin:@"GeolocatorPlugin"]];
   [IntegrationTestPlugin registerWithRegistrar:[registry registrarForPlugin:@"IntegrationTestPlugin"]];
   [RazorpayFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"RazorpayFlutterPlugin"]];
   [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];
-  [StripeIosPlugin registerWithRegistrar:[registry registrarForPlugin:@"StripeIosPlugin"]];
   [URLLauncherPlugin registerWithRegistrar:[registry registrarForPlugin:@"URLLauncherPlugin"]];
 }
 

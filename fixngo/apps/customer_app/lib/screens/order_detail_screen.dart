@@ -604,17 +604,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
         (total is num) ? total : num.parse(total.toString()),
       );
       final paymentId = intentData['paymentId']?.toString() ?? '';
-      final clientSecret = intentData['clientSecret']?.toString() ?? '';
-      final paymentIntentId = clientSecret.contains('_secret')
-          ? clientSecret.split('_secret')[0]
-          : clientSecret;
+      final paymentSessionId = intentData['paymentSessionId']?.toString() ?? '';
+      final cashfreeOrderId = intentData['cashfreeOrderId']?.toString() ?? '';
 
       if (!mounted) return;
       final success = await showPaymentSheet(
         context,
         orderId: widget.orderId,
         paymentId: paymentId,
-        paymentIntentId: paymentIntentId,
+        paymentSessionId: paymentSessionId,
+        cashfreeOrderId: cashfreeOrderId,
         amount: (total is num) ? total : num.parse(total.toString()),
       );
       if (success && mounted) {

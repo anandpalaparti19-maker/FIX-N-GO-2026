@@ -29,7 +29,7 @@ class ApiConfig {
     if (_compileTimeBaseUrl.isNotEmpty) return _compileTimeBaseUrl;
     
     // Default fallback
-    return 'https://nasty-socks-yell.loca.lt';
+    return 'https://bernard-intimate-hosts-massive.trycloudflare.com';
   }
 
   static String get apiBaseUrl => '$baseUrl/api';

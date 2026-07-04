@@ -245,36 +245,85 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                   ],
                 ),
               ),
+
               SizedBox(height: 14),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : () => _createOrder(selected),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.brandGreen,
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    elevation: 0,
-                  ),
-                  child: _isLoading
-                      ? SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          'Book Installation — ₹${selected['price']}',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
+              Builder(
+                builder: (context) {
+                  final basePrice = selected['price'] as int;
+                  final platformFee = (basePrice * 0.1).round();
+                  final finalTotal = basePrice + platformFee;
+                  
+                  return Column(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Theme.of(context).colorScheme.outline),
                         ),
-                ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Base Price', style: TextStyle(color: AppColors.textMuted)),
+                                Text('₹$basePrice', style: TextStyle(color: AppColors.textPrimary)),
+                              ],
+                            ),
+                            SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Platform Fee (10%)', style: TextStyle(color: AppColors.textMuted)),
+                                Text('₹$platformFee', style: TextStyle(color: AppColors.textPrimary)),
+                              ],
+                            ),
+                            Divider(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Total', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+                                Text('₹$finalTotal', style: TextStyle(color: AppColors.brandGreen, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : () => _createOrder(selected, finalTotal),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.brandGreen,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                            elevation: 0,
+                          ),
+                          child: _isLoading
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : Text(
+                                  'Book Installation — ₹$finalTotal',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
               ),
             ],
           ),
@@ -283,7 +332,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
     );
   }
 
-  Future<void> _createOrder(Map<String, dynamic> selected) async {
+  Future<void> _createOrder(Map<String, dynamic> selected, int finalTotal) async {
     setState(() => _isLoading = true);
     try {
       final token = await _storageService.getToken();
@@ -321,7 +370,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
         brand: brand,
         model: model,
         issues: ['Screen Guard: ${selected['name']}'],
-        total: selected['price'] as int,
+        total: finalTotal,
         serviceAddress: address,
         city: 'Hyderabad',
         serviceLat: lat,

@@ -1,4 +1,4 @@
-package com.example.fixngo_technician
+package com.fixngo.technician
 
 import io.flutter.embedding.android.FlutterActivity
 

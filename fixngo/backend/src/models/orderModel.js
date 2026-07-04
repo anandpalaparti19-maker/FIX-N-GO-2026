@@ -71,7 +71,7 @@ const orderSchema = mongoose.Schema(
     paymentStatus: { type: String, enum: ['pending', 'captured', 'failed', 'collected'], default: 'pending' },
     paymentMethod: { type: String, enum: ['cash', 'card', 'upi'], default: 'cash' },
     paymentGatewayOrderId: { type: String, default: '' },
-    stripePaymentIntentId: { type: String, default: '' },
+    cashfreeOrderId: { type: String, default: '' },
     technicianEarning: { type: Number, default: 0 },
     estimatedDateTime: { type: Date, default: null },
     completedAt: { type: Date, default: null },

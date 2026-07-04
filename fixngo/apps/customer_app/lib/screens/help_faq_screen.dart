@@ -19,8 +19,8 @@ class HelpFaqScreen extends StatelessWidget {
     },
     {
       'q': 'What payment methods are accepted?',
-      'a': 'We currently accept Cash on Delivery and UPI. '
-          'Online payment via Stripe is coming soon.',
+      'a': 'We currently accept Cash on Delivery and '
+          'Online payment via Cashfree will be available soon.',
     },
     {
       'q': 'Can I cancel my order?',

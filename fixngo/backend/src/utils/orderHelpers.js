@@ -14,7 +14,7 @@ const defaultChecklist = (issues = []) => {
   return items;
 };
 
-const technicianCut = (total) => Math.round(total * 0.7);
+const technicianCut = (total) => Math.round((total / 1.1) * 0.9);
 
 const pushStatusHistory = (order, status, note = '') => {
   if (!order.statusHistory) order.statusHistory = [];
@@ -65,17 +65,21 @@ const formatOrderForTech = (order, technician = null) => {
     model: order.model,
     issues: order.issues,
     title: order.issues[0] || 'Repair service',
+    serviceType: order.issues[0] || 'Repair service',
     device: `${order.brand} ${order.model}`,
     customerName: customer?.name || 'Customer',
     customerPhone: order.customerPhone || customer?.phone || '',
     serviceAddress: order.serviceAddress,
+    location: { address: order.serviceAddress },
     city: order.city,
     pincode: order.pincode,
     serviceLat: lat,
     serviceLng: lng,
     distanceKm,
+    distance: distanceKm,
     total: order.total,
     earning: order.technicianEarning || technicianCut(order.total),
+    estimatedPrice: order.total,
     status: order.status,
     dispatchStatus: order.dispatchStatus,
     checklist: order.checklist,

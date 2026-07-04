@@ -263,15 +263,14 @@ class ApiService {
 
   Future<bool> requestWithdrawal({
     required double amount,
-    required Map<String, dynamic> bankAccount,
   }) async {
     try {
       final res = await _execute((h) => http.post(
             Uri.parse('$apiBaseUrl/payments/withdraw'),
             headers: h,
-            body: jsonEncode({'amount': amount, 'bankAccount': bankAccount}),
+            body: jsonEncode({'amount': amount}),
           ));
-      return res.statusCode == 201;
+      return res.statusCode == 201 || res.statusCode == 200;
     } catch (e) {
       return false;
     }

@@ -19,7 +19,7 @@ This repository follows a monorepo structure containing all components of the Fi
 - **Real-time**: Socket.io for live tracking
 - **Infrastructure**: Redis (Caching), Stripe (Payments), Twilio (SMS Notifications)
 
-## 🚦 Quick Start
+## 🚦 Quick Start[FixNGo-Customer-Debug.apk](fixngo/FixNGo-Customer-Debug.apk)
 
 ### 1. Backend Setup
 ```bash

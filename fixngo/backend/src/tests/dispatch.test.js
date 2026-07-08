@@ -103,6 +103,7 @@ describe('Dispatch — Accept Race Condition Prevention', () => {
     const res = await request(app)
       .post(`/api/tech/jobs/${order._id}/accept`)
       .set('Authorization', `Bearer ${token2}`);
+    
     // Should be rejected — offered to tech1 only
     expect([400, 403, 404]).toContain(res.status);
   });

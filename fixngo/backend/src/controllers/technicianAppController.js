@@ -1,5 +1,5 @@
 const Order = require('../models/orderModel');
-const User = require('../models/userModel');
+const Technician = require('../models/technicianModel');
 const Withdrawal = require('../models/withdrawalModel');
 const {
   defaultChecklist,
@@ -35,7 +35,7 @@ const getTechnicianProfile = async (req, res, next) => {
 const updateTechnicianProfile = async (req, res, next) => {
   try {
     const { name, phone, address, city, pincode, emoji, experience, bankDetails } = req.body;
-    const user = await User.findById(req.user._id);
+    const user = await Technician.findById(req.user._id);
     if (name) user.name = name;
     if (phone !== undefined) user.phone = phone;
     if (address !== undefined) user.address = address;
@@ -72,7 +72,7 @@ const setOnlineStatus = async (req, res, next) => {
 };
 
 const orderBelongsToTech = (order, techId) =>
-  order.technicianUser && order.technicianUser.toString() === techId.toString();
+  order.technicianUser && order.technicianTechnician.toString() === techId.toString();
 
 const getJobs = async (req, res, next) => {
   try {
@@ -133,14 +133,22 @@ const getJobById = async (req, res, next) => {
 const updateLocation = async (req, res, next) => {
   try {
     const { lat, lng } = req.body;
-    if (lat == null || lng == null) {
-      return res.status(400).json({ message: 'lat and lng are required' });
+    const parsedLat = Number(lat);
+    const parsedLng = Number(lng);
+    
+    if (lat == null || lng == null || isNaN(parsedLat) || isNaN(parsedLng)) {
+      return res.status(400).json({ message: 'lat and lng must be valid numbers' });
     }
-    req.user.lastLat = Number(lat);
-    req.user.lastLng = Number(lng);
+    
+    if (parsedLat < -90 || parsedLat > 90 || parsedLng < -180 || parsedLng > 180) {
+      return res.status(400).json({ message: 'Invalid coordinates' });
+    }
+
+    req.user.lastLat = parsedLat;
+    req.user.lastLng = parsedLng;
     req.user.location = {
       type: 'Point',
-      coordinates: [Number(lng), Number(lat)],
+      coordinates: [parsedLng, parsedLat],
     };
     await req.user.save();
     res.json({
@@ -155,31 +163,52 @@ const updateLocation = async (req, res, next) => {
 
 const acceptJob = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Job not found' });
-    // Allow if it's explicitly offered to them OR if it's globally searching
-    const isExplicitlyOffered = orderBelongsToTech(order, req.user._id) && order.dispatchStatus === 'offered';
-    const isSearching = order.dispatchStatus === 'searching';
+    // Check if the technician already has an active job
+    const activeJob = await Order.findOne({
+      technicianUser: req.user._id,
+      status: { $in: ['assigned', 'in_progress', 'payment_pending'] }
+    });
     
-    if (!isExplicitlyOffered && !isSearching) {
-      return res.status(400).json({ message: 'Job is not available to accept' });
+    if (activeJob) {
+      return res.status(409).json({ message: 'You already have an active job. Complete it first.' });
     }
 
-    // Assign to this tech
-    order.technicianUser = req.user._id;
-    order.technician = req.user.name;
+    // Use atomic update to prevent two technicians from accepting the same job
+    // Also ensure that if it's 'offered', it was offered to THIS technician
+    const order = await Order.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        status: { $in: ['pending', 'assigned'] },
+        $or: [
+          { dispatchStatus: 'searching' },
+          { dispatchStatus: 'offered', offeredTo: req.user._id }
+        ]
+      },
+      {
+        $set: {
+          technicianUser: req.user._id,
+          technician: req.user.name,
+          dispatchStatus: 'accepted',
+          status: 'assigned',
+        }
+      },
+      { new: true }
+    );
 
-    order.dispatchStatus = 'accepted';
-    order.status = 'assigned';
+    if (!order) {
+      return res.status(400).json({ message: 'Job is not available to accept or already accepted' });
+    }
+
     order.technicianEarning = technicianCut(order.total);
-    order.checklist = defaultChecklist(order.issues);
+    if (!order.checklist || order.checklist.length === 0) {
+      order.checklist = defaultChecklist(order.issues);
+    }
     pushStatusHistory(order, 'assigned', 'Technician accepted job');
     await order.save();
 
-    const user = await User.findById(req.user._id);
-    user.technicianMeta.pendingEarnings =
-      (user.technicianMeta.pendingEarnings || 0) + order.technicianEarning;
-    await user.save();
+    await Technician.findByIdAndUpdate(req.user._id, {
+      $inc: { 'technicianMeta.pendingEarnings': order.technicianEarning }
+    });
 
     const populated = await Order.findById(order._id).populate('user', 'name phone');
     res.json(formatOrderForTech(populated, req.user));
@@ -274,7 +303,7 @@ const completeJob = async (req, res, next) => {
     pushStatusHistory(order, 'completed', 'Job completed');
     await order.save();
 
-    const user = await User.findById(req.user._id);
+    const user = await Technician.findById(req.user._id);
     user.technicianMeta.jobsDone = (user.technicianMeta.jobsDone || 0) + 1;
     await user.save();
 
@@ -287,13 +316,27 @@ const completeJob = async (req, res, next) => {
 
 const collectPayment = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Job not found' });
+    // Atomic lock on order to prevent double-collection
+    const order = await Order.findOneAndUpdate(
+      { _id: req.params.id, paymentStatus: { $ne: 'collected' } },
+      { $set: { paymentStatus: 'collected' } },
+      { new: true }
+    );
+    
+    if (!order) {
+      const existing = await Order.findById(req.params.id);
+      if (!existing) return res.status(404).json({ message: 'Job not found' });
+      if (existing.paymentStatus === 'collected') return res.status(400).json({ message: 'Payment already collected' });
+      return res.status(400).json({ message: 'Cannot collect payment' });
+    }
+
     if (!orderBelongsToTech(order, req.user._id)) {
+      // rollback if needed, though this shouldn't happen via UI
+      order.paymentStatus = 'pending';
+      await order.save();
       return res.status(403).json({ message: 'Not your job' });
     }
 
-    order.paymentStatus = 'collected';
     if (order.status !== 'completed') {
       order.status = 'completed';
       pushStatusHistory(order, 'completed', 'Payment collected');
@@ -303,18 +346,21 @@ const collectPayment = async (req, res, next) => {
     order.technicianEarning = earning;
     await order.save();
 
-    const user = await User.findById(req.user._id);
-    user.technicianMeta.walletBalance = (user.technicianMeta.walletBalance || 0) + earning;
-    user.technicianMeta.pendingEarnings = Math.max(
-      0,
-      (user.technicianMeta.pendingEarnings || 0) - earning
+    // Atomic inc to prevent double earnings
+    const updatedUser = await Technician.findByIdAndUpdate(
+      req.user._id,
+      {
+        $inc: {
+          'technicianMeta.walletBalance': earning,
+          'technicianMeta.jobsDone': 1
+        }
+      },
+      { new: true }
     );
-    user.technicianMeta.jobsDone = (user.technicianMeta.jobsDone || 0) + 1;
-    await user.save();
 
     res.json({
       paymentStatus: order.paymentStatus,
-      walletBalance: user.technicianMeta.walletBalance,
+      walletBalance: updatedUser.technicianMeta.walletBalance,
       earning,
     });
   } catch (error) {

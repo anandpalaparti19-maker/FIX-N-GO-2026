@@ -29,14 +29,22 @@ const app = express();
 app.set('trust proxy', 1);
 
 // MQTT Websocket Proxy (Must be before body-parser and helmet)
-app.use('/mqtt', createProxyMiddleware({
+const mqttProxy = createProxyMiddleware({
   target: 'http://127.0.0.1:9001',
   ws: true,
   changeOrigin: true,
   logLevel: 'silent',
-}));
+});
+app.use('/mqtt', mqttProxy);
 
 const server = http.createServer(app);
+
+// Attach upgrade handler for websocket proxying
+server.on('upgrade', (req, socket, head) => {
+  if (req.url.startsWith('/mqtt')) {
+    mqttProxy.upgrade(req, socket, head);
+  }
+});
 
 // ── Security middleware ──────────────────────────────────────────────────────
 app.use(helmet());

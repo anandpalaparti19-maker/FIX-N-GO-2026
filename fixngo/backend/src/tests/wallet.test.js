@@ -4,6 +4,15 @@ const { app } = require('../server');
 const User = require('../models/userModel');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const Technician = require('../models/technicianModel');
+const Withdrawal = require('../models/withdrawalModel');
+const WalletTransaction = require('../models/walletTransactionModel');
+
+beforeAll(async () => {
+  await Technician.createCollection();
+  await Withdrawal.createCollection();
+  await WalletTransaction.createCollection();
+});
 
 const createVerifiedTechnician = async () => {
   const salt = await bcrypt.genSalt(10);
@@ -76,6 +85,7 @@ describe('Wallet — withdrawal', () => {
       .send({ amount: 500 });
 
     // Should succeed (payouts disabled by default in test env)
+    if (res.status !== 200) console.error('WALLET WITHDRAWAL FAILED:', res.status, res.body);
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
 

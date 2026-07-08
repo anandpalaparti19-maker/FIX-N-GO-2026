@@ -29,7 +29,7 @@ class ApiConfig {
     if (_compileTimeBaseUrl.isNotEmpty) return _compileTimeBaseUrl;
     
     // Default fallback
-    return 'https://bernard-intimate-hosts-massive.trycloudflare.com';
+    return 'https://cached-eyed-cork-primary.trycloudflare.com';
   }
 
   static String get apiBaseUrl => '$baseUrl/api';

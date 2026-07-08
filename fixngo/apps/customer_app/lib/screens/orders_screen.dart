@@ -189,7 +189,7 @@ class _OrdersScreenState extends State<OrdersScreen>
             label: Text('Retry', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           ),
@@ -340,7 +340,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                         ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.brandBlue,
-                          foregroundColor: Colors.white,
+                          foregroundColor: Theme.of(context).colorScheme.onPrimary,
                           padding: EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                           elevation: 0,

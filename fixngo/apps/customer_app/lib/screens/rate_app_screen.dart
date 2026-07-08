@@ -149,7 +149,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             onPressed: _submit,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
@@ -193,7 +193,7 @@ class _RateAppScreenState extends State<RateAppScreen> {
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: EdgeInsets.symmetric(
                   horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(

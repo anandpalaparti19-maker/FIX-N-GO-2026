@@ -69,7 +69,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Text(
                   '$unreadCount',
                   style: TextStyle(
-                    color: AppColors.navyDeep,
+                    color: Theme.of(context).colorScheme.surface,
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
                   ),

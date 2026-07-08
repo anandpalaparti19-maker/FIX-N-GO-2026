@@ -1,8 +1,8 @@
-const User = require('../models/userModel');
+const Technician = require('../models/technicianModel');
 
 const getTechnicians = async (req, res, next) => {
   try {
-    const technicians = await User.find({ role: 'technician' })
+    const technicians = await Technician.find({ role: 'technician' })
       .select('name technicianMeta isOnline lastLat lastLng')
       .sort({ 'technicianMeta.rating': -1 });
 

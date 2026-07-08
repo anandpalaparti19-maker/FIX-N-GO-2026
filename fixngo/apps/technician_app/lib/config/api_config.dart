@@ -26,7 +26,7 @@ class ApiConfig {
   static String get baseUrl {
     if (_dynamicBaseUrl.isNotEmpty) return _dynamicBaseUrl;
     if (_compileTimeBaseUrl.isNotEmpty) return _compileTimeBaseUrl;
-    return 'https://bernard-intimate-hosts-massive.trycloudflare.com';
+    return 'https://cached-eyed-cork-primary.trycloudflare.com';
   }
 
   static String get apiBaseUrl => '$baseUrl/api';

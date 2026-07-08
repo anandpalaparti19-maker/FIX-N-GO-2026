@@ -1,4 +1,4 @@
-const User = require('../models/userModel');
+const Technician = require('../models/technicianModel');
 const Withdrawal = require('../models/withdrawalModel');
 const WalletTransaction = require('../models/walletTransactionModel');
 const mongoose = require('mongoose');
@@ -26,7 +26,7 @@ const reverseWithdrawal = async (withdrawalDoc, userId, amount, reason) => {
       status: 'success'
     }], { session });
 
-    await User.findByIdAndUpdate(
+    await Technician.findByIdAndUpdate(
       userId,
       { $inc: { 'technicianMeta.walletBalance': amount } },
       { session }
@@ -80,12 +80,17 @@ const submitPayout = async (withdrawalDoc, user, amount) => {
 const requestWithdrawal = async (req, res, next) => {
   try {
     const { amount } = req.body;
+    const parsedAmount = Number(amount);
+
+    if (isNaN(parsedAmount) || parsedAmount < 500) {
+      return res.status(400).json({ success: false, message: 'Minimum withdrawal amount is ₹500' });
+    }
 
     if (req.user.role !== 'technician') {
       return res.status(403).json({ success: false, message: 'Only technicians can withdraw funds' });
     }
 
-    const user = await User.findById(req.user._id);
+    const user = await Technician.findById(req.user._id);
     const techMeta = user.technicianMeta;
 
     // Check KYC & Bank
@@ -96,23 +101,30 @@ const requestWithdrawal = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'No bank details linked.' });
     }
 
-    // Check balance
-    if (amount < 500) {
-      return res.status(400).json({ success: false, message: 'Minimum withdrawal amount is ₹500' });
-    }
-    if (techMeta.walletBalance < amount) {
+    // Check balance optimistically
+    if (techMeta.walletBalance < parsedAmount) {
       return res.status(400).json({ success: false, message: 'Insufficient wallet balance' });
     }
 
-    // Optimistic Debit Transaction
+    // Atomic Debit Transaction
     const session = await mongoose.startSession();
     session.startTransaction();
     let withdrawal;
 
     try {
+      const updatedUser = await Technician.findOneAndUpdate(
+        { _id: user._id, 'technicianMeta.walletBalance': { $gte: parsedAmount } },
+        { $inc: { 'technicianMeta.walletBalance': -parsedAmount } },
+        { session, new: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error('Insufficient balance or concurrent transaction conflict');
+      }
+
       withdrawal = await Withdrawal.create([{
         technician: user._id,
-        amount: amount,
+        amount: parsedAmount,
         bankAccount: techMeta.bankDetails.accountNumber,
         status: 'pending'
       }], { session });
@@ -120,22 +132,19 @@ const requestWithdrawal = async (req, res, next) => {
       await WalletTransaction.create([{
         technicianId: user._id,
         type: 'debit',
-        amount: amount,
+        amount: parsedAmount,
         description: `Withdrawal request`,
         referenceId: withdrawal[0]._id.toString()
       }], { session });
-
-      await User.findByIdAndUpdate(
-        user._id,
-        { $inc: { 'technicianMeta.walletBalance': -amount } },
-        { session }
-      );
 
       await session.commitTransaction();
       session.endSession();
     } catch (err) {
       await session.abortTransaction();
       session.endSession();
+      if (err.message.includes('Insufficient balance')) {
+        return res.status(400).json({ success: false, message: 'Insufficient wallet balance. Please try again.' });
+      }
       throw err;
     }
 

@@ -11,7 +11,7 @@ const checklistItemSchema = mongoose.Schema(
 
 const orderSchema = mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+    user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Customer' },
     brand: { type: String, required: true },
     model: { type: String, required: true },
     issues: [{ type: String, required: true }],
@@ -26,7 +26,7 @@ const orderSchema = mongoose.Schema(
       default: 'pending',
     },
     technician: { type: String, default: '' },
-    technicianUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    technicianUser: { type: mongoose.Schema.Types.ObjectId, ref: 'Technician', default: null },
     dispatchStatus: {
       type: String,
       enum: ['none', 'searching', 'offered', 'accepted', 'declined', 'no_tech'],
@@ -57,14 +57,14 @@ const orderSchema = mongoose.Schema(
         url: { type: String, required: true },
         fileName: { type: String, required: true },
         uploadedAt: { type: Date, default: Date.now },
-        uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        uploadedBy: { type: mongoose.Schema.Types.ObjectId },
       },
     ],
     serviceNotes: [
       {
         text: { type: String, required: true },
         addedAt: { type: Date, default: Date.now },
-        addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        addedBy: { type: mongoose.Schema.Types.ObjectId },
       },
     ],
     completionOtp: { type: String, default: null },

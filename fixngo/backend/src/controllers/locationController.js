@@ -27,14 +27,22 @@ const getNearbyOrders = async (req, res, next) => {
     const { latitude, longitude, radiusKm = 50 } = req.body;
     const technicianId = req.user._id;
 
-    if (!latitude || !longitude) {
+    const parsedLat = Number(latitude);
+    const parsedLng = Number(longitude);
+    const parsedRadius = Number(radiusKm);
+
+    if (latitude == null || longitude == null || isNaN(parsedLat) || isNaN(parsedLng) || isNaN(parsedRadius)) {
       return res.status(400).json({
         success: false,
-        message: 'Latitude and longitude are required',
+        message: 'Latitude, longitude, and radius must be valid numbers',
       });
     }
 
-    const radiusMeters = Number(radiusKm) * 1000;
+    if (parsedLat < -90 || parsedLat > 90 || parsedLng < -180 || parsedLng > 180) {
+      return res.status(400).json({ success: false, message: 'Invalid coordinates' });
+    }
+
+    const radiusMeters = parsedRadius * 1000;
 
     // Use MongoDB $nearSphere with the 2dsphere index on Order.location
     const orders = await Order.find({
@@ -43,7 +51,7 @@ const getNearbyOrders = async (req, res, next) => {
         $nearSphere: {
           $geometry: {
             type: 'Point',
-            coordinates: [Number(longitude), Number(latitude)],
+            coordinates: [parsedLng, parsedLat],
           },
           $maxDistance: radiusMeters,
         },
@@ -54,8 +62,8 @@ const getNearbyOrders = async (req, res, next) => {
     // Attach computed distance for each order
     const nearbyOrders = orders.map((order) => {
       const distance = calculateDistance(
-        latitude,
-        longitude,
+        parsedLat,
+        parsedLng,
         order.serviceLat,
         order.serviceLng
       );
@@ -252,15 +260,19 @@ const updateTechnicianLocation = async (req, res, next) => {
     const { latitude, longitude } = req.body;
     const technicianId = req.user._id;
 
-    if (!latitude || !longitude) {
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+
+    if (latitude == null || longitude == null || isNaN(lat) || isNaN(lng)) {
       return res.status(400).json({
         success: false,
-        message: 'Latitude and longitude are required',
+        message: 'Latitude and longitude must be valid numbers',
       });
     }
 
-    const lat = Number(latitude);
-    const lng = Number(longitude);
+    if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      return res.status(400).json({ success: false, message: 'Invalid coordinates' });
+    }
 
     const user = await User.findByIdAndUpdate(
       technicianId,

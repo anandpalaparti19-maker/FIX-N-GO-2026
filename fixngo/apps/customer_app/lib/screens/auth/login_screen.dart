@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: RadialGradient(
             center: Alignment(0, -0.3),
             radius: 1.3,
-            colors: [Color(0xFF1E293B), Theme.of(context).scaffoldBackgroundColor],
+            colors: [Theme.of(context).colorScheme.primary.withValues(alpha: 0.05), Theme.of(context).scaffoldBackgroundColor],
           ),
         ),
         child: SafeArea(
@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Align(
                       alignment: Alignment.topRight,
                       child: IconButton(
-                        icon: Icon(Icons.settings, color: Colors.white70),
+                        icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                         onPressed: () {
                           final urlController = TextEditingController(text: 'https://');
                           showDialog(
@@ -246,7 +246,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -258,7 +258,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2),
                             )
                           : Text(
                               'Log In',
@@ -280,7 +280,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushReplacement(
+                            Navigator.of(context).push(
                               MaterialPageRoute(builder: (_) => const RegisterScreen()),
                             );
                           },

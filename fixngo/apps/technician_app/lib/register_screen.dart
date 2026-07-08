@@ -78,16 +78,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       setState(() => _loading = false);
 
-      // TODO: Re-enable KYC upload after testing
-      // KYC upload temporarily disabled
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('onboarding_seen', true);
 
-      _showSnack('Registration submitted! Awaiting approval.');
+      _showSnack('Registration submitted! Please complete KYC.');
       await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/kyc');
     } catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -276,8 +273,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-        // TODO: Re-enable Aadhaar verification section after testing
-        // Aadhaar section temporarily hidden
         SizedBox(height: 24),
         Center(
           child: GestureDetector(

@@ -157,7 +157,9 @@ const updateTechnicianPhoto = async (req, res, next) => {
 
     const fileName = `profile_${req.user._id}_${Date.now()}_${req.file.originalname}`;
     const filePath = path.join(uploadDir, fileName);
-    fs.renameSync(req.file.path, filePath);
+    // QA FIX: copyFileSync + unlinkSync prevents EXDEV errors on cross-device file moves
+    fs.copyFileSync(req.file.path, filePath);
+    fs.unlinkSync(req.file.path);
 
     technician.profilePhoto = `/uploads/${fileName}`;
     await technician.save();
@@ -204,8 +206,11 @@ const updateTechnicianKyc = async (req, res, next) => {
     const frontPath = path.join(uploadDir, frontName);
     const backPath = path.join(uploadDir, backName);
 
-    fs.renameSync(frontFile.path, frontPath);
-    fs.renameSync(backFile.path, backPath);
+    // QA FIX: copyFileSync + unlinkSync prevents EXDEV errors on cross-device file moves
+    fs.copyFileSync(frontFile.path, frontPath);
+    fs.unlinkSync(frontFile.path);
+    fs.copyFileSync(backFile.path, backPath);
+    fs.unlinkSync(backFile.path);
 
     technician.technicianMeta.documents = {
       ...(technician.technicianMeta.documents || {}),
@@ -259,18 +264,21 @@ const updateTechnicianLocation = async (req, res, next) => {
 
     const { lat, lng, isOnline } = req.body;
 
-    if (lat === undefined || lng === undefined) {
+    const parsedLat = parseFloat(lat);
+    const parsedLng = parseFloat(lng);
+
+    if (lat === undefined || lng === undefined || isNaN(parsedLat) || isNaN(parsedLng) || parsedLat < -90 || parsedLat > 90 || parsedLng < -180 || parsedLng > 180) {
       return res.status(400).json({
         success: false,
-        message: 'Latitude and longitude are required',
+        message: 'Valid latitude and longitude are required',
       });
     }
 
-    const technician = await User.findByIdAndUpdate(
+    const technician = await Technician.findByIdAndUpdate(
       req.user._id,
       {
-        lastLat: parseFloat(lat),
-        lastLng: parseFloat(lng),
+        lastLat: parsedLat,
+        lastLng: parsedLng,
         ...(isOnline !== undefined && { isOnline }),
       },
       { new: true }

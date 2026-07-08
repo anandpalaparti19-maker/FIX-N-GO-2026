@@ -1,6 +1,6 @@
 const Rating = require('../models/ratingModel');
 const Order = require('../models/orderModel');
-const User = require('../models/userModel');
+const Technician = require('../models/technicianModel');
 
 // Create a rating/review
 const createRating = async (req, res, next) => {
@@ -45,45 +45,50 @@ const createRating = async (req, res, next) => {
       });
     }
 
-    // Check if already rated
-    const existingRating = await Rating.findOne({ orderId });
-    if (existingRating) {
+    // QA FIX: Use findOneAndUpdate with upsert to prevent double-rating race conditions
+    const newRating = await Rating.findOneAndUpdate(
+      { orderId },
+      {
+        $setOnInsert: {
+          orderId,
+          customerId: req.user._id,
+          technicianId,
+          rating,
+          review: review || '',
+          categories: categories || {},
+        }
+      },
+      { upsert: true, new: true, rawResult: true }
+    );
+
+    if (!newRating.lastErrorObject.updatedExisting && newRating.value) {
+      // If it's a brand new rating, update technician stats via aggregation to avoid TOCTOU
+      const stats = await Rating.aggregate([
+        { $match: { technicianId: technicianId } },
+        { $group: { _id: null, avgRating: { $avg: '$rating' }, total: { $sum: 1 } } }
+      ]);
+      
+      const averageRating = stats.length > 0 ? stats[0].avgRating.toFixed(1) : rating.toFixed(1);
+      const totalRatings = stats.length > 0 ? stats[0].total : 1;
+
+      await Technician.findByIdAndUpdate(
+        technicianId,
+        {
+          'technicianMeta.averageRating': averageRating,
+          'technicianMeta.totalRatings': totalRatings,
+        }
+      );
+    } else if (newRating.lastErrorObject.updatedExisting) {
       return res.status(400).json({
         success: false,
         message: 'This order has already been rated',
       });
     }
 
-    // Create rating
-    const newRating = await Rating.create({
-      orderId,
-      customerId: req.user._id,
-      technicianId,
-      rating,
-      review: review || '',
-      categories: categories || {},
-    });
-
-    // Update technician's average rating
-    const allRatings = await Rating.find({ technicianId });
-    const averageRating =
-      allRatings.length > 0
-        ? (allRatings.reduce((sum, r) => sum + r.rating, 0) / allRatings.length).toFixed(1)
-        : 5.0;
-
-    await User.findByIdAndUpdate(
-      technicianId,
-      {
-        'technicianMeta.averageRating': averageRating,
-        'technicianMeta.totalRatings': allRatings.length,
-      },
-      { new: true }
-    );
-
     res.status(201).json({
       success: true,
       message: 'Rating created successfully',
-      data: newRating,
+      data: newRating.value,
     });
   } catch (error) {
     next(error);
@@ -99,7 +104,7 @@ const getTechnicianRatings = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     // Get technician details
-    const technician = await User.findById(technicianId);
+    const technician = await Technician.findById(technicianId);
     if (!technician || technician.role !== 'technician') {
       return res.status(404).json({
         success: false,
@@ -187,7 +192,7 @@ const getTechnicianAverageRating = async (req, res, next) => {
   try {
     const { technicianId } = req.params;
 
-    const technician = await User.findById(technicianId);
+    const technician = await Technician.findById(technicianId);
     if (!technician || technician.role !== 'technician') {
       return res.status(404).json({
         success: false,

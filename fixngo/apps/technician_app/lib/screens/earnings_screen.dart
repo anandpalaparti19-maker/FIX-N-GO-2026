@@ -164,7 +164,7 @@ class _EarningsScreenState extends State<EarningsScreen>
               padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF1B5E20), AppColors.green],
+                  colors: [AppColors.greenDark, AppColors.green],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),

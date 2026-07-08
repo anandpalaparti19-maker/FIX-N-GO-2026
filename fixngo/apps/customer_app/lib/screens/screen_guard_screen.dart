@@ -51,7 +51,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
       'name': 'Premium UV',
       'price': 399,
       'icon': Icons.star_rounded,
-      'color': const Color(0xFFD946EF),
+      'color': AppColors.brandBlue,
       'popular': false,
       'desc': 'Best quality',
     },
@@ -297,7 +297,7 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
                           onPressed: _isLoading ? null : () => _createOrder(selected, finalTotal),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.brandGreen,
-                            foregroundColor: Colors.white,
+                            foregroundColor: Theme.of(context).colorScheme.onPrimary,
                             padding: EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14)),
@@ -379,11 +379,12 @@ class _ScreenGuardScreenState extends State<ScreenGuardScreen> {
 
       if (mounted) {
         final orderId = result['data']['_id'];
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (_) => FindingTechScreen(orderId: orderId),
           ),
+          (route) => route.isFirst,
         );
       }
     } catch (e) {

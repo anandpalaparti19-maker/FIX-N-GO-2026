@@ -3,6 +3,9 @@ const User = require('../models/userModel');
 const Service = require('../models/serviceModel');
 const Withdrawal = require('../models/withdrawalModel');
 const SupportTicket = require('../models/supportTicketModel');
+const Customer = require('../models/customerModel');
+const Technician = require('../models/technicianModel');
+const Admin = require('../models/adminModel');
 const Notification = require('../models/notificationModel');
 const { logger } = require('../utils/logger');
 
@@ -56,6 +59,24 @@ const updateOrderStatus = async (req, res, next) => {
     }
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
+    // QA FIX: If forcing completed, execute financial hooks
+    if (status === 'completed' && order.status !== 'completed' && order.technicianUser) {
+      const { technicianCut, pushStatusHistory } = require('../utils/orderHelpers');
+      const Technician = require('../models/technicianModel');
+      
+      const earning = order.technicianEarning || technicianCut(order.total);
+      order.technicianEarning = earning;
+      order.paymentStatus = 'collected';
+      pushStatusHistory(order, 'completed', 'Admin forced completion');
+      
+      await Technician.findByIdAndUpdate(order.technicianUser, {
+        $inc: {
+          'technicianMeta.walletBalance': earning,
+          'technicianMeta.jobsDone': 1
+        }
+      });
+    }
+
     order.status = status;
     await order.save();
     logger.info('Admin forced order status', { orderId: order._id, status, adminId: req.user._id });
@@ -68,21 +89,34 @@ const updateOrderStatus = async (req, res, next) => {
 const assignTechnician = async (req, res, next) => {
   try {
     const { orderId, technicianId } = req.body;
-    const order = await Order.findById(orderId);
     const tech = await User.findOne({ _id: technicianId, role: 'technician' });
-    if (!order || !tech) {
-      return res.status(404).json({ success: false, message: 'Order or Technician not found' });
-    }
+    if (!tech) return res.status(404).json({ success: false, message: 'Technician not found' });
 
     const { technicianCut, defaultChecklist, pushStatusHistory } = require('../utils/orderHelpers');
     const { emitNotification } = require('../utils/mqttService');
 
-    order.technicianUser = tech._id;
-    order.technician = tech.name;
-    order.status = 'assigned';
-    order.dispatchStatus = 'offered';
+    // QA FIX: Use atomic lock to prevent assigning a completed/cancelled order or overwriting assignment
+    const order = await Order.findOneAndUpdate(
+      { _id: orderId, status: { $in: ['pending', 'assigned'] } },
+      {
+        $set: {
+          technicianUser: tech._id,
+          technician: tech.name,
+          status: 'assigned',
+          dispatchStatus: 'offered',
+        }
+      },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(400).json({ success: false, message: 'Order not found or cannot be assigned (might be completed/cancelled)' });
+    }
+
     order.technicianEarning = technicianCut(order.total);
-    order.checklist = defaultChecklist(order.issues);
+    if (!order.checklist || order.checklist.length === 0) {
+      order.checklist = defaultChecklist(order.issues);
+    }
     pushStatusHistory(order, 'assigned', `Admin assigned to ${tech.name}`);
     await order.save();
 
@@ -110,7 +144,8 @@ const getAllUsers = async (req, res, next) => {
       { name: { $regex: search, $options: 'i' } },
       { email: { $regex: search, $options: 'i' } },
     ];
-    const users = await User.find(filter).select('-password').sort({ createdAt: -1 });
+    let users = await User.find(filter);
+    users = users.sort((a, b) => b.createdAt - a.createdAt);
     res.json({ success: true, data: users });
   } catch (error) {
     next(error);
@@ -120,7 +155,7 @@ const getAllUsers = async (req, res, next) => {
 // ── Technicians ───────────────────────────────────────────────────────────────
 const getAllTechnicians = async (req, res, next) => {
   try {
-    const technicians = await User.find({ role: 'technician' })
+    const technicians = await Technician.find({ role: 'technician' })
       .select('-password')
       .sort({ createdAt: -1 });
     res.json({ success: true, data: technicians });
@@ -176,7 +211,7 @@ const suspendTechnician = async (req, res, next) => {
 // ── Live Map ──────────────────────────────────────────────────────────────────
 const getLiveMap = async (req, res, next) => {
   try {
-    const technicians = await User.find({
+    const technicians = await Technician.find({
       role: 'technician',
       isOnline: true,
       'location.coordinates': { $exists: true, $ne: [] },
@@ -319,7 +354,7 @@ const broadcastNotification = async (req, res, next) => {
       : audience === 'technicians' ? { role: 'technician' }
       : { role: { $in: ['customer', 'technician'] } };
 
-    const users = await User.find(roleFilter).select('_id');
+    const users = await User.find(roleFilter);
     const { emitNotification } = require('../utils/mqttService');
     const { sendPushToMany } = require('../utils/fcmService');
 
@@ -371,12 +406,12 @@ const getCustomers = async (req, res, next) => {
 
     const skip = (Number(page) - 1) * Number(limit);
     const [customers, total] = await Promise.all([
-      User.find(filter)
+      Customer.find(filter)
         .select('-password')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit)),
-      User.countDocuments(filter),
+      Customer.countDocuments(filter),
     ]);
 
     // Attach order counts
@@ -402,7 +437,7 @@ const getCustomers = async (req, res, next) => {
 
 const getCustomerById = async (req, res, next) => {
   try {
-    const customer = await User.findOne({ _id: req.params.id, role: 'customer' }).select('-password');
+    const customer = await User.findOne({ _id: req.params.id, role: 'customer' });
     if (!customer) return res.status(404).json({ success: false, message: 'Customer not found' });
 
     const orders = await Order.find({ user: customer._id })

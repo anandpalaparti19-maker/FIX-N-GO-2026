@@ -121,7 +121,7 @@ async function sendToToken(fcmToken, notification, data = {}) {
 async function sendPush(userId, notification, data = {}) {
   try {
     const User = require('../models/userModel');
-    const user = await User.findById(userId).select('fcmToken name');
+    const user = await User.findById(userId);
     if (!user || !user.fcmToken) {
       logger.debug('FCM: No FCM token for user', { userId });
       return null;
@@ -147,7 +147,7 @@ async function sendPushToMany(userIds, notification, data = {}) {
 
   try {
     const User = require('../models/userModel');
-    const users = await User.find({ _id: { $in: userIds }, fcmToken: { $ne: '' } }).select('fcmToken');
+    const users = await User.find({ _id: { $in: userIds }, fcmToken: { $ne: '' } });
     const tokens = users.map((u) => u.fcmToken).filter(Boolean);
 
     if (tokens.length === 0) return { successCount: 0, failureCount: 0 };

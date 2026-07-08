@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/locale_provider.dart';
@@ -287,12 +288,7 @@ class ProfileScreen extends StatelessWidget {
                             _MenuItem(
                                 icon: Icons.notifications_outlined,
                                 label: l10n.notifications,
-                                trailing: Switch(
-                                  value: true,
-                                  onChanged: (_) {},
-                                  activeThumbColor: AppColors.brandBlue,
-                                  activeTrackColor: AppColors.brandBlue.withValues(alpha: 0.4),
-                                ),
+                                trailing: const _NotificationToggle(),
                                 onTap: () => Navigator.push(context,
                                     MaterialPageRoute(builder: (_) => const NotificationsScreen()))),
                             _MenuItem(
@@ -497,6 +493,45 @@ class _MenuItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _NotificationToggle extends StatefulWidget {
+  const _NotificationToggle();
+  @override
+  State<_NotificationToggle> createState() => _NotificationToggleState();
+}
+
+class _NotificationToggleState extends State<_NotificationToggle> {
+  bool _enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadState();
+  }
+
+  Future<void> _loadState() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _enabled = prefs.getBool('notifications_enabled') ?? true;
+    });
+  }
+
+  Future<void> _toggle(bool val) async {
+    setState(() => _enabled = val);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_enabled', val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Switch(
+      value: _enabled,
+      onChanged: _toggle,
+      activeThumbColor: AppColors.brandBlue,
+      activeTrackColor: AppColors.brandBlue.withValues(alpha: 0.4),
     );
   }
 }

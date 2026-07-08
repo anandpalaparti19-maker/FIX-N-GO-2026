@@ -208,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     shape: BoxShape.circle,
                                     border: Border.all(color: Theme.of(context).scaffoldBackgroundColor, width: 2),
                                   ),
-                                  child: Icon(Icons.camera_alt_rounded, size: 14, color: AppColors.navyDeep),
+                                  child: Icon(Icons.camera_alt_rounded, size: 14, color: Theme.of(context).colorScheme.surface),
                                 ),
                               ),
                             ),
@@ -358,3 +358,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+

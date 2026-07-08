@@ -78,6 +78,7 @@ class HomeScreen extends StatelessWidget {
           ),
           const Spacer(),
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const NotificationsScreen()),
@@ -126,10 +127,10 @@ class HomeScreen extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.brandBlue, Color(0xFF1A3A8F)],
+            colors: [Theme.of(context).colorScheme.primary, AppColors.brandBlueDark],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
@@ -155,7 +156,7 @@ class HomeScreen extends StatelessWidget {
                         'Hi $firstName',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
-                          color: Colors.white.withValues(alpha: 0.9),
+                          color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -164,7 +165,7 @@ class HomeScreen extends StatelessWidget {
                           userEmail,
                           style: GoogleFonts.poppins(
                             fontSize: 11,
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.6),
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -179,7 +180,7 @@ class HomeScreen extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onPrimary,
                 height: 1.1,
               ),
             ),
@@ -189,18 +190,18 @@ class HomeScreen extends StatelessWidget {
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
+                    color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.bolt, color: Colors.white, size: 14),
+                      Icon(Icons.bolt, color: Theme.of(context).colorScheme.onPrimary, size: 14),
                       SizedBox(width: 4),
                       Text(
                         'Doorstep in under 60 min',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),

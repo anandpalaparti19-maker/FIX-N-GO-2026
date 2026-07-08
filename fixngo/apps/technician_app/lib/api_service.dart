@@ -11,7 +11,7 @@ class ApiService {
 
   static String get serverOrigin {
     if (_overrideBaseUrl.isNotEmpty) return _overrideBaseUrl;
-    return 'https://bernard-intimate-hosts-massive.trycloudflare.com';
+    return 'https://cached-eyed-cork-primary.trycloudflare.com';
   }
 
   static String get baseUrl {

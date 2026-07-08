@@ -160,8 +160,8 @@ class _FindingTechScreenState extends State<FindingTechScreen>
                 child: Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0F1A2E),
-                    borderRadius: BorderRadius.circular(20),
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: ClipRRect(
@@ -555,7 +555,7 @@ class _TechFoundCard extends StatelessWidget {
             onPressed: onTrack,
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               padding: EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),

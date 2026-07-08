@@ -436,7 +436,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                               shape: BoxShape.circle,
                               boxShadow: AppShadows.amber,
                             ),
-                            child: Icon(Icons.my_location_rounded, color: Colors.white, size: 24),
+                            child: Icon(Icons.my_location_rounded, color: Theme.of(context).colorScheme.onSurface, size: 24),
                           ),
                           SizedBox(height: 8),
                           Container(
@@ -448,7 +448,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             ),
                             child: Text(
                               'Tap to open Maps',
-                              style: TextStyle(color: Colors.white, fontSize: 13),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
                             ),
                           ),
                         ],
@@ -465,7 +465,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   Expanded(
                     child: Text(
                       address,
-                      style: TextStyle(color: Colors.white, fontSize: 13),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13),
                     ),
                   ),
                 ],
@@ -507,7 +507,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             child: Text(
               value,
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
               ),
@@ -530,7 +530,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Text(
                 'Service Checklist',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -572,7 +572,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         ),
                       ),
                       child: _checklist[i]
-                          ? Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                          ? Icon(Icons.check_rounded, color: Theme.of(context).colorScheme.onSurface, size: 14)
                           : null,
                     ),
                     SizedBox(width: 12),
@@ -607,7 +607,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Text(
                 'Payment Summary',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -627,7 +627,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Text(
                 'Total',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
@@ -651,7 +651,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             controller: _otpController,
             keyboardType: TextInputType.number,
             maxLength: 4,
-            style: TextStyle(color: Colors.white, fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
+            style: TextStyle(color: AppColors.textPrimary, fontSize: 24, letterSpacing: 8, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
             decoration: InputDecoration(
               counterText: '',
@@ -684,7 +684,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           Text(
             value,
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

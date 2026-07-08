@@ -197,7 +197,7 @@ class _PaymentSheetState extends State<_PaymentSheet> with SingleTickerProviderS
                   ),
                 ),
                 child: _state == _PayState.loading
-                    ? CircularProgressIndicator(color: Colors.white)
+                    ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
                     : Text(
                         'Pay ₹\${widget.amount}',
                         style: GoogleFonts.poppins(

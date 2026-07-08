@@ -44,7 +44,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
       'name': 'Speaker / Mic',
       'price': 399,
       'icon': Icons.volume_up_rounded,
-      'color': const Color(0xFFD946EF),
+      'color': AppColors.brandBlue,
     },
     {
       'name': 'Back glass',
@@ -285,7 +285,7 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
                   onPressed: _isLoading ? null : _createOrder,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14)),
@@ -365,11 +365,12 @@ class _RepairIssueScreenState extends State<RepairIssueScreen> {
 
       if (mounted) {
         final orderId = result['data']['_id'];
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
             builder: (_) => FindingTechScreen(orderId: orderId),
           ),
+          (route) => route.isFirst,
         );
       }
     } catch (e) {

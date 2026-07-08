@@ -7,12 +7,14 @@ Fix-N-Go is a monorepo for on-demand mobile device repair booking.
 ```mermaid
 flowchart LR
   CustomerApp[Flutter Customer App]
-  AdminUI[Admin Web Panel]
+  subgraph Admin
+        AP["🖥️ Admin Panel (React)"]
+    end
   API[Express REST API]
   DB[(MongoDB)]
 
   CustomerApp -->|JWT| API
-  AdminUI -->|JWT admin| API
+  AP -->|JWT admin| API
   API --> DB
 ```
 
@@ -32,9 +34,9 @@ flowchart LR
 - `ApiService` + `SharedPreferences` for API and session persistence
 - Booking flow: login → home → brand/model → issues → find tech → confirm → orders
 
-### Admin panel (`fixngo/apps/admin_panel/public`)
+### Admin panel (`fixngo/apps/admin_panel`)
 
-- Vanilla HTML/CSS/JS dashboard
+- React + Vite dashboard
 - Login, stats, order status updates, user list
 
 ## Data model

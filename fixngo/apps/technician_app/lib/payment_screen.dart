@@ -172,7 +172,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(Icons.qr_code_2_rounded, size: 120, color: Colors.black),
+                                  Icon(Icons.qr_code_2_rounded, size: 120, color: Theme.of(context).colorScheme.onSurface),
                                   SizedBox(height: 4),
                                   Text(
                                     'fixer@upi',

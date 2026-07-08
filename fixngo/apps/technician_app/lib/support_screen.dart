@@ -216,7 +216,7 @@ class _SupportScreenState extends State<SupportScreen> {
                   onPressed: _submitting ? null : _submitTicket,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.amber,
-                    foregroundColor: AppColors.navyDeep,
+                    foregroundColor: Theme.of(context).colorScheme.surface,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
@@ -224,7 +224,7 @@ class _SupportScreenState extends State<SupportScreen> {
                       ? SizedBox(
                           height: 18,
                           width: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.navyDeep),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.surface),
                         )
                       : Text('Send Support Request'),
                 ),
@@ -424,3 +424,4 @@ class _SupportScreenState extends State<SupportScreen> {
     );
   }
 }
+

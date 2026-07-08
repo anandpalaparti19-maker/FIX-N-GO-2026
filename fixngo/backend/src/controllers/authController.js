@@ -253,7 +253,12 @@ const forgotPassword = async (req, res, next) => {
     const emailNorm = normalizeEmail(email);
     const user = await User.findOne(emailSelector(emailNorm));
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      // SECURITY FIX: Prevent user enumeration by returning success even if not found
+      return res.json({
+        success: true,
+        message: 'If this email is registered, a reset link has been sent',
+        resetToken: crypto.randomBytes(32).toString('hex') // Dummy token for frontend flow
+      });
     }
 
     // Generate OTP and reset token
@@ -280,7 +285,7 @@ const forgotPassword = async (req, res, next) => {
 
     res.json({
       success: true,
-      message: 'Reset OTP sent to your email',
+      message: 'If this email is registered, a reset link has been sent',
       resetToken: token, // Client needs this to verify OTP
     });
   } catch (error) {
@@ -467,21 +472,20 @@ const refreshAccessToken = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Refresh token is required' });
     }
 
-    // Find the refresh token in DB
-    const storedToken = await RefreshToken.findOne({ token: refreshToken, revoked: false });
+    // Atomic lock to prevent refresh token race conditions
+    const storedToken = await RefreshToken.findOneAndUpdate(
+      { token: refreshToken, revoked: false },
+      { $set: { revoked: true } },
+      { new: false } // Get the document as it was before the update
+    );
+    
     if (!storedToken) {
       return res.status(401).json({ success: false, message: 'Invalid or expired refresh token' });
     }
 
     if (new Date() > storedToken.expiresAt) {
-      storedToken.revoked = true;
-      await storedToken.save();
       return res.status(401).json({ success: false, message: 'Refresh token has expired' });
     }
-
-    // Revoke the old token (rotation)
-    storedToken.revoked = true;
-    await storedToken.save();
 
     // Issue new access token
     const user = await User.findById(storedToken.userId);

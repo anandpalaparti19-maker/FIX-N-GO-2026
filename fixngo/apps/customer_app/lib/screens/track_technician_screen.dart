@@ -231,7 +231,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
                     child: Container(
                       margin: EdgeInsets.fromLTRB(16, 0, 16, 0),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F1A2E),
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Theme.of(context).colorScheme.outline),
                       ),

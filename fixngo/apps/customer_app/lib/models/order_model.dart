@@ -62,7 +62,7 @@ class OrderModel {
       statusHistory: (json['statusHistory'] as List?)
           ?.map((e) => StatusHistory.fromJson(e))
           .toList(),
-      completionOtp: json['completionOtp'],
+      completionOtp: json['completionOtp']?.toString(),
     );
   }
 }

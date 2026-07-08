@@ -125,7 +125,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         color: AppColors.amber,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.camera_alt_rounded, size: 16, color: AppColors.navyDeep),
+                      child: Icon(Icons.camera_alt_rounded, size: 16, color: Theme.of(context).colorScheme.surface),
                     ),
                   ),
                 ],
@@ -175,3 +175,4 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 }
+

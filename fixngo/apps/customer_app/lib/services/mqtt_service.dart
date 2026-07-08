@@ -30,15 +30,18 @@ class MqttService {
 
   MqttService._internal() {
     String host = const String.fromEnvironment('MQTT_HOST', defaultValue: '');
-    int port = 443;
+    int port = const int.fromEnvironment('MQTT_PORT', defaultValue: 9001);
     if (host.isEmpty) {
       final base = ApiConfig.baseUrl.replaceAll('https://', '').replaceAll('http://', '');
       if (base.contains(':')) {
         host = base.split(':')[0];
-        port = int.tryParse(base.split(':')[1]) ?? 9001;
+        // Don't use the API port (e.g. 5000) for MQTT, stick to 9001
+        // unless it's explicitly set via env.
       } else {
         host = base;
-        port = host.contains('cloudflare') ? 443 : 80;
+        if (host.contains('cloudflare')) {
+          port = 443;
+        }
       }
     }
     client = setupMqttClient(host, 'customer_client_${DateTime.now().millisecondsSinceEpoch}', port);

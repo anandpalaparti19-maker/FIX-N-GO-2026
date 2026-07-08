@@ -69,7 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           gradient: RadialGradient(
             center: Alignment(0, -0.3),
             radius: 1.3,
-            colors: [Color(0xFF1E293B), Theme.of(context).scaffoldBackgroundColor],
+            colors: [Theme.of(context).colorScheme.primary.withValues(alpha: 0.05), Theme.of(context).scaffoldBackgroundColor],
           ),
         ),
         child: SafeArea(
@@ -101,7 +101,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Icon(
                           Icons.person_add_rounded,
                           size: 36,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                       ),
                     ),
@@ -253,7 +253,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.brandBlue,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
                         padding: EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -265,7 +265,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2),
                             )
                           : Text(
                               'Register',
@@ -287,9 +287,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(builder: (_) => const LoginScreen()),
-                            );
+                            Navigator.of(context).pop();
                           },
                           child: Text(
                             'Log In',

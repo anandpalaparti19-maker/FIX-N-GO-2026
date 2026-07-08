@@ -67,6 +67,7 @@ const formatOrderForTech = (order, technician = null) => {
     title: order.issues[0] || 'Repair service',
     serviceType: order.issues[0] || 'Repair service',
     device: `${order.brand} ${order.model}`,
+    deviceModel: `${order.brand} ${order.model}`,
     customerName: customer?.name || 'Customer',
     customerPhone: order.customerPhone || customer?.phone || '',
     serviceAddress: order.serviceAddress,

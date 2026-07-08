@@ -23,20 +23,20 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bgDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: IndexedStack(
         index: _currentIndex,
         children: _screens,
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: AppColors.bgCard,
+          color: Theme.of(context).bottomNavigationBarTheme.backgroundColor ?? Theme.of(context).cardColor,
           border: Border(
-            top: BorderSide(color: AppColors.borderColor, width: 1),
+            top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.4),
+              color: Theme.of(context).shadowColor.withValues(alpha: Theme.of(context).brightness == Brightness.dark ? 0.4 : 0.1),
               blurRadius: 20,
               offset: const Offset(0, -4),
             ),

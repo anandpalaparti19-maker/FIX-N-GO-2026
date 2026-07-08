@@ -144,7 +144,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             label: Text('Retry', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.brandBlue,
-              foregroundColor: Colors.white,
+              foregroundColor: Theme.of(context).colorScheme.onPrimary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
           ),
@@ -286,7 +286,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                         fontSize: 14, fontWeight: FontWeight.w700)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.statusRed,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
@@ -472,6 +472,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             _buildPaymentSection(o, status, total),
             SizedBox(height: 24),
 
+            // Completion OTP Section
+            if (status.toLowerCase() == 'in_progress' && o['completionOtp'] != null)
+              Container(
+                padding: EdgeInsets.all(16),
+                margin: EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: AppColors.brandGreen.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.brandGreen),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Completion PIN:', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.brandGreen)),
+                    Text(o['completionOtp'].toString(), style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 4, color: AppColors.brandGreen)),
+                  ],
+                ),
+              ),
+
             // Action buttons
             if (isActive) ...[
               SizedBox(
@@ -490,7 +509,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           fontSize: 14, fontWeight: FontWeight.w700)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
@@ -574,7 +593,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
               ? SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                  child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary, strokeWidth: 2),
                 )
               : Icon(Icons.payment_rounded),
           label: Text(
@@ -583,7 +602,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.brandBlue,
-            foregroundColor: Colors.white,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
             padding: EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             elevation: 0,

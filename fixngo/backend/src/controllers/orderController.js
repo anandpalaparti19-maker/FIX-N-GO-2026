@@ -214,7 +214,7 @@ const createOrder = async (req, res, next) => {
     // Calculate pricing splits
     const actualBasePrice = Number(req.body.basePrice) || Number(total);
     const customerFee = actualBasePrice * 0.10;
-    const technicianCommission = actualBasePrice * 0.10;
+    const technicianCommission = actualBasePrice * 0.90;
     const customerTotal = actualBasePrice + customerFee;
 
     // Create order
@@ -407,12 +407,16 @@ const rejectOrder = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Order not found' });
     }
 
-    // Allow declining a job that is currently being broadcast (searching) or was offered directly
-    if (order.status !== 'pending' || !['searching', 'offered'].includes(order.dispatchStatus)) {
+    // Only allow declining if the job is explicitly offered or assigned to this technician
+    if (!['assigned', 'offered'].includes(order.dispatchStatus) && order.status !== 'assigned') {
       return res.status(400).json({
         success: false,
-        message: 'Order is not available for rejection',
+        message: 'Order is not explicitly offered to you for rejection',
       });
+    }
+
+    if (order.technicianUser?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, message: 'Not authorized to reject this order' });
     }
 
     pushStatusHistory(order, 'pending', `Declined by ${req.user.name}`);

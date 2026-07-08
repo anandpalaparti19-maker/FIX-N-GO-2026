@@ -77,7 +77,7 @@ describe('Payment — Create Intent', () => {
       .set('Authorization', `Bearer ${token}`)
       .send({ orderId, amount: 800 });
     // In test env without real Stripe key, expect either a Stripe error or mock response
-    expect([200, 400, 500, 503]).toContain(res.status);
+    expect([200, 201, 400, 500, 503]).toContain(res.status);
     // CRITICAL: must never silently succeed with { success: true } when Stripe fails
     if (res.status >= 400) {
       expect(res.body.success).not.toBe(true);
@@ -165,7 +165,7 @@ describe('Payment — Wallet & Withdrawals', () => {
 
   it('rejects withdrawal request without bank details', async () => {
     const res = await request(app)
-      .post('/api/payments/withdraw')
+      .post('/api/wallet/withdraw')
       .set('Authorization', `Bearer ${techToken}`)
       .send({ amount: 500 }); // missing bankAccount
     expect([400, 422]).toContain(res.status);
@@ -173,7 +173,7 @@ describe('Payment — Wallet & Withdrawals', () => {
 
   it('rejects withdrawal of more than wallet balance', async () => {
     const res = await request(app)
-      .post('/api/payments/withdraw')
+      .post('/api/wallet/withdraw')
       .set('Authorization', `Bearer ${techToken}`)
       .send({
         amount: 999999,
@@ -185,7 +185,7 @@ describe('Payment — Wallet & Withdrawals', () => {
   it('customer cannot request withdrawal', async () => {
     const { token } = await registerCustomer('nowithdraw');
     const res = await request(app)
-      .post('/api/payments/withdraw')
+      .post('/api/wallet/withdraw')
       .set('Authorization', `Bearer ${token}`)
       .send({ amount: 100, bankAccount: { accountName: 'Test', accountNumber: '123', ifscCode: 'TEST0001' } });
     expect([400, 403]).toContain(res.status);
@@ -197,14 +197,14 @@ describe('Payment — Wallet & Withdrawals', () => {
 describe('Payment — Razorpay Webhook Security', () => {
   it('rejects webhook without signature header', async () => {
     const res = await request(app)
-      .post('/api/payments/webhook/razorpay')
+      .post('/api/webhooks/razorpay')
       .send({ event: 'payment.captured', payload: {} });
     expect([400, 401]).toContain(res.status);
   });
 
   it('rejects webhook with invalid signature', async () => {
     const res = await request(app)
-      .post('/api/payments/webhook/razorpay')
+      .post('/api/webhooks/razorpay')
       .set('x-razorpay-signature', 'invalid_signature_here')
       .send({ event: 'payment.captured', payload: { payment: { entity: { order_id: 'abc' } } } });
     expect(res.status).toBe(400);

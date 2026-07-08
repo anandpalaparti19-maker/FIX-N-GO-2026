@@ -92,8 +92,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1A2A1A), Color(0xFF0F1F0F)],
+        gradient: LinearGradient(
+          colors: [Theme.of(context).colorScheme.surface, Theme.of(context).scaffoldBackgroundColor],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

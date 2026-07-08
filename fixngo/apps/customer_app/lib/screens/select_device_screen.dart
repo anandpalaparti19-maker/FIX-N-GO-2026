@@ -383,7 +383,7 @@ class _SelectDeviceScreenState extends State<SelectDeviceScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.brandBlue,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),

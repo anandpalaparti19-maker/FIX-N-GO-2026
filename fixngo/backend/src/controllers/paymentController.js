@@ -4,7 +4,7 @@ const Payment = require('../models/paymentModel');
 const Withdrawal = require('../models/withdrawalModel');
 const Order = require('../models/orderModel');
 const User = require('../models/userModel');
-const logger = require('../utils/logger');
+const { logger } = require('../utils/logger');
 
 const getCashfreeUrl = (endpoint) => {
   const isProd = process.env.CASHFREE_ENVIRONMENT === 'production';
@@ -89,6 +89,11 @@ const confirmPayment = async (req, res, next) => {
     const payment = await Payment.findById(paymentId);
     if (!payment) return res.status(404).json({ success: false, message: 'Payment record not found' });
 
+    // SECURITY PATCH: Verify cashfreeOrderId strictly matches what we generated
+    if (payment.cashfreeOrderId !== cashfreeOrderId) {
+      return res.status(400).json({ success: false, message: 'Invalid payment order ID' });
+    }
+
     const response = await axios.get(getCashfreeUrl(`/orders/${cashfreeOrderId}/payments`), { headers: getCashfreeHeaders() });
     const payments = response.data;
     
@@ -98,6 +103,11 @@ const confirmPayment = async (req, res, next) => {
     if (successfulPayment) {
       const order = await Order.findById(orderId || payment.orderId);
       
+      // SECURITY PATCH: Verify payment amount matches the order total
+      if (order && Number(successfulPayment.payment_amount) !== Number(order.customerTotal)) {
+        return res.status(400).json({ success: false, message: 'Payment amount mismatch' });
+      }
+
       payment.status = 'completed';
       await payment.save();
 
@@ -136,26 +146,6 @@ const getMonthlyEarnings = async (req, res, next) => {
   res.status(200).json({ success: true, data: [] });
 };
 
-const requestWithdrawal = async (req, res, next) => {
-  res.status(200).json({ success: true, message: 'Withdrawal requested' });
-};
-
-const getWithdrawalHistory = async (req, res, next) => {
-  res.status(200).json({ success: true, data: [] });
-};
-
-const getAllWithdrawals = async (req, res, next) => {
-  res.status(200).json({ success: true, data: [] });
-};
-
-const approveWithdrawal = async (req, res, next) => {
-  res.status(200).json({ success: true, message: 'Approved' });
-};
-
-const rejectWithdrawal = async (req, res, next) => {
-  res.status(200).json({ success: true, message: 'Rejected' });
-};
-
 const handleStripeWebhook = (req, res) => { res.status(200).json({ received: true }); };
 
 module.exports = {
@@ -164,10 +154,5 @@ module.exports = {
   getPaymentHistory,
   getTechnicianEarnings,
   getMonthlyEarnings,
-  requestWithdrawal,
-  getWithdrawalHistory,
-  getAllWithdrawals,
-  approveWithdrawal,
-  rejectWithdrawal,
   handleStripeWebhook
 };

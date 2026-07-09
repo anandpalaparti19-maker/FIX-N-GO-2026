@@ -9,15 +9,24 @@ const {
   addServiceNotes,
 } = require('../controllers/photoController');
 
+const crypto = require('crypto');
+const ALLOWED_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+
 // Configure multer for photo uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, '../../temp'));
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}_${file.originalname}`);
+    // AUDIT FIX §3.2: Never use file.originalname in path — prevents path traversal
+    const ext = path.extname(path.basename(file.originalname)).toLowerCase();
+    if (!ALLOWED_EXTS.includes(ext)) {
+      return cb(new Error('Invalid file extension'));
+    }
+    cb(null, `${crypto.randomUUID()}${ext}`);
   },
 });
+
 
 const upload = multer({
   storage: storage,

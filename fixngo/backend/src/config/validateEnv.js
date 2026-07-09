@@ -48,15 +48,17 @@ const validateEnv = () => {
 
   // ── Production-only requirements ──────────────────────────────────
   if (isProduction) {
+    // AUDIT FIX §4.4: Require Cashfree keys (actually used) instead of Stripe (dead code)
     const requiredProd = [
-      'STRIPE_SECRET_KEY',
-      'STRIPE_WEBHOOK_SECRET',
+      'CASHFREE_APP_ID',
+      'CASHFREE_SECRET_KEY',
+      'ENCRYPTION_KEY',
       'SMTP_USER',
       'SMTP_PASS',
     ];
     for (const key of requiredProd) {
       const val = process.env[key] || '';
-      if (!val || val.startsWith('sk_test_xxxx') || val.startsWith('whsec_xxxx') || val === 'your-email@gmail.com' || val === 'your-app-password') {
+      if (!val || val === 'your-email@gmail.com' || val === 'your-app-password' || val.startsWith('test_') || val.startsWith('xxxx')) {
         errors.push(`${key} is missing or set to a placeholder value`);
       }
     }

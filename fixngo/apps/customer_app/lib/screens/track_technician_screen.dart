@@ -7,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import '../services/payment_service.dart';
 import 'dart:math';
 import '../theme/app_theme.dart';
 import 'chat_screen.dart';
@@ -32,7 +32,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
   
   OrderModel? _order;
   bool _isLoading = true;
-  late Razorpay _razorpay;
+  final PaymentService _paymentService = PaymentService();
   LatLng? _technicianPosition;
   String _etaText = 'Calculating...';
 
@@ -42,10 +42,7 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     _fetchOrder();
     _setupSocket();
 
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    // Payment handled via Cashfree through PaymentService
 
 
 
@@ -70,7 +67,8 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
       _socketService.onNotification((data) {
         if (data['type'] == 'order_completed' && data['orderId'] == widget.orderId) {
           _fetchOrder();
-          _openRazorpayCheckout(data['checkoutSession']);
+          // AUDIT FIX: Use Cashfree payment flow instead of Razorpay
+          _initiatePayment(data);
         }
       });
 
@@ -141,36 +139,63 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
 
   double _toRad(double deg) => deg * pi / 180;
 
-  void _openRazorpayCheckout(Map<String, dynamic> session) {
-    var options = {
-      'key': const String.fromEnvironment('RAZORPAY_KEY', defaultValue: 'rzp_test_REPLACE_WITH_YOUR_KEY'),
-      'amount': session['amount'], // in paise
-      'name': 'Fix-N-Go',
-      'order_id': session['id'],
-      'description': 'Repair Service Payment',
-      'prefill': {
-        'contact': '',
-        'email': 'customer@example.com'
-      }
-    };
+  /// Initiate Cashfree payment when order is completed
+  Future<void> _initiatePayment(Map<String, dynamic> data) async {
     try {
-      _razorpay.open(options);
+      final orderId = data['orderId'];
+      final amount = data['customerTotal'] ?? _order?.customerTotal ?? _order?.total;
+
+      if (orderId == null || amount == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Payment info missing. Please try from order details.')),
+          );
+        }
+        return;
+      }
+
+      // Create Cashfree payment intent (positional params)
+      final intentResult = await _paymentService.createPaymentIntent(
+        orderId,
+        (amount as num).toDouble(),
+      );
+
+      if (intentResult['success'] == true) {
+        final paymentData = intentResult['data'];
+        // Confirm via Cashfree
+        final confirmResult = await _paymentService.confirmPayment(
+          cashfreeOrderId: paymentData['cashfreeOrderId'],
+          paymentId: paymentData['paymentId'],
+          orderId: orderId,
+        );
+
+        if (mounted) {
+          if (confirmResult['success'] == true) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Payment Successful!')),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(confirmResult['message'] ?? 'Payment failed. Please try again.')),
+            );
+          }
+          _fetchOrder();
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(intentResult['message'] ?? 'Could not start payment. Try from order details.')),
+          );
+        }
+      }
     } catch (e) {
-      debugPrint('Error: $e');
+      debugPrint('Payment error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Payment error. Please try from order details.')),
+        );
+      }
     }
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment Successful!')));
-    _fetchOrder();
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment Failed. Please try again.')));
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('External Wallet Selected: ${response.walletName}')));
   }
 
   @override
@@ -179,7 +204,6 @@ class _TrackTechnicianScreenState extends State<TrackTechnicianScreen>
     _socketService.off('technician-location');
     _socketService.off('notification');
     _pulseController.dispose();
-    _razorpay.clear();
     super.dispose();
   }
 

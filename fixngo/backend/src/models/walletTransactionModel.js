@@ -29,7 +29,7 @@ const walletTransactionSchema = mongoose.Schema(
       type: String 
     },
     referenceId: { 
-      type: String // For payout IDs or Razorpay order IDs
+      type: String // For payout IDs or Cashfree order IDs
     }
   },
   { timestamps: true }

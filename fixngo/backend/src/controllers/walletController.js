@@ -4,7 +4,28 @@ const WalletTransaction = require('../models/walletTransactionModel');
 const mongoose = require('mongoose');
 const cashfreePayout = require('../utils/cashfreePayout');
 
-const PAYOUTS_ENABLED = process.env.CASHFREE_PAYOUTS_ENABLED === 'true' || process.env.RAZORPAY_PAYOUTS_ENABLED === 'true';
+const PAYOUTS_ENABLED = process.env.CASHFREE_PAYOUTS_ENABLED === 'true';
+
+// AUDIT FIX §4.1: Add withdrawal history endpoint (was missing, Flutter calls GET /api/wallet/withdraw/history)
+const getWithdrawalHistory = async (req, res, next) => {
+  try {
+    if (req.user.role !== 'technician') {
+      return res.status(403).json({ success: false, message: 'Only technicians can view withdrawal history' });
+    }
+
+    const withdrawals = await Withdrawal.find({ technician: req.user._id })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    res.json({
+      success: true,
+      count: withdrawals.length,
+      data: withdrawals,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 /**
  * Reverse a withdrawal debit when the downstream payout gateway fails.
@@ -148,7 +169,8 @@ const requestWithdrawal = async (req, res, next) => {
       throw err;
     }
 
-    const payoutResult = await submitPayout(withdrawal[0], user, amount);
+    // AUDIT FIX §4.12: Use parsedAmount (validated) instead of raw amount
+    const payoutResult = await submitPayout(withdrawal[0], user, parsedAmount);
 
     if (payoutResult.success === false) {
       return res.status(502).json({
@@ -172,4 +194,4 @@ const requestWithdrawal = async (req, res, next) => {
   }
 };
 
-module.exports = { requestWithdrawal };
+module.exports = { requestWithdrawal, getWithdrawalHistory };

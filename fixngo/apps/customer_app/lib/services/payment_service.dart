@@ -38,19 +38,16 @@ class PaymentService {
     return (res['data'] as Map<String, dynamic>?) ?? {};
   }
 
-  /// Confirm cash-on-delivery payment (uses mock prefix)
+  /// Confirm cash-on-delivery payment via dedicated COD endpoint
+  /// AUDIT FIX M-8: No longer fabricates a fake cashfreeOrderId
   Future<Map<String, dynamic>> confirmCashPayment({
-    required String paymentId,
     required String orderId,
   }) async {
     await _ensureToken();
-    final mockId = 'cf_test_cash_${DateTime.now().millisecondsSinceEpoch}';
-    final res = await _api.post('/api/payments/confirm', {
-      'cashfreeOrderId': mockId,
-      'paymentId': paymentId,
+    final res = await _api.post('/api/payments/confirm-cash', {
       'orderId': orderId,
     });
-    return (res['data'] as Map<String, dynamic>?) ?? {};
+    return res;
   }
 
   /// Get payment history for the logged-in customer
@@ -80,7 +77,7 @@ class PaymentService {
     required Map<String, dynamic> bankAccount,
   }) async {
     await _ensureToken();
-    final res = await _api.post('/api/payments/withdraw', {
+    final res = await _api.post('/api/wallet/withdraw', {
       'amount': amount,
       'bankAccount': bankAccount,
     });
@@ -90,7 +87,7 @@ class PaymentService {
   /// Get withdrawal history (technician only)
   Future<List<dynamic>> getWithdrawalHistory() async {
     await _ensureToken();
-    final res = await _api.get('/api/payments/withdraw/history');
+    final res = await _api.get('/api/wallet/withdraw/history');
     return (res['data'] as List<dynamic>?) ?? [];
   }
 

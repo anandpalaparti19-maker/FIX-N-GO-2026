@@ -4,6 +4,7 @@ const Rating = require('../models/ratingModel');
 const fs = require('fs');
 const path = require('path');
 const { logger } = require('../utils/logger');
+const { encrypt, mask } = require('../utils/encryption');
 
 const uploadDir = path.join(__dirname, '../../uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -98,7 +99,8 @@ const updateTechnicianProfile = async (req, res, next) => {
       };
 
       const { aadharNumber, aadharFront, aadharBack } = documents;
-      if (aadharNumber !== undefined) technician.technicianMeta.documents.aadharNumber = aadharNumber;
+      // AUDIT FIX §4.2: Encrypt Aadhaar number before storing
+      if (aadharNumber !== undefined) technician.technicianMeta.documents.aadharNumber = encrypt(aadharNumber);
       if (aadharFront !== undefined) technician.technicianMeta.documents.aadharFront = aadharFront;
       if (aadharBack !== undefined) technician.technicianMeta.documents.aadharBack = aadharBack;
 
@@ -112,9 +114,14 @@ const updateTechnicianProfile = async (req, res, next) => {
     }
 
     if (bankDetails) {
+      // AUDIT FIX §4.2: Encrypt bank account number before storing
+      const encryptedBankDetails = { ...bankDetails };
+      if (encryptedBankDetails.accountNumber) {
+        encryptedBankDetails.accountNumber = encrypt(encryptedBankDetails.accountNumber);
+      }
       technician.technicianMeta.bankDetails = {
         ...technician.technicianMeta.bankDetails,
-        ...bankDetails,
+        ...encryptedBankDetails,
       };
     }
 
@@ -131,7 +138,18 @@ const updateTechnicianProfile = async (req, res, next) => {
         city: technician.city,
         address: technician.address,
         profilePhoto: technician.profilePhoto || '',
-        technicianMeta: technician.technicianMeta,
+        technicianMeta: {
+          ...technician.technicianMeta.toObject ? technician.technicianMeta.toObject() : technician.technicianMeta,
+          documents: {
+            ...(technician.technicianMeta.documents || {}),
+            // AUDIT FIX §4.2: Mask sensitive data in API response
+            aadharNumber: mask(technician.technicianMeta.documents?.aadharNumber, 4),
+          },
+          bankDetails: {
+            ...(technician.technicianMeta.bankDetails || {}),
+            accountNumber: mask(technician.technicianMeta.bankDetails?.accountNumber, 4),
+          },
+        },
       },
     });
   } catch (error) {
@@ -155,7 +173,8 @@ const updateTechnicianPhoto = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Technician not found' });
     }
 
-    const fileName = `profile_${req.user._id}_${Date.now()}_${req.file.originalname}`;
+    // AUDIT FIX §3.2: Use multer-generated safe filename instead of originalname
+    const fileName = `profile_${req.user._id}_${Date.now()}_${path.basename(req.file.filename)}`;
     const filePath = path.join(uploadDir, fileName);
     // QA FIX: copyFileSync + unlinkSync prevents EXDEV errors on cross-device file moves
     fs.copyFileSync(req.file.path, filePath);
@@ -201,8 +220,9 @@ const updateTechnicianKyc = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Aadhaar number, front image, and back image are required' });
     }
 
-    const frontName = `aadhaar_front_${req.user._id}_${Date.now()}_${frontFile.originalname}`;
-    const backName = `aadhaar_back_${req.user._id}_${Date.now()}_${backFile.originalname}`;
+    // AUDIT FIX §3.2: Use multer-generated safe filenames instead of originalname
+    const frontName = `aadhaar_front_${req.user._id}_${Date.now()}_${path.basename(frontFile.filename)}`;
+    const backName = `aadhaar_back_${req.user._id}_${Date.now()}_${path.basename(backFile.filename)}`;
     const frontPath = path.join(uploadDir, frontName);
     const backPath = path.join(uploadDir, backName);
 
@@ -214,10 +234,11 @@ const updateTechnicianKyc = async (req, res, next) => {
 
     technician.technicianMeta.documents = {
       ...(technician.technicianMeta.documents || {}),
-      aadharNumber,
+      // AUDIT FIX §4.2: Encrypt Aadhaar number before storing
+      aadharNumber: encrypt(aadharNumber),
       aadharFront: `/uploads/${frontName}`,
       aadharBack: `/uploads/${backName}`,
-      aadhar: aadharNumber,
+      aadhar: encrypt(aadharNumber),
     };
     technician.technicianMeta.verification = {
       ...(technician.technicianMeta.verification || {}),
@@ -231,7 +252,12 @@ const updateTechnicianKyc = async (req, res, next) => {
       success: true,
       message: 'Aadhaar KYC updated successfully',
       data: {
-        documents: technician.technicianMeta.documents,
+        documents: {
+          ...(technician.technicianMeta.documents || {}),
+          // AUDIT FIX §4.2: Mask Aadhaar in response
+          aadharNumber: mask(technician.technicianMeta.documents?.aadharNumber, 4),
+          aadhar: mask(technician.technicianMeta.documents?.aadhar, 4),
+        },
         verification: technician.technicianMeta.verification,
       },
     });

@@ -314,14 +314,9 @@ const acceptOrder = async (req, res, next) => {
       return res.status(403).json({ success: false, message: 'Only technicians can accept orders' });
     }
 
-    // Prevent accepting if technician already has an active order
-    const activeJob = await Order.findOne({
-      technicianUser: req.user._id,
-      status: { $in: ['assigned', 'in_progress'] },
-    });
-    if (activeJob) {
-      return res.status(400).json({ success: false, message: 'You already have an active job. Complete or cancel it first.' });
-    }
+    // AUDIT FIX M-9: Removed racy pre-check query.
+    // The findOneAndUpdate below is already atomic (first-accept-wins).
+    // We check for an active job AFTER winning the race, and roll back if needed.
 
     // Atomic update: only succeed if status is still 'pending' AND dispatch is still 'searching'
     const order = await Order.findOneAndUpdate(
@@ -345,6 +340,20 @@ const acceptOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Job is no longer available or already accepted by someone else.' });
     }
 
+    // Now check for existing active job (after winning the race — no window for double-accept)
+    const activeJob = await Order.findOne({
+      technicianUser: req.user._id,
+      status: { $in: ['assigned', 'in_progress'] },
+      _id: { $ne: order._id }, // exclude the order we just accepted
+    });
+    if (activeJob) {
+      // Roll back: revert this order to pending so another tech can take it
+      await Order.findByIdAndUpdate(order._id, {
+        $set: { status: 'pending', dispatchStatus: 'searching', technicianUser: null, technician: null },
+      });
+      return res.status(400).json({ success: false, message: 'You already have an active job. Complete or cancel it first.' });
+    }
+
     // Stop the dispatch loop now that a technician accepted
     clearDispatchTimer(order._id);
 
@@ -361,12 +370,7 @@ const acceptOrder = async (req, res, next) => {
     pushStatusHistory(order, 'assigned', `Accepted by ${req.user.name}`);
     await order.save();
 
-    // Update technician's job count
-    await User.findByIdAndUpdate(
-      req.user._id,
-      { $inc: { 'technicianMeta.jobsDone': 1 } },
-      { new: true }
-    );
+    // AUDIT FIX §4.6: jobsDone is now incremented in completeOrder, not here
 
     // Notify customer in real-time
     emitOrderUpdate(order._id.toString(), {
@@ -552,44 +556,26 @@ const completeOrder = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid OTP' });
     }
 
-    // Create Razorpay Order
-    const razorpay = require('../utils/razorpay');
-
-    let rpOrder;
-    try {
-      if (process.env.RAZORPAY_KEY_ID === 'rzp_test_dummy_key_id' || !process.env.RAZORPAY_KEY_ID) {
-        rpOrder = { id: `dummy_order_${Date.now()}` };
-      } else {
-        rpOrder = await razorpay.orders.create({
-          amount: order.customerTotal * 100, // paise
-          currency: 'INR',
-          receipt: `receipt_order_${order._id}`,
-        });
-      }
-    } catch (rpErr) {
-      console.error('Razorpay Error:', rpErr);
-      rpOrder = { id: `failed_order_${Date.now()}` };
-    }
-
     order.status = 'completed';
     order.completedAt = new Date();
-    order.paymentGatewayOrderId = rpOrder.id;
     pushStatusHistory(order, 'completed', 'Job marked complete via OTP');
 
     await order.save();
 
-    // Notify customer via MQTT to trigger payment checkout
+    // AUDIT FIX §4.6: Increment jobsDone at completion, not at acceptance
+    await User.findByIdAndUpdate(
+      req.user._id,
+      { $inc: { 'technicianMeta.jobsDone': 1 } },
+      { new: true }
+    );
+
+    // Notify customer via MQTT to trigger Cashfree payment checkout
     emitNotification(order.user.toString(), {
       type: 'order_completed',
       title: 'Service Completed!',
       message: 'Your service is complete. Please complete the payment.',
       orderId: order._id,
-      checkoutSession: {
-        id: rpOrder.id,
-        amount: rpOrder.amount,
-        currency: rpOrder.currency,
-        customerTotal: order.customerTotal,
-      },
+      customerTotal: order.customerTotal,
     });
 
     res.json({
@@ -597,11 +583,7 @@ const completeOrder = async (req, res, next) => {
       message: 'Order completed, awaiting payment',
       data: {
         order: formatOrderForTech(order, req.user),
-        checkoutSession: {
-          id: rpOrder.id,
-          amount: rpOrder.amount,
-          currency: rpOrder.currency,
-        },
+        customerTotal: order.customerTotal,
       },
     });
   } catch (error) {

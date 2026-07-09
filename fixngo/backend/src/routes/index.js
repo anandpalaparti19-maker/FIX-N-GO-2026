@@ -14,7 +14,7 @@ const locationRoutes = require('./locationRoutes');
 const photoRoutes = require('./photoRoutes');
 const notificationRoutes = require('./notificationRoutes');
 const supportRoutes = require('./supportRoutes');
-const webhookRoutes = require('./webhookRoutes');
+
 const walletRoutes = require('./walletRoutes');
 
 const rateLimit = require('express-rate-limit');
@@ -56,7 +56,7 @@ router.use('/api/location', locationRoutes);
 router.use('/api/photos', photoRoutes);
 router.use('/api/notifications', notificationRoutes);
 router.use('/api/support', supportRoutes);
-router.use('/api/webhooks', webhookRoutes);
+
 router.use('/api/wallet', walletRoutes);
 
 router.use('/admin', express.static(path.join(__dirname, '../../../apps/admin_panel/public')));

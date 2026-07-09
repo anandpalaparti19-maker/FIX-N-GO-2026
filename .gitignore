@@ -56,3 +56,11 @@ apps/technician_app/android/app/google-services.json
 fixngo/backend/cloudflared.exe
 fixngo/backend/uploads/
 *.exe
+
+# AUDIT FIX §11: Repo cleanup — prevent stale code and build artifacts
+scratch/
+lib_backup_*/
+build_locked_*/
+*.backup
+cloudflared.exe
+fixngo/scratch/

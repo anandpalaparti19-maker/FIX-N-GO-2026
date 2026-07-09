@@ -1,7 +1,7 @@
 /**
  * Payment Test Suite
- * Tests: Stripe payment intent creation, confirmation guards,
- * idempotency, amount mismatch rejection, and Razorpay webhook signature.
+ * Tests: Cashfree payment intent creation, confirmation guards,
+ * idempotency, amount mismatch rejection, and wallet operations.
  */
 require('./setup');
 const request = require('supertest');
@@ -70,15 +70,15 @@ describe('Payment — Create Intent', () => {
     expect([400, 422]).toContain(res.status);
   });
 
-  it('returns an error (not success) when Stripe key is invalid/test', async () => {
+  it('returns an error (not success) when Cashfree key is invalid/test', async () => {
     if (!orderId) return; // Skip if order creation failed
     const res = await request(app)
       .post('/api/payments/create-intent')
       .set('Authorization', `Bearer ${token}`)
       .send({ orderId, amount: 800 });
-    // In test env without real Stripe key, expect either a Stripe error or mock response
+    // In test env without real Cashfree key, expect either a Cashfree error or mock response
     expect([200, 201, 400, 500, 503]).toContain(res.status);
-    // CRITICAL: must never silently succeed with { success: true } when Stripe fails
+    // CRITICAL: must never silently succeed with { success: true } when Cashfree fails
     if (res.status >= 400) {
       expect(res.body.success).not.toBe(true);
     }
@@ -192,21 +192,3 @@ describe('Payment — Wallet & Withdrawals', () => {
   });
 });
 
-// ── Razorpay Webhook ───────────────────────────────────────────────────────────
-
-describe('Payment — Razorpay Webhook Security', () => {
-  it('rejects webhook without signature header', async () => {
-    const res = await request(app)
-      .post('/api/webhooks/razorpay')
-      .send({ event: 'payment.captured', payload: {} });
-    expect([400, 401]).toContain(res.status);
-  });
-
-  it('rejects webhook with invalid signature', async () => {
-    const res = await request(app)
-      .post('/api/webhooks/razorpay')
-      .set('x-razorpay-signature', 'invalid_signature_here')
-      .send({ event: 'payment.captured', payload: { payment: { entity: { order_id: 'abc' } } } });
-    expect(res.status).toBe(400);
-  });
-});

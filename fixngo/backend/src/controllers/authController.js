@@ -53,6 +53,11 @@ const registerUser = async (req, res, next) => {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
+    // AUDIT FIX §9: Enforce minimum password length on registration (was only on reset)
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
     const emailNorm = normalizeEmail(email);
     const allowedRoles = ['customer', 'technician'];
     const userRole = allowedRoles.includes(role) ? role : 'customer';
@@ -374,7 +379,8 @@ const sendPhoneOtp = async (req, res, next) => {
       return res.status(500).json({ success: false, message: 'Failed to send OTP' });
     }
 
-    logger.info(`OTP sent to ${phone}: ${otp}`);
+    // AUDIT FIX §4.5: Never log OTP value — mask phone number too
+    logger.info(`OTP sent to ${'*'.repeat(Math.max(0, phone.length - 4))}${phone.slice(-4)}`);
 
     res.json({
       success: true,
@@ -426,7 +432,9 @@ const verifyPhoneOtp = async (req, res, next) => {
       return res.status(409).json({ success: false, message: 'Email already registered' });
     }
 
-    const existingPhone = await User.findOne({ phone });
+    // AUDIT FIX §10: Normalize phone number before duplicate check
+    const normalizedPhone = phone.replace(/[\s\-()]/g, '').replace(/^(\+91|91)/, '+91');
+    const existingPhone = await User.findOne({ phone: normalizedPhone });
     if (existingPhone) {
       return res.status(409).json({ success: false, message: 'Phone already registered' });
     }

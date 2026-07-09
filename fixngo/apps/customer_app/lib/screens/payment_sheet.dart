@@ -113,7 +113,6 @@ class _PaymentSheetState extends State<_PaymentSheet> with SingleTickerProviderS
       setState(() => _state = _PayState.loading);
       try {
         await _paymentService.confirmCashPayment(
-          paymentId: widget.paymentId,
           orderId: widget.orderId,
         );
         setState(() => _state = _PayState.success);
